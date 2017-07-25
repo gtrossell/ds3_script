@@ -16,13 +16,14 @@ import java.nio.file.Files
 import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
 
+/** Represents a BlackPearl Object, extends Ds3Object */
 class BpObject extends Ds3Object {
-  GetBucketResponse bucket
+  BpBucket bucket
   Ds3ClientImpl client
   User owner
   def metadata
 
-  def BpObject(Contents contents, GetBucketResponse bucket, Ds3ClientImpl client) {
+  def BpObject(Contents contents, BpBucket bucket, Ds3ClientImpl client) {
     this.name = contents.getKey()
     this.size = contents.getSize()
     this.owner = contents.getOwner()
@@ -30,7 +31,10 @@ class BpObject extends Ds3Object {
     this.client = client
   }
 
-  /** Deletes the object from the BP */
+  /** 
+   * Deletes the object from the BP 
+   * @return true if object was deleted 
+   */
   def delete() {
     try {
       def deleteRequest = new DeleteObjectRequest(bucket.name, this.name)
@@ -42,12 +46,15 @@ class BpObject extends Ds3Object {
     return true
   }
 
-  /** Write to given directory */
-  def writeTo(path) {
+  /** 
+   * Write object to given directory.
+   * It will create the directory path if it does not exist
+   * @param path  directory to write object to
+   * @return true if the write was successful
+   */
+  def writeTo(Path path) {
     try {
-      if (!Files.exists(path)) {
-        Files.createDirectory(path)
-      }
+      if (!Files.exists(path)) Files.createDirectory(path)
       
       /* convert BpObject to Ds3Object */
       def objectList = [new Ds3Object(this.getName())]
@@ -81,7 +88,7 @@ class BpObject extends Ds3Object {
     return true
   }
 
-  /** return map of the metadata */
+  /** @return map of the metadata */
   def getMetadata() {
      metadata = [
                   name:       this.name, 

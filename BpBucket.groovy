@@ -6,6 +6,7 @@ import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
 
+/** Represents a BlackPearl bucket, extended from GetBucketResponse */
 class BpBucket extends GetBucketResponse {
   Ds3ClientImpl client
   String name
@@ -19,27 +20,35 @@ class BpBucket extends GetBucketResponse {
   }
 
   /** 
-   * returns list of objects in bucket if no arguments are given
-   * returns a single object if one name is given
-   * returns a list of all objects listed
+   * @param objectNames objects names to return
+   * @return list all objects in bucket or objects with given names 
    */
   def objects(String ...objectNames) {
     def allObjects = this.getListBucketResult().getObjects()
-    def result
+    def result = []
     if (objectNames.length == 0) {
       result = contentsToBpObjects(allObjects)
-    } else if (objectNames.length == 1) {
-      this.getListBucketResult().getObjects().each { contents ->
-        if (contents.getKey() == objectNames[0]) {
-          result = contentsToBpObjects(contents)[0]
-        }
-      }
     } else {
       def wantedObjects = []
       this.getListBucketResult().getObjects().each { contents -> 
         if (objectNames.contains(contents.getKey())) wantedObjects << contents
       }
       result = contentsToBpObjects(wantedObjects)
+    }
+    return result
+  }
+
+  /** 
+   * @param objectName the name of the object to return
+   * @return BpObject with given name 
+   */
+  def object(String objectName) {
+    def allObjects = this.getListBucketResult().getObjects()
+    def result = null
+    this.getListBucketResult().getObjects().each { contents ->
+      if (contents.getKey() == objectName) {
+        result = contentsToBpObjects(contents)[0]
+      }
     }
     return result
   }
