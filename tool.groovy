@@ -18,7 +18,6 @@ import jline.console.ConsoleReader
 import jline.console.completer.FileNameCompleter
 
 import spectra.*
-import static spectra.ClientCommands.*
 
 class Tool extends Script {
   def run() {
