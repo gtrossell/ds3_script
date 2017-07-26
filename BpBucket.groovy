@@ -19,23 +19,30 @@ class BpBucket extends GetBucketResponse {
     this.name = response.getListBucketResult().getName()
   }
 
+  /**
+   * Creates object in the bucket using the given file
+   * @param objectName  name for the new object
+   * @param filePath    Location of the file to upload
+   * @return  BpObject of the newly uploaded object
+   */
+  def createObject(String objectName) {
+
+  }
+
   /** 
    * @param objectNames objects names to return
    * @return list all objects in bucket or objects with given names 
    */
   def objects(String ...objectNames) {
-    def allObjects = this.getListBucketResult().getObjects()
-    def result = []
+    def wantedObjects = []
     if (objectNames.length == 0) {
-      result = contentsToBpObjects(allObjects)
+      wantedObjects = this.listBucketResult.objects
     } else {
-      def wantedObjects = []
-      this.getListBucketResult().getObjects().each { contents -> 
+      this.listBucketResult.objects.each { contents -> 
         if (objectNames.contains(contents.getKey())) wantedObjects << contents
       }
-      result = contentsToBpObjects(wantedObjects)
     }
-    return result
+    return contentsToBpObjects(wantedObjects)
   }
 
   /** 
@@ -43,14 +50,8 @@ class BpBucket extends GetBucketResponse {
    * @return BpObject with given name 
    */
   def object(String objectName) {
-    def allObjects = this.getListBucketResult().getObjects()
-    def result = null
-    this.getListBucketResult().getObjects().each { contents ->
-      if (contents.getKey() == objectName) {
-        result = contentsToBpObjects(contents)[0]
-      }
-    }
-    return result
+    def objs = objects(objectName)
+    return (objs.size() == 1 ? objs[0] : null)
   }
 
   /** Converts an array of Contents objects to ds3Objects */
