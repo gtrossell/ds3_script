@@ -18,18 +18,23 @@ import java.nio.file.Files
 class BpBucket extends GetBucketResponse {
   Ds3ClientImpl client
   String name
+  ListBucketResult listBucketResult
 
   def BpBucket(GetBucketResponse response, Ds3ClientImpl client) {
     super(response.getListBucketResult(), 
           response.getChecksum(), 
           response.getChecksumType())
+    this.listBucketResult = response.getListBucketResult()
     this.client = client
     this.name = response.getListBucketResult().getName()
   }
 
   /** @return the current version of this bucket. Doesn't change this object */
   def reload() {
-    client.bucket(this.name)
+    // TODO: Check with Ryan to see if this is OK. Checksums might be an issue
+    def tmpBucket = client.bucket(this.name)
+    this.listBucketResult = tmpBucket.getListBucketResult()
+    this
   }
 
   /** 
@@ -54,7 +59,7 @@ class BpBucket extends GetBucketResponse {
   def putBulk(Path ...paths) {
     // TODO: add true logging
     def helper = Ds3ClientHelpers.wrap(this.client)
-    def objects = [:] // key: directory val: array of Ds3Objects
+    def objects = [:] /* key: directory val: array of Ds3Objects */
     paths.each { path ->
       if (!Files.exists(path)) {
         println "WARNING: '$path' does not exist, skipping"

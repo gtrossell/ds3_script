@@ -26,4 +26,8 @@ class BpClient extends Ds3ClientImpl {
     bucket(name)
   }
 
+  def bucketNames() {
+
+  }
+
 }

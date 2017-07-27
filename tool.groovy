@@ -22,7 +22,7 @@ import spectra.*
 class Tool extends Script {
   def run() {
     def shell = new GroovyShell(this.class.classLoader, buildBinding(), buildConfig())
-
+    // TODO: add autocomplete for file paths
     try {
       def console = new ConsoleReader()
       console.setPrompt(Globals.PROMPT)
