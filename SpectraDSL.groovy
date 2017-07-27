@@ -39,7 +39,7 @@ abstract class SpectraDSL extends Script {
                       String secretKey="", Boolean https=false) {
     // TODO: add real logging
     def env = System.getenv()
-    // endpoint = endpoint ?: env['DS3_ENDPOINT']
+    endpoint = endpoint ?: env['DS3_ENDPOINT']
     accessId = accessId ?: env['DS3_ACCESS_KEY']
     secretKey = secretKey ?: env['DS3_SECRET_KEY']
     if (!endpoint || !accessId || !secretKey) {
