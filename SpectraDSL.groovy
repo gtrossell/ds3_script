@@ -32,10 +32,10 @@ abstract class SpectraDSL extends Script {
 
   def SpectraDSL() {
     /** gets bucket */
-    Ds3ClientImpl.metaClass.bucket { String bucketName ->
-      def response = delegate.getBucket(new GetBucketRequest(bucketName))
-      return new BpBucket(response, delegate)
-    }
+    // Ds3ClientImpl.metaClass.bucket { String bucketName ->
+    //   def response = delegate.getBucket(new GetBucketRequest(bucketName))
+    //   return new BpBucket(response, delegate)
+    // }
 
   }
 
@@ -43,7 +43,7 @@ abstract class SpectraDSL extends Script {
   def createBpClient(String endpoint, String accessid, String secretKey, Boolean https=false) {
     // TODO: allow no arguments and use the enviroment variables
     def cred = new Credentials(accessid, secretKey)
-    Ds3ClientBuilder.create(endpoint, cred).withHttps(https).build()
+    new BpClient(Ds3ClientBuilder.create(endpoint, cred).withHttps(https).build())
   }
 
   /** Creates directory or file path from string  */

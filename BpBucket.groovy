@@ -30,6 +30,10 @@ class BpBucket extends GetBucketResponse {
     // TODO: reloads the bucket to get any object changes
   }
 
+  def delete() {
+    
+  }
+
   /**
    * Puts each file and file in each directory given
    */
