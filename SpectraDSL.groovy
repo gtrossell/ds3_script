@@ -35,9 +35,19 @@ abstract class SpectraDSL extends Script {
   }
 
   /** Returns a BP client */
-  def createBpClient(String endpoint, String accessid, String secretKey, Boolean https=false) {
-    // TODO: allow no arguments and use the enviroment variables
-    def cred = new Credentials(accessid, secretKey)
+  def createBpClient(String endpoint="", String accessId="", 
+                      String secretKey="", Boolean https=false) {
+    // TODO: add real logging
+    def env = System.getenv()
+    endpoint = endpoint ?: env['DS3_ENDPOINT']
+    accessId = accessId ?: env['DS3_ACCESS_KEY']
+    secretKey = secretKey ?: env['DS3_SECRET_KEY']
+    if (!endpoint || !accessId || !secretKey) {
+      println "[Error] Endpoint, Access ID, and/or Sectret Key is not set!\n" +
+              "\tTry setting the enviroment or method variable(s)"
+    }
+    
+    def cred = new Credentials(accessId, secretKey)
     new BpClient(Ds3ClientBuilder.create(endpoint, cred).withHttps(https).build())
   }
 
