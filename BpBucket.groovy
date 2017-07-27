@@ -1,17 +1,10 @@
 package spectra
 
-import com.spectralogic.ds3client.helpers.Ds3ClientHelpers;
-import com.spectralogic.ds3client.helpers.FileObjectPutter;
 import com.spectralogic.ds3client.models.ListBucketResult
 import com.spectralogic.ds3client.models.ChecksumType
-import com.spectralogic.ds3client.models.bulk.Ds3Object
 import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
-
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.Files
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
 class BpBucket extends GetBucketResponse {
@@ -26,66 +19,14 @@ class BpBucket extends GetBucketResponse {
     this.name = response.getListBucketResult().getName()
   }
 
-  def reload() {
-    // TODO: reloads the bucket to get any object changes
-  }
-
   /**
-   * Puts each file and file in each directory given
-   */
-  def putBulk(Path ...paths) {
-    // TODO: add true logging
-    def helper = Ds3ClientHelpers.wrap(this.client)
-    def objects = [:] // key: directory val: array of Ds3Objects
-    paths.each { path ->
-      if (!Files.exists(path)) {
-        println "WARNING: '$path' does not exist, skipping"
-      } else if (Files.isDirectory(path)) {
-        def pathStr = path.toString()
-        if (objects[pathStr] == null) objects[pathStr] = []
-        objects[pathStr] << helper.listObjectsForDirectory(path)
-      } else if (Files.isRegularFile(path)) {
-        def pathStr = path.getParent().toString()
-        if (objects[pathStr] == null) objects[pathStr] = []
-        objects[pathStr] << new Ds3Object((String) path.getFileName(), Files.size(path))
-      } else {
-        println "WARNING: '$path' is not a directory or regular file, skipping"
-      }
-    }
-    objects.each { dir, objs ->
-      def job = helper.startWriteJob(this.name, objs.flatten())
-      job.transfer(new FileObjectPutter(Paths.get(dir)))
-    }
-  }
-
-  def putBulk(String ...pathsStr) {
-    def paths = []
-    pathsStr.each { pathStr ->
-      paths << Paths.get(pathStr)
-    }
-    putBulk(*paths)
-  }
-
-  /**
-   * Same as putBulk with one file, but allows user to name the name the object 
-   * that is created. Also, it returns the created object
+   * Creates object in the bucket using the given file
    * @param objectName  name for the new object
    * @param filePath    Location of the file to upload
    * @return  BpObject of the newly uploaded object
    */
-  def putObject(String objectName, Path path) {
-    // TODO: objectName can also include a path to be made in the bucket
-    // TODO: add true logging
-    // if (!Files.exists(path)) {
-    //   println "ERROR: File does not exist"
-    //   return null
-    // } else if (Files.isDirectory(path)) {
-    //   println "ERROR: Path given is a directory"
-    //   return null
-    // }
+  def createObject(String objectName) {
 
-    // def job = helper.startWriteJob(this.name, new Ds3Object((String) path.getFileName(), Files.size(path)))
-    // job.transfer(new FileObjectPutter(path.getParent()))
   }
 
   /** 
@@ -93,7 +34,6 @@ class BpBucket extends GetBucketResponse {
    * @return list all objects in bucket or objects with given names 
    */
   def objects(String ...objectNames) {
-    // TODO: if object cannot be found, reload the bucket
     def wantedObjects = []
     if (objectNames.length == 0) {
       wantedObjects = this.listBucketResult.objects

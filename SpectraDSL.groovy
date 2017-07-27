@@ -41,13 +41,12 @@ abstract class SpectraDSL extends Script {
 
   /** Returns a BP client */
   def createBpClient(String endpoint, String accessid, String secretKey, Boolean https=false) {
-    // TODO: allow no arguments and use the enviroment variables
     def cred = new Credentials(accessid, secretKey)
     Ds3ClientBuilder.create(endpoint, cred).withHttps(https).build()
   }
 
-  /** Creates directory or file path from string  */
-  def Path filePath(String dirName) {
+  /** Creates directory path from string  */
+  def Path dirPath(String dirName) {
     Paths.get(dirName)
   }
 

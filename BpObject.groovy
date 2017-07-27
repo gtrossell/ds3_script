@@ -36,7 +36,6 @@ class BpObject extends Ds3Object {
    * @return true if object was deleted 
    */
   def delete() {
-    // TODO: reload bucket after delete?
     try {
       def deleteRequest = new DeleteObjectRequest(bucket.name, this.name)
       def deleteResponse = client.deleteObject(deleteRequest)
@@ -54,7 +53,6 @@ class BpObject extends Ds3Object {
    * @return true if the write was successful
    */
   def writeTo(Path path) {
-    // TODO: write to a file or directory
     try {
       if (!Files.exists(path)) Files.createDirectory(path)
       
