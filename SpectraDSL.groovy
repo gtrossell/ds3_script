@@ -39,12 +39,13 @@ abstract class SpectraDSL extends Script {
                       String secretKey="", Boolean https=false) {
     // TODO: add real logging
     def env = System.getenv()
-    endpoint = endpoint ?: env['DS3_ENDPOINT']
+    // endpoint = endpoint ?: env['DS3_ENDPOINT']
     accessId = accessId ?: env['DS3_ACCESS_KEY']
     secretKey = secretKey ?: env['DS3_SECRET_KEY']
     if (!endpoint || !accessId || !secretKey) {
       println "[Error] Endpoint, Access ID, and/or Sectret Key is not set!\n" +
               "\tTry setting the enviroment or method variable(s)"
+      return null
     }
     
     def cred = new Credentials(accessId, secretKey)
