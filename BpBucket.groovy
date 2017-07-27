@@ -7,6 +7,7 @@ import com.spectralogic.ds3client.models.ChecksumType
 import com.spectralogic.ds3client.models.bulk.Ds3Object
 import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
 import com.spectralogic.ds3client.commands.GetBucketResponse
+import com.spectralogic.ds3client.commands.DeleteBucketRequest
 import com.spectralogic.ds3client.Ds3ClientImpl
 
 import java.nio.file.Path
@@ -31,8 +32,20 @@ class BpBucket extends GetBucketResponse {
     client.bucket(this.name)
   }
 
+  /** 
+   * Deletes bucket, but only if the bucket is already empty so that data is not
+   * accidentally deleted
+   * @return true if bucket was deleted
+   */
   def delete() {
-    
+    // TODO: figure out if there are still objects or not
+    client.deleteBucket(new DeleteBucketRequest(this.name))
+  }
+
+  /** Deletes all objects inside it */
+  def empty() {
+    objects().each { it.delete() }
+    reload()
   }
 
   /**
