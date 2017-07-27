@@ -29,7 +29,11 @@ class Tool extends Script {
       println Globals.init_message(console.getTerminal().getWidth())
       def line
       while (line = console.readLine()) {
-        println shell.evaluate(line)
+        try {
+          println shell.evaluate(line)
+        } catch (Exception e) {
+          e.printStackTrace()
+        }
       }
     } catch (IOException e) {
       e.printStackTrace()

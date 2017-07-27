@@ -31,11 +31,6 @@ import spectra.*
 abstract class SpectraDSL extends Script {
 
   def SpectraDSL() {
-    /** gets bucket */
-    // Ds3ClientImpl.metaClass.bucket { String bucketName ->
-    //   def response = delegate.getBucket(new GetBucketRequest(bucketName))
-    //   return new BpBucket(response, delegate)
-    // }
 
   }
 
