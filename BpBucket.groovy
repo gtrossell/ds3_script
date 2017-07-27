@@ -26,8 +26,9 @@ class BpBucket extends GetBucketResponse {
     this.name = response.getListBucketResult().getName()
   }
 
+  /** @return the current version of this bucket. Doesn't change this object */
   def reload() {
-    // TODO: reloads the bucket to get any object changes
+    client.bucket(this.name)
   }
 
   def delete() {
@@ -35,7 +36,7 @@ class BpBucket extends GetBucketResponse {
   }
 
   /**
-   * Puts each file and file in each directory given
+   * Puts each file and file in each directory given into the bucket
    */
   def putBulk(Path ...paths) {
     // TODO: add true logging
@@ -60,6 +61,7 @@ class BpBucket extends GetBucketResponse {
       def job = helper.startWriteJob(this.name, objs.flatten())
       job.transfer(new FileObjectPutter(Paths.get(dir)))
     }
+    reload()
   }
 
   def putBulk(String ...pathsStr) {
