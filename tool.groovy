@@ -17,6 +17,8 @@ import jline.TerminalFactory
 import jline.console.ConsoleReader
 import jline.console.completer.FileNameCompleter
 
+import java.io.File
+
 import spectra.*
 
 class Tool extends Script {
@@ -27,6 +29,13 @@ class Tool extends Script {
       def console = new ConsoleReader()
       console.setPrompt(Globals.PROMPT)
       println Globals.init_message(console.getTerminal().getWidth())
+
+      /* Run script passed in */
+      if (args.size() > 0) {
+        def scriptArgs = args.size() > 1 ? args[1..args.size()-1] : []
+        shell.run(new File(args[0]), scriptArgs)
+      }
+
       def line
       while (line = console.readLine()) {
         try {
