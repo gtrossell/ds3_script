@@ -45,7 +45,6 @@ abstract class SpectraDSL extends Script {
     if (!endpoint || !accessId || !secretKey) {
       println "[Error] Endpoint, Access ID, and/or Sectret Key is not set!\n" +
               "\tTry setting the enviroment or method variable(s)"
-      return null
     }
     
     def cred = new Credentials(accessId, secretKey)

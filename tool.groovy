@@ -37,10 +37,7 @@ class Tool extends Script {
       }
 
       def line
-      while (true) {
-        line = console.readLine()
-        if (line in [null, '']) continue
-        if (line in ['exit', 'quit']) break
+      while (line = console.readLine()) {
         try {
           println shell.evaluate(line)
         } catch (Exception e) {
