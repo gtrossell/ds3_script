@@ -48,7 +48,7 @@ class BpBucket extends GetBucketResponse {
 
   /** Deletes all objects inside it */
   def empty() {
-    deleteObjects(objects())
+    deleteObjects(*objects())
   }
 
   /** Deletes each of the objects in the given list */

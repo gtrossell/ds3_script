@@ -14,8 +14,13 @@ class BpClient extends Ds3ClientImpl {
   /** @return BpBucket of bucket with given name */
   def bucket(String bucketName) {
     // TODO: if no bucket is found return null and issue warning
-    def response = this.getBucket(new GetBucketRequest(bucketName))
-    return new BpBucket(response, this)
+    try {
+      def response = this.getBucket(new GetBucketRequest(bucketName))
+      return new BpBucket(response, this)
+    } catch (com.spectralogic.ds3client.networking.FailedRequestException e) {
+      println e
+      return null
+    }
   }
 
   /** @return BpBucket of newly created BP bucket */
@@ -24,10 +29,6 @@ class BpClient extends Ds3ClientImpl {
     // TODO: impliment dataPolicyId
     this.putBucket(new PutBucketRequest(name))
     bucket(name)
-  }
-
-  def bucketNames() {
-
   }
 
 }

@@ -36,10 +36,10 @@ class BpObject extends Ds3Object {
    * @return true if object was deleted 
    */
   def delete() {
-    // TODO: reload bucket after delete?
     try {
       def deleteRequest = new DeleteObjectRequest(bucket.name, this.name)
       def deleteResponse = client.deleteObject(deleteRequest)
+      bucket.reload()
     } catch (Exception e) {
       e.printStackTrace()
       return false
@@ -55,6 +55,7 @@ class BpObject extends Ds3Object {
    */
   def writeTo(Path path) {
     // TODO: write to a file or directory
+    // TODO: allow use of a string
     try {
       if (!Files.exists(path)) Files.createDirectory(path)
       
@@ -90,13 +91,16 @@ class BpObject extends Ds3Object {
     return true
   }
 
+  /** @return size of object in bytes */
+  def size() { this.size }
+
   /** @return map of the metadata */
   def getMetadata() {
-     metadata = [
-                  name:       this.name, 
-                  size:       this.size, 
-                  owner:      this.owner,
-                  bucketName: this.bucket.name
-                ]
+    [
+      name:       this.name, 
+      size:       this.size, 
+      owner:      this.owner,
+      bucketName: this.bucket.name
+    ]
   }
 }
