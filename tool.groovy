@@ -81,7 +81,11 @@ class Tool extends Script {
 
   /** Builds shell binding */
   private buildBinding() {
-    new Binding()
+    def binding = new Binding()
+    if (new Environment().ready()) 
+      binding.setVariable('client', Globals.createBpClient())
+
+    binding
   }
 
 }

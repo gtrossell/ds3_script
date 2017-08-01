@@ -9,6 +9,11 @@ class Environment {
   def getAccessKey() { env['DS3_ACCESS_KEY'] }
   def getSecretKey() { env['DS3_SECRET_KEY'] }
 
+  /** @return true if all variables are non-empty */
+  def ready() {
+    getEndpoint() && getAccessKey() && getSecretKey()
+  }
+
   String toString() {
     "endpoint: ${getEndpoint()}, " +
     "access key: ${getAccessKey()}, " +

@@ -7,12 +7,9 @@ package spectra
 ])
 
 import com.spectralogic.ds3client.commands.*
-import com.spectralogic.ds3client.Ds3Client
-import com.spectralogic.ds3client.Ds3ClientBuilder
 import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.models.Bucket
 import com.spectralogic.ds3client.models.bulk.Ds3Object
-import com.spectralogic.ds3client.models.common.Credentials
 import com.spectralogic.ds3client.models.Contents
 import com.spectralogic.ds3client.models.ListBucketResult
 import com.spectralogic.ds3client.models.User
@@ -30,26 +27,14 @@ import spectra.*
  */
 abstract class SpectraDSL extends Script {
 
-  def SpectraDSL() {
-
-  }
-
-  /** Returns a BP client */
+  /**
+   * Points to a Global function since functions in an abstract class cannot be
+   * be directly referenced and this function is used before init 
+   * @return BpClient with given attributes or environment variables
+   */
   def createBpClient(String endpoint="", String accessId="", 
                       String secretKey="", Boolean https=false) {
-    // TODO: add real logging
-    environment = new Environment()
-    endpoint = endpoint ?: environment.getEndpoint()
-    accessId = accessId ?: environment.getAccessKey()
-    secretKey = secretKey ?: environment.getSecretKey()
-    if (!endpoint || !accessId || !secretKey) {
-      println "[Error] Endpoint, Access ID, and/or Sectret Key is not set!\n" +
-              "\tTry setting the environment or method variable(s)"
-      return null
-    }
-    
-    def cred = new Credentials(accessId, secretKey)
-    new BpClient(Ds3ClientBuilder.create(endpoint, cred).withHttps(https).build())
+    Globals.createBpClient(endpoint, accessId, secretKey, https)
   }
 
   /** Creates directory or file path from string  */

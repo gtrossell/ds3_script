@@ -31,7 +31,6 @@ class BpBucket extends GetBucketResponse {
 
   /** @return the current version of this bucket. Doesn't change this object */
   def reload() {
-    // TODO: Check with Ryan to see if this is OK. Checksums might be an issue
     this.listBucketResult = client.bucket(this.name).getListBucketResult()
     this
   }
