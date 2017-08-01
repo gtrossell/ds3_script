@@ -2,9 +2,9 @@ import groovy.util.GroovyTestSuite
 import junit.framework.Test 
 import junit.textui.TestRunner 
 
-import spectra.test.BpBucketTest
-import spectra.test.BpClientTest
-import spectra.test.BpObjectTest
+import spectra.test.models.BpBucketTest
+import spectra.test.models.BpClientTest
+import spectra.test.models.BpObjectTest
 import spectra.test.SpectraDSLTest
 
 class Test {

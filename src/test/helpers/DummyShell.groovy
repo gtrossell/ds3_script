@@ -1,4 +1,4 @@
-package spectra.test
+package spectra.test.helpers
 
 import spectra.SpectraDSL
 

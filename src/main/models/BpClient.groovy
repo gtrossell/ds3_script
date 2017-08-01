@@ -1,4 +1,4 @@
-package spectra
+package spectra.models
 
 import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.commands.GetBucketResponse

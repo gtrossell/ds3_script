@@ -19,7 +19,7 @@ import groovy.transform.*
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import spectra.*
+import spectra.helpers.Globals
 
 /**
  * This is the customized SpectraShell that contains the DSL and acts similar

@@ -1,9 +1,9 @@
-package spectra.test
+package spectra.test.models
 
 import java.util.Random
 
-import spectra.BpClient
-import spectra.test.DummyShell
+import spectra.models.BpClient
+import spectra.test.helpers.DummyShell
 
 /** Tests BpClient class. Enviroment variables for client must be set */
 class BpBucketTest extends GroovyTestCase {
@@ -16,10 +16,10 @@ class BpBucketTest extends GroovyTestCase {
 
     // put test objects
     def homePath = new File("").getAbsoluteFile().toString()
-    bucket.putBulk("${homePath}/test/res/dir2")
-    bucket.putBulk("${homePath}/test/res/dir1/txt1.txt",
-                    "${homePath}/test/res/dir1/txt2.txt",
-                    "${homePath}/test/res/dir1/txt3.txt")
+    bucket.putBulk("${homePath}/test-data/dir2")
+    bucket.putBulk("${homePath}/test-data/dir1/txt1.txt",
+                    "${homePath}/test-data/dir1/txt2.txt",
+                    "${homePath}/test-data/dir1/txt3.txt")
     // TODO: prevent user from having two named the same?
     assertEquals 5, bucket.objects().size()
     assertEquals bucket.objects().size(), bucket.reload().objects().size()

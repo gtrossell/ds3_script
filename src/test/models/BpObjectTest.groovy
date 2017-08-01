@@ -1,9 +1,9 @@
-package spectra.test
+package spectra.test.models
 
 import java.util.Random
 
-import spectra.BpClient
-import spectra.test.DummyShell
+import spectra.models.BpClient
+import spectra.test.helpers.DummyShell
 
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -20,7 +20,7 @@ class BpObjectTest extends GroovyTestCase {
     
     def homePath = new File("").getAbsoluteFile().toString()
     def fileName = 'txt1.txt'
-    bucket.putBulk("${homePath}/test/res/dir1/" + fileName)
+    bucket.putBulk("${homePath}/test-data/dir1/" + fileName)
     def object = bucket.object(fileName)
     def meta = object.getMetadata()
     assert meta['name']
@@ -30,7 +30,7 @@ class BpObjectTest extends GroovyTestCase {
     assert meta['bucketName']
 
     // write
-    def dirPath = "${homePath}/test/res/tmp/"
+    def dirPath = "${homePath}/test-data/tmp/"
     object.writeTo(shell.filePath(dirPath))
     def file = shell.filePath(dirPath + object.name)
     assert Files.exists(file)

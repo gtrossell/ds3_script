@@ -1,4 +1,4 @@
-package spectra
+package spectra.helpers
 
 /** Manages access to environment variables */
 class Environment {

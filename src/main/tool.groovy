@@ -18,7 +18,9 @@ import jline.console.completer.FileNameCompleter
 import java.io.File
 import java.io.IOException
 
-import spectra.*
+import spectra.helpers.Environment
+import spectra.helpers.Globals
+import spectra.SpectraDSL
 
 class Tool extends Script {
   def run() {
@@ -75,7 +77,7 @@ class Tool extends Script {
   private buildConfig() {
     def config = new CompilerConfiguration()
     config.addCompilationCustomizers(buildImportCustomizer())
-    config.scriptBaseClass = 'SpectraDSL'
+    config.scriptBaseClass = 'spectra.SpectraDSL'
     return config
   }
 

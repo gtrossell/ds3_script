@@ -1,9 +1,9 @@
-package spectra
+package spectra.helpers
 
 import com.spectralogic.ds3client.models.common.Credentials
 
-import spectra.Environment
-import spectra.BpClient
+import spectra.helpers.Environment
+import spectra.models.BpClient
 import com.spectralogic.ds3client.Ds3Client
 import com.spectralogic.ds3client.Ds3ClientBuilder
 

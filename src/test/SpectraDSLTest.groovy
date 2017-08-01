@@ -2,9 +2,9 @@ package spectra.test
 
 import java.util.Random
 
-import spectra.BpClient
-import spectra.Environment
-import spectra.test.DummyShell
+import spectra.models.BpClient
+import spectra.helpers.Environment
+import spectra.test.helpers.DummyShell
 
 /** Tests SpectraDSL class. Enviroment variables for client must be set */
 class SpectraDSLTest extends GroovyTestCase {

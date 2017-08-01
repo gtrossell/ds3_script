@@ -1,4 +1,4 @@
-package spectra
+package spectra.models
 
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers
 import com.spectralogic.ds3client.helpers.FileObjectPutter
