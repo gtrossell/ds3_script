@@ -21,13 +21,24 @@ import java.io.IOException
 import spectra.helpers.Environment
 import spectra.helpers.Globals
 import spectra.SpectraDSL
+import spectra.commands.ShellCommandFactory
 
 class Tool extends Script {
+  ShellCommandFactory commandFactory
 
   /** Logic for parsing and evaluating a line */
   def evaluate(GroovyShell shell, String line) {
     if (line in [null, '']) return true
-    if (line in ['exit', 'quit']) return false
+    
+    /* command */
+    if (line[0] == ':') {
+      def args = line.split(' ')
+      def command = args[0]
+      args = 1 < args.size() ? args[1..(args.size()-1)] : []
+      return commandFactory.runCommand(command, args)
+    }
+
+    /* shell evaluation */
     try {
       println Globals.RETURN_PROMPT + shell.evaluate(line)
     } catch (Exception e) {
@@ -38,6 +49,7 @@ class Tool extends Script {
 
   def run() {
     def shell = new GroovyShell(this.class.classLoader, buildBinding(), buildConfig())
+    commandFactory = new ShellCommandFactory()
     // TODO: add autocomplete for file paths
     try {
       def console = new ConsoleReader()
