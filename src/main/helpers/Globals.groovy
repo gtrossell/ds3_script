@@ -12,8 +12,9 @@ import com.spectralogic.ds3client.Ds3ClientBuilder
  * places or are constants
  */
 class Globals {
-  final static def PROMPT = 'spectra> '
-  static def init_message(width) {
+  final static String PROMPT = 'spectra> '
+  final static String RETURN_PROMPT = '===> '
+  static def initMessage(width) {
     """
 Welcome to the Spectra DSL for BlackPearl!
 ${'=' * width}"""

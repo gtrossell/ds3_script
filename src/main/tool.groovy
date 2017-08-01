@@ -29,7 +29,8 @@ class Tool extends Script {
     try {
       def console = new ConsoleReader()
       console.setPrompt(Globals.PROMPT)
-      println Globals.init_message(console.getTerminal().getWidth())
+      def returnPrompt = Globals.RETURN_PROMPT
+      println Globals.initMessage(console.getTerminal().getWidth())
 
       /* Run script passed in */
       if (args.size() > 0) {
@@ -43,7 +44,7 @@ class Tool extends Script {
         if (line in [null, '']) continue
         if (line in ['exit', 'quit']) break
         try {
-          println '===> ' + shell.evaluate(line)
+          println returnPrompt + shell.evaluate(line)
         } catch (Exception e) {
           e.printStackTrace()
         }
