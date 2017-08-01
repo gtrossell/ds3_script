@@ -23,13 +23,25 @@ import spectra.helpers.Globals
 import spectra.SpectraDSL
 
 class Tool extends Script {
+
+  /** Logic for parsing and evaluating a line */
+  def evaluate(GroovyShell shell, String line) {
+    if (line in [null, '']) return true
+    if (line in ['exit', 'quit']) return false
+    try {
+      println Globals.RETURN_PROMPT + shell.evaluate(line)
+    } catch (Exception e) {
+      e.printStackTrace()
+    }
+    return true
+  }
+
   def run() {
     def shell = new GroovyShell(this.class.classLoader, buildBinding(), buildConfig())
     // TODO: add autocomplete for file paths
     try {
       def console = new ConsoleReader()
       console.setPrompt(Globals.PROMPT)
-      def returnPrompt = Globals.RETURN_PROMPT
       println Globals.initMessage(console.getTerminal().getWidth())
 
       /* Run script passed in */
@@ -38,17 +50,8 @@ class Tool extends Script {
         shell.run(new File(args[0]), scriptArgs)
       }
 
-      def line
-      while (true) {
-        line = console.readLine()
-        if (line in [null, '']) continue
-        if (line in ['exit', 'quit']) break
-        try {
-          println returnPrompt + shell.evaluate(line)
-        } catch (Exception e) {
-          e.printStackTrace()
-        }
-      }
+      while (evaluate(shell, console.readLine())) { }
+
     } catch (IOException e) {
       e.printStackTrace()
     } finally {
