@@ -72,8 +72,8 @@ class Tool extends Script {
       def result
       while (true) {
         line = console.readLine()
-        result = Globals.RETURN_PROMPT + evaluate(shell, line)
-        println result
+        result = evaluate(shell, line)
+        println Globals.RETURN_PROMPT + result
         recorder.record(line, result)
       }
       recorder.close()
