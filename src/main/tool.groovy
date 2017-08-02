@@ -20,9 +20,14 @@ import java.io.IOException
 
 import spectra.helpers.Environment
 import spectra.helpers.Globals
+import spectra.helpers.LogRecorder
 import spectra.SpectraDSL
 import spectra.commands.ShellCommandFactory
 
+/** 
+ * This is the main class for the Spectra DSL tool.
+ * It Handles the terminal and handles all user interaction
+ */
 class Tool extends Script {
   ShellCommandFactory commandFactory
 
@@ -40,16 +45,17 @@ class Tool extends Script {
 
     /* shell evaluation */
     try {
-      println Globals.RETURN_PROMPT + shell.evaluate(line)
+      shell.evaluate(line)
     } catch (Exception e) {
       e.printStackTrace()
     }
-    return true
   }
 
   def run() {
     def shell = new GroovyShell(this.class.classLoader, buildBinding(), buildConfig())
     commandFactory = new ShellCommandFactory()
+    def recorder = new LogRecorder()
+    recorder.init()
     // TODO: add autocomplete for file paths
     try {
       def console = new ConsoleReader()
@@ -62,7 +68,15 @@ class Tool extends Script {
         shell.run(new File(args[0]), scriptArgs)
       }
 
-      while (evaluate(shell, console.readLine())) { }
+      def line
+      def result
+      while (true) {
+        line = console.readLine()
+        result = Globals.RETURN_PROMPT + evaluate(shell, line)
+        println result
+        recorder.record(line, result)
+      }
+      recorder.close()
 
     } catch (IOException e) {
       e.printStackTrace()
