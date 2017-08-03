@@ -4,26 +4,23 @@ import spectra.helpers.LogRecorder
 
 class ShellCommandFactory {
   LogRecorder recorder
-  RecordScript recordCommand
+  List<ShellCommand> commands
 
   ShellCommandFactory(LogRecorder recorder) {
     this.recorder = recorder
-    recordCommand = new RecordScript(recorder)
+    commands = []
+    commands << new HelpCommand()
+    commands << new RecordCommand(recorder)
   }
 
-  def runCommand(command, args) {
-    def commandObj = null
-    switch (command.toLowerCase()) {
-      case [':record', ':r']:
-        commandObj = recordCommand
-        break
-      default:
-        // TODO: add help command
-        println "Command $command is unknown."
-        break
+  def runCommand(commandName, args) {
+    def execCommand = { name -> 
+      for (def i = 0; i < commands.size(); i++)
+        if (name in commands[i].commandNames()) return commands[i].run(args)
+      return null
     }
 
-    return commandObj.run(args)
+    return execCommand(commandName) ?: execCommand(':help')
   }
 
 }

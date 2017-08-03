@@ -8,7 +8,7 @@ import spectra.helpers.Config
 import spectra.helpers.Globals
 import spectra.helpers.LogRecorder
 
-class RecordScript implements ShellCommand {
+class RecordCommand implements ShellCommand {
   CliBuilder cli
   LogRecorder recorder
   String recordId
@@ -18,7 +18,7 @@ class RecordScript implements ShellCommand {
   Boolean isRecording
   Boolean isRecordEnv
 
-  RecordScript(LogRecorder recorder) {
+  RecordCommand(LogRecorder recorder) {
     this.recorder = recorder
     init()
 
@@ -30,6 +30,14 @@ class RecordScript implements ShellCommand {
     cli.d('script description', longOpt: 'desc', args:1, argName:'description')
     cli.h('display this message', longOpt:'help')
   }
+  
+  String help() {
+    "Record shell statements and save them to a script file using ':record'" +
+    "You can run recorded scripts with the command ':execute'" +
+    "For more information, run ':record -h'"
+  }
+
+  String[] commandNames() { [':record', ':r'] }
 
   String run(args) {
     def message = commandOptions(args)
