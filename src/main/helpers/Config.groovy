@@ -6,13 +6,32 @@ package spectra.helpers
  * can come from environment variables
  */
 class Config {
+  static String homeDir = ''
   static String logDir = ''
+  static String scriptDir = ''
+
+  def static getHomeDir() {
+    if (!homeDir)
+      homeDir = new File("").getAbsoluteFile().toString()
+    return addTrailingSlash(homeDir)
+  }
+
+  def static getScriptDir() {
+    if (!scriptDir)
+      scriptDir = getHomeDir() + "scripts/"
+    return addTrailingSlash(scriptDir)
+  }
 
   def static getLogDir() {
-    if (!logDir) {
-      logDir = new File("").getAbsoluteFile().toString() + "/log"
-    }
-    logDir
+    if (!logDir)
+      logDir = getHomeDir() + "log/"
+    return addTrailingSlash(logDir)
+  }
+
+  private static addTrailingSlash(path) {
+    if (path[path.size() - 1] != '/')
+      path += '/'
+    path
   }
 
 }

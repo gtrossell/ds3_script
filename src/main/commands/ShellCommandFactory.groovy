@@ -13,7 +13,7 @@ class ShellCommandFactory {
 
   def runCommand(command, args) {
     def commandObj = null
-    switch (command) {
+    switch (command.toLowerCase()) {
       case [':record', ':r']:
         commandObj = recordCommand
         break
