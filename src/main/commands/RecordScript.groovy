@@ -14,7 +14,7 @@ class RecordScript implements ShellCommand {
   Boolean isRecording
   Boolean isRecordEnv
 
-  def RecordScript(LogRecorder recorder) {
+  RecordScript(LogRecorder recorder) {
     this.recorder = recorder
     initFields()
 

@@ -4,7 +4,7 @@ class LogRecorder {
   String logDir
   Date now
 
-  def LogRecorder() {
+  LogRecorder() {
     now = new Date()
     logDir = Config.logDir
     if (logDir[logDir.size()-1] != '/') {

@@ -6,7 +6,7 @@ class ShellCommandFactory {
   LogRecorder recorder
   RecordScript recordCommand
 
-  def ShellCommandFactory(LogRecorder recorder) {
+  ShellCommandFactory(LogRecorder recorder) {
     this.recorder = recorder
     recordCommand = new RecordScript(recorder)
   }
