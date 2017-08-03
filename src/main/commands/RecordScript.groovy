@@ -143,7 +143,9 @@ class RecordScript implements ShellCommand {
         return "[Error] The directory ${file.getParent()} does not exist!\n"
       } else if (!(FilenameUtils.getExtension(file.toString()) in ['','groovy'])) {
         return "[Error] The script extension must be 'groovy' or none."
-      }else {
+      } else {
+        if (FilenameUtils.getExtension(file.toString()) == '')
+          file = new File(file.toString() + '.groovy')
         scriptFile = file
       }
     }
