@@ -2,6 +2,8 @@ package spectra.commands
 
 import java.util.Random
 
+import org.apache.commons.io.FilenameUtils
+
 import spectra.helpers.Config
 import spectra.helpers.Globals
 import spectra.helpers.LogRecorder
@@ -21,6 +23,7 @@ class RecordScript implements ShellCommand {
     init()
 
     cli = new CliBuilder(usage:':record, :r [options]')
+    // TODO: make a better header
     cli.header = 'First usage starts recording, second saves'
     cli.e('record environment variables to script', longOpt: 'environment')
     cli.f('file name and/or location', longOpt: 'file', args:1, argName:'name')
@@ -113,28 +116,36 @@ class RecordScript implements ShellCommand {
 
   /** @return help message if requested or error message */
   private String commandOptions(args) {
+    def stringWriter = new StringWriter()
+    cli.writer = new PrintWriter(stringWriter)
     def options = cli.parse(args)
-    def message = '' /* only used to store help/error messages */
-    if (!options) return message
+    if (stringWriter.toString()) return stringWriter.toString()
+
+    if (!options) return ''
     if (options.h) {
-      def stringWriter = new StringWriter()
-      cli.writer = new PrintWriter(stringWriter)
       cli.usage()
-      message += stringWriter.toString()
+      return stringWriter.toString()
     }
     if (options.f) {
       def pathStr = options.f
-      // TODO: make sure it ends in .groovy?
+      def file
       if (!pathStr.contains('/')) {
-        this.scriptFile = new File(Config.getScriptDir(), pathStr)
+        file = new File(Config.getScriptDir(), pathStr)
       } else if (pathStr[0] == '.') {
-        this.scriptFile = new File(Config.getHomeDir(), pathStr.substring(1))
+        file = new File(Config.getHomeDir(), pathStr.substring(1))
       } else {
-        this.scriptFile = new File(pathStr)
+        file = new File(pathStr)
       }
-      // TODO: parse name
-      // TODO: check if directory exists and throw an error if it doesn't
-      // TODO: error if file exists already
+
+      if (file.exists()) {
+        return "[Error] The file $file already exists!\n"
+      } else if (!file.getParentFile().exists()) {
+        return "[Error] The directory ${file.getParent()} does not exist!\n"
+      } else if (!(FilenameUtils.getExtension(file.toString()) in ['','groovy'])) {
+        return "[Error] The script extension must be 'groovy' or none."
+      }else {
+        scriptFile = file
+      }
     }
     if (options.d) {
       this.scriptDesc = options.d
@@ -142,7 +153,6 @@ class RecordScript implements ShellCommand {
     if (options.e) {
       this.isRecordEnv = true
     }
-    return message
   }
 
   /** sets fields to their default values */
