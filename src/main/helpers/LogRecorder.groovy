@@ -18,8 +18,13 @@ class LogRecorder {
 
   /** records a command and response to the current log file */
   def record(String input="", String output="") {
-    getCurrentLogFile() << getInputLinePrefix() + input + '\n'
-    getCurrentLogFile() << getOutputLinePrefix() + output + '\n'
+    def file = getLogFile()
+    file << getInputLinePrefix() + input + '\n'
+    file << getOutputLinePrefix() + output + '\n'
+  }
+
+  def writeLine(String line) {
+    getLogFile() << "$line\n"
   }
 
   def init() {
@@ -38,7 +43,7 @@ class LogRecorder {
     Globals.RETURN_PROMPT
   }
 
-  private getCurrentLogFile() {
+  def getLogFile() {
     def day = now.date.toString()
     day = day.size() < 2 ? '0' + day : day
     def month = (now.month + 1).toString()

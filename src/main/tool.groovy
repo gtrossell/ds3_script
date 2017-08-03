@@ -53,8 +53,9 @@ class Tool extends Script {
 
   def run() {
     def shell = new GroovyShell(this.class.classLoader, buildBinding(), buildConfig())
-    commandFactory = new ShellCommandFactory()
     def recorder = new LogRecorder()
+    commandFactory = new ShellCommandFactory(recorder)
+    
     recorder.init()
     // TODO: add autocomplete for file paths
     try {
@@ -74,7 +75,7 @@ class Tool extends Script {
         line = console.readLine()
         result = evaluate(shell, line)
         println Globals.RETURN_PROMPT + result
-        recorder.record(line, result)
+        recorder.record(line, result.toString())
       }
       recorder.close()
 
