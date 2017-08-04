@@ -3,19 +3,11 @@ package spectra.commands
 class HelpCommand implements ShellCommand {
 
   String run(args) {
-    if (args) {
-      "nothing atm\n"
-    } else {
-      "The available commands are:\n" +
-      "\t- :help\n" +
-      "\t- :record\n" +
-      "\n" +
-      ":help <command>\n"
-    }
-  }
-
-  String help() {
-
+    "The available commands are:\n" +
+    "\t* :help\n" +
+    "\t* :record\n" +
+    "\n" +
+    "Use '<command> -h' for help on a specific command"
   }
 
   String[] commandNames() { [':help', ':h'] }

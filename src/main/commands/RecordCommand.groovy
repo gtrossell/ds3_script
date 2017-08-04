@@ -30,12 +30,6 @@ class RecordCommand implements ShellCommand {
     cli.d('script description', longOpt: 'desc', args:1, argName:'description')
     cli.h('display this message', longOpt:'help')
   }
-  
-  String help() {
-    "Record shell statements and save them to a script file using ':record'" +
-    "You can run recorded scripts with the command ':execute'" +
-    "For more information, run ':record -h'"
-  }
 
   String[] commandNames() { [':record', ':r'] }
 
