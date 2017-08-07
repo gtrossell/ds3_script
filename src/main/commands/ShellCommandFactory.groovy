@@ -3,18 +3,18 @@ package spectra.commands
 import spectra.helpers.LogRecorder
 
 class ShellCommandFactory {
-  LogRecorder recorder
   List<ShellCommand> commands
 
-  ShellCommandFactory(LogRecorder recorder) {
-    this.recorder = recorder
+  ShellCommandFactory(GroovyShell shell, LogRecorder recorder) {
     commands = []
     commands << new HelpCommand()
     commands << new RecordCommand(recorder)
+    commands << new ExecuteCommand(shell)
   }
 
   def runCommand(commandName, args) {
-    def execCommand = { name -> 
+    def execCommand = { name ->
+      name = name.toLowerCase()
       for (def i = 0; i < commands.size(); i++)
         if (name in commands[i].commandNames()) return commands[i].run(args)
       return null

@@ -39,7 +39,7 @@ class Tool extends Script {
     if (line[0] == ':') {
       def args = line.split(' ')
       def command = args[0]
-      args = 1 < args.size() ? args[1..(args.size()-1)] : []
+      args = 1 < args.size() ? args[1..args.size()-1] : []
       return commandFactory.runCommand(command, args)
     }
 
@@ -54,7 +54,7 @@ class Tool extends Script {
   def run() {
     def shell = new GroovyShell(this.class.classLoader, buildBinding(), buildConfig())
     def recorder = new LogRecorder()
-    commandFactory = new ShellCommandFactory(recorder)
+    commandFactory = new ShellCommandFactory(shell, recorder)
     
     recorder.init()
     // TODO: add autocomplete for file paths
