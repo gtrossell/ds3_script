@@ -4,6 +4,7 @@ import java.util.Random
 
 import org.apache.commons.io.FilenameUtils
 
+import spectra.helpers.CommandHelper
 import spectra.helpers.Config
 import spectra.helpers.Globals
 import spectra.helpers.LogRecorder
@@ -25,7 +26,7 @@ class RecordCommand implements ShellCommand {
     cli = new CliBuilder(usage:':record, :r [options]')
     // TODO: make a better header
     cli.header = 'First usage starts recording, second saves'
-    cli.e('record environment variables to script', longOpt: 'environment')
+    cli.e('save environment in script', longOpt: 'environment')
     cli.f('file name and/or location', longOpt: 'file', args:1, argName:'name')
     cli.d('script description', longOpt: 'desc', args:1, argName:'description')
     cli.h('display this message', longOpt:'help')
@@ -42,7 +43,7 @@ class RecordCommand implements ShellCommand {
       recordId = createScriptId()
       recorder.writeLine(startLine())
       isRecording = true
-      return 'Starting recording'
+      return "Started recording script"
     } else {
       /* end recording */
       recorder.writeLine(endLine())
@@ -57,13 +58,13 @@ class RecordCommand implements ShellCommand {
         if (line == startLine()) isScript = true
       }
 
-      saveScript(scriptLines)
+      def scriptLoc = saveScript(scriptLines)
       init()
-      return 'Finished recording'
+      return "Saved script to '$scriptLoc'"
     }
   }
 
-  private saveScript(scriptLines) {
+  private String saveScript(scriptLines) {
     if (!scriptFile)
       scriptFile = new File(Config.getScriptDir(), "${recordId}.groovy")
 
@@ -87,8 +88,9 @@ class RecordCommand implements ShellCommand {
       lineComment('*')
     )
     scriptLines.add(0, comment)
-
     scriptFile.write(scriptLines.join('\n'))
+
+    scriptFile.toString()
   }
 
   /** Pads/divides a comment to keep the comment body uniform length */
@@ -129,15 +131,7 @@ class RecordCommand implements ShellCommand {
       return stringWriter.toString()
     }
     if (options.f) {
-      def pathStr = options.f
-      def file
-      if (!pathStr.contains('/')) {
-        file = new File(Config.getScriptDir(), pathStr)
-      } else if (pathStr[0] == '.') {
-        file = new File(Config.getHomeDir(), pathStr.substring(1))
-      } else {
-        file = new File(pathStr)
-      }
+      def file = new CommandHelper().getScriptFromString(options.f)
 
       if (file.exists()) {
         return "[Error] The file $file already exists!\n"
