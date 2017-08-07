@@ -34,7 +34,7 @@ abstract class SpectraDSL extends Script {
    */
   def createBpClient(String endpoint="", String accessId="", 
                       String secretKey="", Boolean https=false) {
-    Globals.createBpClient(endpoint, accessId, secretKey, https)
+    Globals.createBpClient(endpoint, accessId, secretKey, https, environment)
   }
 
   /** Creates directory or file path from string  */

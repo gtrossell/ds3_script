@@ -22,9 +22,15 @@ ${'=' * width}"""
 
   /** Returns a BP client */
   static def createBpClient(String endpoint="", String accessId="", 
-                      String secretKey="", Boolean https=false) {
+                      String secretKey="", Boolean https=false,
+                      Environment environment=null) {
     // TODO: add real logging
-    def environment = new Environment()
+    if (!environment) environment = new Environment()
+    if (!(environment in Environment)) {
+      println "[Warning] Variable 'environment' should be of type spectra.helpers.Environment"
+      environment = new Environment()
+    }
+
     endpoint = endpoint ?: environment.getEndpoint()
     accessId = accessId ?: environment.getAccessKey()
     secretKey = secretKey ?: environment.getSecretKey()
