@@ -100,6 +100,7 @@ class Tool extends Script {
     importCustomizer.addImport('com.spectralogic.ds3client.models.common.Credentials')
     importCustomizer.addImport('com.spectralogic.ds3client.Ds3ClientBuilder')
     importCustomizer.addStarImports('com.spectralogic.ds3client.commands')
+    importCustomizer.addImport('spectra.helpers.Environment')
     
     return importCustomizer
   }

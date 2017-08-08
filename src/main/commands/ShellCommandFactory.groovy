@@ -8,7 +8,7 @@ class ShellCommandFactory {
   ShellCommandFactory(GroovyShell shell, LogRecorder recorder) {
     commands = []
     commands << new HelpCommand()
-    commands << new RecordCommand(recorder)
+    commands << new RecordCommand(recorder, shell.getVariable('environment'))
     commands << new ExecuteCommand(shell)
   }
 

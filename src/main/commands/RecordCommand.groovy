@@ -6,12 +6,14 @@ import org.apache.commons.io.FilenameUtils
 
 import spectra.helpers.CommandHelper
 import spectra.helpers.Config
+import spectra.helpers.Environment
 import spectra.helpers.Globals
 import spectra.helpers.LogRecorder
 
 class RecordCommand implements ShellCommand {
   CliBuilder cli
   LogRecorder recorder
+  Environment environment
   String recordId
   File scriptFile
   String scriptName
@@ -19,8 +21,9 @@ class RecordCommand implements ShellCommand {
   Boolean isRecording
   Boolean isRecordEnv
 
-  RecordCommand(LogRecorder recorder) {
+  RecordCommand(LogRecorder recorder, Environment environment) {
     this.recorder = recorder
+    this.environment = environment
     init()
 
     cli = new CliBuilder(usage:':record, :r [options]')
@@ -69,7 +72,20 @@ class RecordCommand implements ShellCommand {
       scriptFile = new File(Config.getScriptDir(), "${recordId}.groovy")
 
     /* set environment vars */
-    // TODO: use the :env command
+    if (isRecordEnv) {
+      def tmpEnv = "tmpEnvironmentFor_$recordId"
+      def saveEnvLine = "$tmpEnv = environment"
+      def envLineBuilder = new StringBuilder('environment = new Environment([')
+      environment.getEnvironment().each{ key, val -> 
+        envLineBuilder.append("'$key':'$val',")
+      }
+      envLineBuilder.setCharAt(envLineBuilder.length() - 1, ']' as char)
+      envLineBuilder.append(')\n')
+
+      scriptLines.add(0, envLineBuilder.toString())
+      scriptLines.add(0, saveEnvLine)
+      scriptLines << "\nenvironment = $tmpEnv"
+    }
 
     /* create title comment */
     scriptName = scriptFile.getName()
@@ -151,6 +167,7 @@ class RecordCommand implements ShellCommand {
     if (options.e) {
       this.isRecordEnv = true
     }
+    return ''
   }
 
   /** sets fields to their default values */
