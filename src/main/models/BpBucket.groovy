@@ -1,5 +1,6 @@
 package spectra.models
 
+import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChannelBuilder
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers
 import com.spectralogic.ds3client.helpers.FileObjectPutter
 import com.spectralogic.ds3client.models.ListBucketResult
@@ -57,10 +58,19 @@ class BpBucket extends GetBucketResponse {
   }
 
   /**
+   * @param paths Directories and files to upload
+   * @param remoteDir Directory on BP to use as a root for uploading (ie 'Dir1/')
    * Puts each file and file in each directory given into the bucket
    */
-  def putBulk(Path ...paths) {
+  def putBulk(List<String> pathStrs, String remoteDir='') {
+    def paths = []
+    pathStrs.each { pathStr ->
+      paths << Paths.get(pathStr)
+    }
+    if (remoteDir && remoteDir[-1] != '/') remoteDir += '/'
+
     // TODO: add true logging
+    /* Group files into common directories */
     def helper = Ds3ClientHelpers.wrap(this.client)
     def objects = [:] /* key: directory val: array of Ds3Objects */
     paths.each { path ->
@@ -78,19 +88,17 @@ class BpBucket extends GetBucketResponse {
         println "WARNING: '$path' is not a directory or regular file, skipping"
       }
     }
-    objects.each { dir, objs ->
-      def job = helper.startWriteJob(this.name, objs.flatten())
-      job.transfer(new FileObjectPutter(Paths.get(dir)))
-    }
-    reload()
-  }
 
-  def putBulk(String ...pathsStr) {
-    def paths = []
-    pathsStr.each { pathStr ->
-      paths << Paths.get(pathStr)
+    /* Put job that maintains subdirectory order and remoteDir prefix */
+    objects.each { dir, objs ->
+      objs = objs.flatten() /* might be lists in list */
+      objs = helper.addPrefixToDs3ObjectsList(objs, remoteDir)
+      def job = helper.startWriteJob(this.name, objs)
+      job.transfer(new PrefixAdderObjectChannelBuilder(
+        new FileObjectPutter(Paths.get(dir)), remoteDir))
     }
-    putBulk(*paths)
+
+    reload()
   }
 
   /**
