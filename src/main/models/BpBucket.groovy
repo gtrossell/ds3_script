@@ -153,6 +153,11 @@ class BpBucket extends GetBucketResponse {
     return (objs.size() == 1 ? objs[0] : null)
   }
 
+  String toString() {
+    "name: $name, " +
+    "client: {$client}"
+  }
+
   /** Converts an array of Contents objects to ds3Objects */
   private contentsToBpObjects(contents) {
     def bpObjects = []

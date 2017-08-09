@@ -42,4 +42,10 @@ class BpClient extends Ds3ClientImpl {
     bucket(name)
   }
 
+  String toString() {
+    def details = this.netClient.getConnectionDetails()
+    "endpoint: ${details.getEndpoint()}, " +
+    "access_key: ${details.getCredentials().getClientId()}"
+  }
+
 }
