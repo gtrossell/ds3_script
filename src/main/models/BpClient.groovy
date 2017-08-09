@@ -3,6 +3,7 @@ package spectra.models
 import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.commands.GetBucketRequest
+import com.spectralogic.ds3client.commands.GetServiceRequest
 import com.spectralogic.ds3client.commands.PutBucketRequest
 
 class BpClient extends Ds3ClientImpl {
@@ -21,6 +22,16 @@ class BpClient extends Ds3ClientImpl {
       println e
       return null
     }
+  }
+
+  /** @return the names of the buckets */
+  List<String> buckets() {
+    def buckets = []
+    def response = this.getService(new GetServiceRequest())
+    response.getListAllMyBucketsResult().getBuckets().each{ bucket -> 
+      buckets << bucket.getName()
+    }
+    return buckets
   }
 
   /** @return BpBucket of newly created BP bucket */
