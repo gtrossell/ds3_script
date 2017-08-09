@@ -101,6 +101,10 @@ class BpBucket extends GetBucketResponse {
     reload()
   }
 
+  def putBulk(String pathStr, String remoteDir='') {
+    putBulk([pathStr], remoteDir)
+  }
+
   /**
    * Same as putBulk with one file, but allows user to name the name the object 
    * that is created. Also, it returns the created object
