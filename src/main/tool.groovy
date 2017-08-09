@@ -119,8 +119,8 @@ class Tool extends Script {
     def environment = new Environment()
     if (environment.ready()) {
       binding.setVariable('client', Globals.createBpClient())
-      binding.setVariable('environment', environment)
     }
+    binding.setVariable('environment', environment)
     return binding
   }
 
