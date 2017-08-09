@@ -42,7 +42,7 @@ class BpBucket extends GetBucketResponse {
    * @return true if bucket was deleted
    */
   def delete() {
-    // TODO: figure out if there are still objects or not
+    if (this.objects()) return '[Error] Bucket must be empty to delete!'
     client.deleteBucket(new DeleteBucketRequest(this.name))
   }
 
