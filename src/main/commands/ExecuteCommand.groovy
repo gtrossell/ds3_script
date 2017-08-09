@@ -1,8 +1,11 @@
 package spectra.commands
 
+import groovy.io.FileType
+
 import org.apache.commons.io.FilenameUtils
 
 import spectra.helpers.CommandHelper
+import spectra.helpers.Config
 
 class ExecuteCommand implements ShellCommand {
   GroovyShell shell
@@ -14,6 +17,8 @@ class ExecuteCommand implements ShellCommand {
     cli = new CliBuilder(usage:':execute, :e <script>')
     cli.header = 'Execute a script'
     cli.h('display this message', longOpt:'help')
+    cli.l('list scripts in script folder', longOpt:'list')
+    cli.d('delete script in script folder', longOpt:'delete', args:1, argName:'script')
   }
 
   String[] commandNames() { [':execute', ':e'] }
@@ -45,6 +50,32 @@ class ExecuteCommand implements ShellCommand {
     if (options.h || args.size() < 1) {
       cli.usage()
       return stringWriter.toString()
+    } else if (options.l) {
+      return listScripts()
+    } else if (options.d) {
+      return deleteScript(options.d)
+    } else {
+      return ''
     }
   }
+
+  private listScripts() {
+    def scripts = []
+    new File(Config.getScriptDir()).eachFileRecurse (FileType.FILES) { file ->
+      scripts << ' - ' + FilenameUtils.removeExtension(file.getName())
+    }
+    return 'Available scripts:\n' + scripts.join('\n')
+  }
+
+  private deleteScript(scriptName) {
+    if (FilenameUtils.getExtension(scriptName) == '') scriptName += '.groovy'
+    def script = new CommandHelper().getScriptFromString(scriptName)
+    if (script.exists()) {
+      script.delete()
+      return "[Info] Deleted script $scriptName"
+    } else {
+      return "[Info] No script named $scriptName"
+    }
+  }
+
 }
