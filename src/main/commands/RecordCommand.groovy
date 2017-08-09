@@ -16,7 +16,6 @@ class RecordCommand implements ShellCommand {
   Environment environment
   String recordId
   File scriptFile
-  String scriptName
   String scriptDesc
   Boolean isRecording
   Boolean isRecordEnv
@@ -88,7 +87,7 @@ class RecordCommand implements ShellCommand {
     }
 
     /* create title comment */
-    scriptName = scriptFile.getName()
+    def scriptName = scriptFile.getName()
     if (scriptName.contains('.')) scriptName = scriptName.split('\\.')[0]
     scriptDesc = scriptDesc ?: 'Spectra BlackPearl DSL script'
 
@@ -139,27 +138,28 @@ class RecordCommand implements ShellCommand {
     def stringWriter = new StringWriter()
     cli.writer = new PrintWriter(stringWriter)
     def options = cli.parse(args)
-    if (stringWriter.toString()) return stringWriter.toString()
+    if (stringWriter.toString()) 
+      return stringWriter.toString()
 
-    if (!options) return ''
+    if (options.arguments()) {
+      def file = new CommandHelper().getScriptFromString(options.arguments()[0])
+      file = ensureExtension(file)
+      if (errorCheckFile(file)) return errorCheckFile(file)
+      this.scriptFile = file
+    }
+
+    if (!options) 
+      return ''
+
     if (options.h) {
       cli.usage()
       return stringWriter.toString()
     }
     if (options.f) {
       def file = new CommandHelper().getScriptFromString(options.f)
-
-      if (file.exists()) {
-        return "[Error] The file $file already exists!\n"
-      } else if (!file.getParentFile().exists()) {
-        return "[Error] The directory ${file.getParent()} does not exist!\n"
-      } else if (!(FilenameUtils.getExtension(file.toString()) in ['','groovy'])) {
-        return "[Error] The script extension must be 'groovy' or none."
-      } else {
-        if (FilenameUtils.getExtension(file.toString()) == '')
-          file = new File(file.toString() + '.groovy')
-        scriptFile = file
-      }
+      file = ensureExtension(file)
+      if (errorCheckFile(file)) return errorCheckFile(file)
+      this.scriptFile = file
     }
     if (options.d) {
       this.scriptDesc = options.d
@@ -170,11 +170,30 @@ class RecordCommand implements ShellCommand {
     return ''
   }
 
+  /** @return Error message if there is something wrong with the file location */
+  private String errorCheckFile(File file) {
+    if (file.exists()) {
+      return "[Error] The file $file already exists!\n"
+    } else if (!file.getParentFile().exists()) {
+      return "[Error] The directory ${file.getParent()} does not exist!\n"
+    } else if (!(FilenameUtils.getExtension(file.toString()) in ['','groovy'])) {
+      return "[Error] The script extension must be 'groovy' or none."
+    } else {
+      return ''
+    }
+  }
+
+  /** @return same file but with .groovy extension if none is given */
+  private File ensureExtension(File file) {
+    if (FilenameUtils.getExtension(file.toString()) == '')
+      file = new File(file.toString() + '.groovy')
+    return file
+  }
+
   /** sets fields to their default values */
   private void init() {
     this.recordId     = ''
     this.scriptDesc   = ''
-    this.scriptName   = ''
     this.scriptFile   = null
     this.isRecording  = false
     this.isRecordEnv  = false
