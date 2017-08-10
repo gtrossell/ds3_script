@@ -100,7 +100,7 @@ class Tool extends Script {
     importCustomizer.addImport('com.spectralogic.ds3client.models.common.Credentials')
     importCustomizer.addImport('com.spectralogic.ds3client.Ds3ClientBuilder')
     importCustomizer.addStarImports('com.spectralogic.ds3client.commands')
-    importCustomizer.addImport('spectra.helpers.Environment')
+    importCustomizer.addImport('com.spectralogic.dsl.helpers.Environment')
     
     return importCustomizer
   }
@@ -109,7 +109,7 @@ class Tool extends Script {
   private buildConfig() {
     def config = new CompilerConfiguration()
     config.addCompilationCustomizers(buildImportCustomizer())
-    config.scriptBaseClass = 'spectra.SpectraDSL'
+    config.scriptBaseClass = 'com.spectralogic.dsl.SpectraDSL'
     return config
   }
 
