@@ -1,4 +1,4 @@
-package spectra.helpers
+package com.spectralogic.dsl.helpers
 
 /** Provides methods to help the command classes */
 class CommandHelper {

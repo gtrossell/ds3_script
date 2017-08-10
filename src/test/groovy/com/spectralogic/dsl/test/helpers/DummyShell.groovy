@@ -1,6 +1,6 @@
-package spectra.test.helpers
+package com.spectralogic.dsl.test.helpers
 
-import spectra.SpectraDSL
+import com.spectralogic.dsl.SpectraDSL
 
 /** Extends the SpectraDSL */
 class DummyShell extends SpectraDSL { def run() {} }

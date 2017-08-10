@@ -1,4 +1,4 @@
-package spectra.commands
+package com.spectralogic.dsl.commands
 
 class HelpCommand implements ShellCommand {
 

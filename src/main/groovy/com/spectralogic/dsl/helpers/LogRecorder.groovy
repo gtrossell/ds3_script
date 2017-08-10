@@ -1,4 +1,4 @@
-package spectra.helpers
+package com.spectralogic.dsl.helpers
 
 class LogRecorder {
   String logDir

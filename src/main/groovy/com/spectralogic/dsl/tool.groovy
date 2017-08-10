@@ -1,4 +1,4 @@
-package spectra
+package com.spectralogic.dsl
 
 @GrabResolver(name='Spectra-Github', root='http://dl.bintray.com/spectralogic/ds3/')
 @Grapes([
@@ -18,11 +18,11 @@ import jline.console.completer.FileNameCompleter
 import java.io.File
 import java.io.IOException
 
-import spectra.helpers.Environment
-import spectra.helpers.Globals
-import spectra.helpers.LogRecorder
-import spectra.SpectraDSL
-import spectra.commands.ShellCommandFactory
+import com.spectralogic.dsl.helpers.Environment
+import com.spectralogic.dsl.helpers.Globals
+import com.spectralogic.dsl.helpers.LogRecorder
+import com.spectralogic.dsl.SpectraDSL
+import com.spectralogic.dsl.commands.ShellCommandFactory
 
 /** 
  * This is the main class for the Spectra DSL tool.

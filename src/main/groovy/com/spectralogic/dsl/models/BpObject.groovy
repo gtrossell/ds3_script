@@ -1,4 +1,4 @@
-package spectra.models
+package com.spectralogic.dsl.models
 
 import com.spectralogic.ds3client.commands.DeleteObjectRequest
 import com.spectralogic.ds3client.commands.DeleteObjectResponse

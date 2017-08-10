@@ -1,11 +1,11 @@
-package spectra.commands
+package com.spectralogic.dsl.commands
 
 import groovy.io.FileType
 
 import org.apache.commons.io.FilenameUtils
 
-import spectra.helpers.CommandHelper
-import spectra.helpers.Config
+import com.spectralogic.dsl.helpers.CommandHelper
+import com.spectralogic.dsl.helpers.Config
 
 class ExecuteCommand implements ShellCommand {
   GroovyShell shell

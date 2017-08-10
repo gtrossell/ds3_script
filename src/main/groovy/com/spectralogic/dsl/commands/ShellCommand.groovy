@@ -1,4 +1,4 @@
-package spectra.commands
+package com.spectralogic.dsl.commands
 
 /** Interface for all shell commands */
 interface ShellCommand {

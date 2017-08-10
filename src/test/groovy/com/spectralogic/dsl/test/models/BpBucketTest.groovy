@@ -1,9 +1,9 @@
-package spectra.test.models
+package com.spectralogic.dsl.test.models
 
 import java.util.Random
 
-import spectra.models.BpClient
-import spectra.test.helpers.DummyShell
+import com.spectralogic.dsl.models.BpClient
+import com.spectralogic.dsl.test.helpers.DummyShell
 
 /** Tests BpClient class. Enviroment variables for client must be set */
 class BpBucketTest extends GroovyTestCase {

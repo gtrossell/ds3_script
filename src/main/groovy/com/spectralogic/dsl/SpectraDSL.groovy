@@ -1,4 +1,4 @@
-package spectra
+package com.spectralogic.dsl
 
 @GrabResolver(name='Spectra-Github', root='http://dl.bintray.com/spectralogic/ds3/')
 @Grapes([
@@ -19,7 +19,7 @@ import groovy.transform.*
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import spectra.helpers.Globals
+import com.spectralogic.dsl.helpers.Globals
 
 /**
  * This is the customized SpectraShell that contains the DSL and acts similar

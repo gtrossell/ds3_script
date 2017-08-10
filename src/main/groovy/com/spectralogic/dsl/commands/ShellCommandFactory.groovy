@@ -1,6 +1,6 @@
-package spectra.commands
+package com.spectralogic.dsl.commands
 
-import spectra.helpers.LogRecorder
+import com.spectralogic.dsl.helpers.LogRecorder
 
 class ShellCommandFactory {
   List<ShellCommand> commands

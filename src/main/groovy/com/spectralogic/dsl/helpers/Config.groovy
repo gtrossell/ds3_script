@@ -1,4 +1,4 @@
-package spectra.helpers
+package com.spectralogic.dsl.helpers
 
 /**
  * Config keeps all of the strings and options that are able to be changed

@@ -1,4 +1,4 @@
-package spectra.helpers
+package com.spectralogic.dsl.helpers
 
 /** Manages access to environment variables */
 class Environment {
