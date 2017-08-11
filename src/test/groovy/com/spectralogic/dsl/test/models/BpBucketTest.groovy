@@ -1,25 +1,25 @@
-package com.spectralogic.dsl.test.models
+import org.junit.Test
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertNull
 
 import java.util.Random
 
-import com.spectralogic.dsl.models.BpClient
-import com.spectralogic.dsl.test.helpers.DummyShell
+import com.spectralogic.dsl.helpers.Globals
 
-/** Tests BpClient class. Enviroment variables for client must be set */
-class BpBucketTest extends GroovyTestCase {
-
-  /** Test putBulk(), empty(), reload(), delete(), object() and objects() */
-  void testAll() {
-    def client = new DummyShell().createBpClient()
+/** Tests BpBucket */
+public class BpBucketTest {
+  @Test
+  public void testBucket() throws IOException {
+    def client = Globals.createBpClient()
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)
 
     // put test objects
     def homePath = new File("").getAbsoluteFile().toString()
     bucket.putBulk("${homePath}/test-data/dir2")
-    bucket.putBulk("${homePath}/test-data/dir1/txt1.txt",
+    bucket.putBulk(["${homePath}/test-data/dir1/txt1.txt",
                     "${homePath}/test-data/dir1/txt2.txt",
-                    "${homePath}/test-data/dir1/txt3.txt")
+                    "${homePath}/test-data/dir1/txt3.txt"])
     // TODO: prevent user from having two named the same?
     assertEquals 5, bucket.objects().size()
     assertEquals bucket.objects().size(), bucket.reload().objects().size()
@@ -27,11 +27,10 @@ class BpBucketTest extends GroovyTestCase {
     assertEquals 2, bucket.objects('txt2.txt', 'txt3.txt').size()
     assert 10000 < bucket.object('txt2.txt').size()
 
-    shouldFail { bucket.delete() }
+    assert bucket.delete().contains('[Error]')
     bucket.empty()
     assertEquals 0, bucket.objects().size()
     bucket.delete()
     assertNull client.bucket(bucketName)
   }
-
 }

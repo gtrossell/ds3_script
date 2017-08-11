@@ -1,15 +1,16 @@
-package com.spectralogic.dsl.test.models
+import org.junit.Test
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertNull
 
 import java.util.Random
 
-import com.spectralogic.dsl.models.BpClient
-import com.spectralogic.dsl.test.helpers.DummyShell
+import com.spectralogic.dsl.helpers.Globals
 
-/** Tests BpClient class. Enviroment variables for client must be set */
-class BpClientTest extends GroovyTestCase {
-
-  void testCreateBucket() {
-    def client = new DummyShell().createBpClient()
+/** Tests BpClient */
+public class BpClientTest {
+  @Test
+  public void testClient() throws IOException {
+    def client = Globals.createBpClient()
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)
     assertEquals bucketName, bucket.name
@@ -17,5 +18,4 @@ class BpClientTest extends GroovyTestCase {
     bucket.delete()
     assertNull client.bucket(bucketName)
   }
-
 }

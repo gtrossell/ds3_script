@@ -1,20 +1,17 @@
-package com.spectralogic.dsl.test.models
+import org.junit.Test
+import static org.junit.Assert.assertNull
 
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.Random
 
-import com.spectralogic.dsl.models.BpClient
-import com.spectralogic.dsl.test.helpers.DummyShell
+import com.spectralogic.dsl.helpers.Globals
 
-import java.nio.file.Path
-import java.nio.file.Paths
-import java.nio.file.Files
-
-/** Tests BpClient class. Enviroment variables for client must be set */
-class BpObjectTest extends GroovyTestCase {
-
-  void testAll() {
-    def shell = new DummyShell()
-    def client = shell.createBpClient()
+/** Tests BpObject */
+public class BpObjectTest {
+  @Test
+  public void testObject() throws IOException {
+    def client = Globals.createBpClient()
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)
     
@@ -31,8 +28,8 @@ class BpObjectTest extends GroovyTestCase {
 
     // write
     def dirPath = "${homePath}/test-data/tmp/"
-    object.writeTo(shell.filePath(dirPath))
-    def file = shell.filePath(dirPath + object.name)
+    object.writeTo(Paths.get(dirPath))
+    def file = Paths.get(dirPath + object.name)
     assert Files.exists(file)
     Files.delete(file)
 
@@ -41,5 +38,4 @@ class BpObjectTest extends GroovyTestCase {
     assertNull bucket.object(fileName)
     bucket.delete()
   }
-
 }
