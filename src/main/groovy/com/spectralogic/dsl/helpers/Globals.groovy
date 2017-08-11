@@ -17,6 +17,7 @@ class Globals {
   static def initMessage(width) {
     """
 Welcome to the Spectra DSL for BlackPearl!
+Use the ':help' command to get started
 ${'=' * width}"""
   }
 
