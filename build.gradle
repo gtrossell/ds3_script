@@ -24,16 +24,9 @@ repositories {
     }
 }
 
-configurations {
-    ivy
-}
-
 dependencies {
     // Use the latest Groovy version for building this library
     compile 'org.codehaus.groovy:groovy-all:2.4.11'
-
-    // Ivy for the Grapes
-    ivy group: 'org.apache.ivy', name: 'ivy', version: '2.4.0'
 
     // Use the awesome Spock testing and specification framework
     // testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
@@ -45,14 +38,11 @@ dependencies {
 
     // Logging
     compile 'org.slf4j:slf4j-api:1.7.21'
+    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.21'
 
     compile 'jline:jline:2.14.2'
 
     compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
-}
-
-tasks.withType(GroovyCompile) {
-    groovyClasspath += configurations.ivy
 }
 
 // Define the main class for the application
