@@ -48,7 +48,7 @@ bucket.deleteObjects(object)
 bucket.delete() // bucket must be empty to delete
 ```
 
-### Objects
+#### Objects
 ```
 object = bucket.object('test_object')
 object.metadata
