@@ -36,8 +36,11 @@ class BpClient extends Ds3ClientImpl {
 
   /** @return BpBucket of newly created BP bucket */
   def createBucket(String name, String dataPolicyId="") {
-    // TODO: check if bucket already exists
     // TODO: impliment dataPolicyId
+    if (this.bucket(name)) {
+      println "[Error] Bucket with name '$name' already exists!"
+      return null
+    }
     this.putBucket(new PutBucketRequest(name))
     bucket(name)
   }
