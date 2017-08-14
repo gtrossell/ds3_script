@@ -15,4 +15,4 @@ include 'api'
 include 'services:webservice'
 */
 
-rootProject.name = 'ds3_script'
+rootProject.name = 'ds3-script'
