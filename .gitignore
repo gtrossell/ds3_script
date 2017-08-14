@@ -11,3 +11,4 @@ script_layout.md
 scripts/
 build/
 .gradle/
+run.sh
