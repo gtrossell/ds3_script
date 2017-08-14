@@ -1,28 +1,16 @@
 package com.spectralogic.dsl
 
-// @GrabResolver(name='Spectra-Github', root='http://dl.bintray.com/spectralogic/ds3/')
-// @Grapes([
-//   @Grab(group='com.spectralogic.ds3', module='ds3-sdk', version='3.4.0'),
-//   @Grab(group='org.slf4j', module='slf4j-simple', version='1.7.21'),
-//   @GrabConfig(systemClassLoader = true)
-// ])
-
-import org.codehaus.groovy.runtime.InvokerHelper
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.ImportCustomizer
-
-import jline.TerminalFactory
-import jline.console.ConsoleReader
-import jline.console.completer.FileNameCompleter
-
-import java.io.File
-import java.io.IOException
-
+import com.spectralogic.dsl.commands.ShellCommandFactory
 import com.spectralogic.dsl.helpers.Environment
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
-import com.spectralogic.dsl.SpectraDSL
-import com.spectralogic.dsl.commands.ShellCommandFactory
+import java.io.File
+import java.io.IOException
+import jline.console.ConsoleReader
+import jline.TerminalFactory
+import org.codehaus.groovy.control.CompilerConfiguration
+import org.codehaus.groovy.control.customizers.ImportCustomizer
+import org.codehaus.groovy.runtime.InvokerHelper
 
 /** 
  * This is the main class for the Spectra DSL tool.

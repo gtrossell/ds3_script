@@ -21,7 +21,7 @@ class BpBucket extends GetBucketResponse {
   String name
   ListBucketResult listBucketResult
 
-  def BpBucket(GetBucketResponse response, Ds3ClientImpl client) {
+  BpBucket(GetBucketResponse response, Ds3ClientImpl client) {
     super(response.getListBucketResult(), 
           response.getChecksum(), 
           response.getChecksumType())
@@ -31,7 +31,7 @@ class BpBucket extends GetBucketResponse {
   }
 
   /** @return the current version of this bucket. Doesn't change this object */
-  def reload() {
+  BpBucket reload() {
     this.listBucketResult = client.bucket(this.name).getListBucketResult()
     this
   }
@@ -41,9 +41,13 @@ class BpBucket extends GetBucketResponse {
    * accidentally deleted
    * @return true if bucket was deleted
    */
-  def delete() {
-    if (this.objects()) return '[Error] Bucket must be empty to delete!'
+  Boolean delete() {
+    if (this.objects()) {
+      println '[Error] Bucket must be empty to delete!'
+      return false
+    }
     client.deleteBucket(new DeleteBucketRequest(this.name))
+    return true
   }
 
   /** Deletes all objects inside it */
@@ -131,7 +135,7 @@ class BpBucket extends GetBucketResponse {
    * @param objectNames objects names to return
    * @return list all objects in bucket or objects with given names 
    */
-  def objects(String ...objectNames) {
+  List<BpObject> objects(String ...objectNames) {
     // TODO: if object cannot be found, reload the bucket
     def wantedObjects = []
     if (objectNames.length == 0) {
@@ -148,7 +152,7 @@ class BpBucket extends GetBucketResponse {
    * @param objectName the name of the object to return
    * @return BpObject with given name 
    */
-  def object(String objectName) {
+  BpObject object(String objectName) {
     def objs = objects(objectName)
     return (objs.size() == 1 ? objs[0] : null)
   }

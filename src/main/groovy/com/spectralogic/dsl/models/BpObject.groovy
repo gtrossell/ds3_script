@@ -16,14 +16,14 @@ import java.nio.file.Files
 import java.nio.channels.FileChannel
 import java.nio.file.StandardOpenOption
 
-/** Represents a BlackPearl Object, extends Ds3Object */
+/** Represents a BlackPearl Object */
 class BpObject extends Ds3Object {
   BpBucket bucket
   Ds3ClientImpl client
   User owner
-  def metadata
+  Map metadata
 
-  def BpObject(Contents contents, BpBucket bucket, Ds3ClientImpl client) {
+  BpObject(Contents contents, BpBucket bucket, Ds3ClientImpl client) {
     this.name = contents.getKey()
     this.size = contents.getSize()
     this.owner = contents.getOwner()
@@ -35,7 +35,7 @@ class BpObject extends Ds3Object {
    * Deletes the object from the BP 
    * @return true if object was deleted 
    */
-  def delete() {
+  Boolean delete() {
     try {
       def deleteRequest = new DeleteObjectRequest(bucket.name, this.name)
       def deleteResponse = client.deleteObject(deleteRequest)
@@ -53,7 +53,7 @@ class BpObject extends Ds3Object {
    * @param path  directory to write object to
    * @return true if the write was successful
    */
-  def writeTo(Path path) {
+  Boolean writeTo(Path path) {
     // TODO: write to a file or directory
     // TODO: allow use of a string
     try {
@@ -92,10 +92,10 @@ class BpObject extends Ds3Object {
   }
 
   /** @return size of object in bytes */
-  def size() { this.size }
+  Long size() { this.size }
 
   /** @return map of the metadata */
-  def getMetadata() {
+  Map getMetadata() {
     [
       name:       this.name, 
       size:       this.size, 

@@ -1,11 +1,10 @@
 package com.spectralogic.dsl.helpers
 
-import com.spectralogic.ds3client.models.common.Credentials
-
-import com.spectralogic.dsl.helpers.Environment
-import com.spectralogic.dsl.models.BpClient
 import com.spectralogic.ds3client.Ds3Client
 import com.spectralogic.ds3client.Ds3ClientBuilder
+import com.spectralogic.ds3client.models.common.Credentials
+import com.spectralogic.dsl.helpers.Environment
+import com.spectralogic.dsl.models.BpClient
 
 /**
  * Globals keeps all fields and functions that need to be accessed multiple

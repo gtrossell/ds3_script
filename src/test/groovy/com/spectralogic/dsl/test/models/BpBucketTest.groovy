@@ -1,5 +1,6 @@
 import org.junit.Test
 import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertFalse
 import static org.junit.Assert.assertNull
 
 import java.util.Random
@@ -27,7 +28,7 @@ public class BpBucketTest {
     assertEquals 2, bucket.objects('txt2.txt', 'txt3.txt').size()
     assert 10000 < bucket.object('txt2.txt').size()
 
-    assert bucket.delete().contains('[Error]')
+    assertFalse bucket.delete()
     bucket.empty()
     assertEquals 0, bucket.objects().size()
     bucket.delete()

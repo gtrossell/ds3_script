@@ -1,19 +1,8 @@
 package com.spectralogic.dsl
 
-import com.spectralogic.ds3client.commands.*
-import com.spectralogic.ds3client.Ds3ClientImpl
-import com.spectralogic.ds3client.models.Bucket
-import com.spectralogic.ds3client.models.bulk.Ds3Object
-import com.spectralogic.ds3client.models.Contents
-import com.spectralogic.ds3client.models.ListBucketResult
-import com.spectralogic.ds3client.models.User
-
-import groovy.transform.*
-
+import com.spectralogic.dsl.helpers.Globals
 import java.nio.file.Path
 import java.nio.file.Paths
-
-import com.spectralogic.dsl.helpers.Globals
 
 /**
  * This is the customized SpectraShell that contains the DSL and acts similar

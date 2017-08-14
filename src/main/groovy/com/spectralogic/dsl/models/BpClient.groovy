@@ -6,14 +6,15 @@ import com.spectralogic.ds3client.commands.GetBucketRequest
 import com.spectralogic.ds3client.commands.GetServiceRequest
 import com.spectralogic.ds3client.commands.PutBucketRequest
 
+/** Represents a BlackPearl Client */
 class BpClient extends Ds3ClientImpl {
   
-  def BpClient(Ds3ClientImpl ds3Client) {
+  BpClient(Ds3ClientImpl ds3Client) {
     super(ds3Client.getNetClient())
   }
 
   /** @return BpBucket of bucket with given name */
-  def bucket(String bucketName) {
+  BpBucket bucket(String bucketName) {
     // TODO: if no bucket is found return null and issue warning
     try {
       def response = this.getBucket(new GetBucketRequest(bucketName))
@@ -35,7 +36,7 @@ class BpClient extends Ds3ClientImpl {
   }
 
   /** @return BpBucket of newly created BP bucket */
-  def createBucket(String name, String dataPolicyId="") {
+  BpBucket createBucket(String name, String dataPolicyId="") {
     // TODO: impliment dataPolicyId
     if (this.bucket(name)) {
       println "[Error] Bucket with name '$name' already exists!"
