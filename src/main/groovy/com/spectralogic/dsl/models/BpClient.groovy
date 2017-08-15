@@ -10,11 +10,10 @@ import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl Client */
 class BpClient extends Ds3ClientImpl {
-  private final static logger
+  private final static logger = LoggerFactory.getLogger(BpClient.class)
 
   BpClient(Ds3ClientImpl ds3Client) { // just net client
     super(ds3Client.getNetClient())
-    logger = LoggerFactory.getLogger(BpClient.class)
   }
 
   /** @return BpBucket of bucket with given name */

@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
 class BpBucket extends GetBucketResponse {
-  private final static logger
+  private final static logger = LoggerFactory.getLogger(BpBucket.class)
   private final Ds3ClientImpl client
   private ListBucketResult listBucketResult
   final String name
@@ -31,7 +31,6 @@ class BpBucket extends GetBucketResponse {
     this.listBucketResult = response.getListBucketResult()
     this.client = client
     this.name = response.getListBucketResult().getName()
-    logger = LoggerFactory.getLogger(BpBucket.class)
   }
 
   /** @return the current version of this bucket. Doesn't change this object */

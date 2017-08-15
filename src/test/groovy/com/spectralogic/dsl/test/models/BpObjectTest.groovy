@@ -21,8 +21,8 @@ public class BpObjectTest {
     def object = bucket.object(fileName)
     def meta = object.getMetadata()
     assert meta['name']
-    assert meta['size'] == object.size()
-    assert 10 < object.size()
+    assert meta['size'] == object.size
+    assert 10 < object.size
     assert meta['owner']
     assert meta['bucketName']
 

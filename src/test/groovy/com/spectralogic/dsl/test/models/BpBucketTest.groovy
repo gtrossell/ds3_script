@@ -26,7 +26,7 @@ public class BpBucketTest {
     assertEquals bucket.objects().size(), bucket.reload().objects().size()
     assertEquals 'txt1.txt', bucket.object('txt1.txt').name
     assertEquals 2, bucket.objects('txt2.txt', 'txt3.txt').size()
-    assert 10000 < bucket.object('txt2.txt').size()
+    assert 10000 < bucket.object('txt2.txt').size
 
     assertFalse bucket.delete()
     bucket.empty()
