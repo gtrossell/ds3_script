@@ -13,13 +13,14 @@ import com.spectralogic.dsl.models.BpClient
 class Globals {
   final static String PROMPT = 'spectra> '
   final static String RETURN_PROMPT = '===> '
+  private final static logger
+  
   static def initMessage(width) {
     """
 Welcome to the Spectra DSL for BlackPearl!
 Use the ':help' command to get started
 ${'=' * width}"""
   }
-  private final static logger
 
   /** Returns a BP client */
   static def createBpClient(String endpoint="", String accessId="", 

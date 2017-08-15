@@ -30,6 +30,7 @@ class CommandResponse {
 
   def CommandResponse addError(String message) {
     error << message
+    this
   }
 
   def Boolean isEmpty() {

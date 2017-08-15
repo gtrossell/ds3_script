@@ -6,7 +6,8 @@ class HelpCommand implements ShellCommand {
     new CommandResponse().addInfo("The available commands are:\n" +
       "\t* :help, :h\n" +
       "\t* :record, :r\n" +
-      "\t* :execute, :e" +
+      "\t* :execute, :e\n" +
+      "\t* :exit\n"
       "\n" +
       "Use '<command> -h' for help on a specific command\n" +
       "\n" +
