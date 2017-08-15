@@ -21,6 +21,7 @@ abstract class SpectraDSL extends Script {
   }
 
   /** Creates directory or file path from string  */
+  // TODO: depricate?
   def Path filePath(String dirName) {
     Paths.get(dirName)
   }

@@ -53,10 +53,11 @@ class BpObject extends Ds3Object {
    * @param path  directory to write object to
    * @return true if the write was successful
    */
-  Boolean writeTo(Path path) {
-    // TODO: write to a file or directory
-    // TODO: allow use of a string
+  Boolean writeTo(String pathStr) {
+    // TODO: write to a file
+    def path = Paths.get(pathStr)
     try {
+      // TODO: test if this works
       if (!Files.exists(path)) Files.createDirectory(path)
       
       /* convert BpObject to Ds3Object */
@@ -84,7 +85,7 @@ class BpObject extends Ds3Object {
           ))
         }
       }
-    } catch (Exception e) {
+    } catch (Exception e) { // TODO: just throw the exception up
       e.printStackTrace()
       return false
     }

@@ -28,7 +28,7 @@ public class BpObjectTest {
 
     // write
     def dirPath = "${homePath}/test-data/tmp/"
-    object.writeTo(Paths.get(dirPath))
+    object.writeTo(dirPath)
     def file = Paths.get(dirPath + object.name)
     assert Files.exists(file)
     Files.delete(file)
