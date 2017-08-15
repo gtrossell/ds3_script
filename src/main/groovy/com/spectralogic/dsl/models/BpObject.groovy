@@ -54,46 +54,43 @@ class BpObject extends Ds3Object {
    * @return true if the write was successful
    */
   Boolean writeTo(String pathStr) {
-    // TODO: write to a file
+    // TODO: write to a file option
     def path = Paths.get(pathStr)
-    try {
-      // TODO: test if this works
-      if (!Files.exists(path)) Files.createDirectory(path)
-      
-      /* convert BpObject to Ds3Object */
-      def objectList = [new Ds3Object(this.getName())]
-      def bulkRequest = new GetBulkJobSpectraS3Request(bucket.name, objectList)
-      def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
-      
-      def list = bulkResponse.getMasterObjectList()
-      for (objects in list.getObjects()) {
-        for (obj in objects.getObjects()) {
-          def channel = FileChannel.open(
-            path.resolve(obj.getName()),
-            StandardOpenOption.WRITE,
-            StandardOpenOption.CREATE
-          )
-          
-          channel.position(obj.getOffset());
-          
-          client.getObject(new GetObjectRequest(
-            bucket.name,
-            obj.getName(),
-            channel,
-            list.getJobId().toString(),
-            obj.getOffset()
-          ))
-        }
+    // TODO: test if this works
+    if (!Files.exists(path)) Files.createDirectory(path)
+    
+    /* convert BpObject to Ds3Object */
+    def objectList = [new Ds3Object(this.getName())]
+    def bulkRequest = new GetBulkJobSpectraS3Request(bucket.name, objectList)
+    def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
+    
+    def list = bulkResponse.getMasterObjectList()
+    for (objects in list.getObjects()) {
+      for (obj in objects.getObjects()) {
+        def channel = FileChannel.open(
+          path.resolve(obj.getName()),
+          StandardOpenOption.WRITE,
+          StandardOpenOption.CREATE
+        )
+        
+        channel.position(obj.getOffset());
+        
+        client.getObject(new GetObjectRequest(
+          bucket.name,
+          obj.getName(),
+          channel,
+          list.getJobId().toString(),
+          obj.getOffset()
+        ))
       }
-    } catch (Exception e) { // TODO: just throw the exception up
-      e.printStackTrace()
-      return false
     }
     return true
   }
 
   /** @return size of object in bytes */
-  Long size() { this.size }
+  Long size() { 
+    this.size 
+  }
 
   /** @return map of the metadata */
   Map getMetadata() {
