@@ -3,16 +3,17 @@ package com.spectralogic.dsl.models
 import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChannelBuilder
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers
 import com.spectralogic.ds3client.helpers.FileObjectPutter
-import com.spectralogic.ds3client.models.ListBucketResult
 import com.spectralogic.ds3client.models.ChecksumType
+import com.spectralogic.ds3client.models.Contents
+import com.spectralogic.ds3client.models.ListBucketResult
 import com.spectralogic.ds3client.models.bulk.Ds3Object
-import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
-import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.commands.DeleteBucketRequest
+import com.spectralogic.ds3client.commands.GetBucketResponse
+import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.Files
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -76,7 +77,6 @@ class BpBucket extends GetBucketResponse {
     }
     if (remoteDir && remoteDir[-1] != '/') remoteDir += '/'
 
-    // TODO: add true logging
     /* Group files into common directories */
     def helper = Ds3ClientHelpers.wrap(this.client)
     def objects = [:] /* key: directory val: array of Ds3Objects */
@@ -117,14 +117,11 @@ class BpBucket extends GetBucketResponse {
    * @return list all objects in bucket or objects with given names 
    */
   List<BpObject> objects(String ...objectNames) {
-    // TODO: if object cannot be found, reload the bucket
-    def wantedObjects = []
+    def wantedObjects
     if (objectNames.length == 0) {
-      wantedObjects = this.listBucketResult.objects
+      wantedObjects = listBucketResult.objects
     } else {
-      this.listBucketResult.objects.each { contents -> 
-        if (objectNames.contains(contents.getKey())) wantedObjects << contents
-      }
+      wantedObjects = listBucketResult.objects.findAll { objectNames.contains(it.getKey()) }
     }
     return contentsToBpObjects(wantedObjects)
   }
