@@ -6,8 +6,8 @@ import groovy.io.FileType
 import org.apache.commons.io.FilenameUtils
 
 class ExecuteCommand implements ShellCommand {
-  GroovyShell shell
-  CliBuilder cli
+  private final GroovyShell shell
+  private final CliBuilder cli
 
   ExecuteCommand(GroovyShell shell) {
     this.shell = shell
@@ -19,41 +19,50 @@ class ExecuteCommand implements ShellCommand {
     cli.d('delete script in script folder', longOpt:'delete', args:1, argName:'script')
   }
 
-  String[] commandNames() { [':execute', ':e'] }
+  String[] commandNames() {
+    [':execute', ':e']
+  }
 
-  String run(args) {
-    def message = commandOptions(args)
-    if (message) return message
+  CommandResponse run(args) {
+    def response = new CommandResponse()
+    if (!commandOptions(args, response).isEmpty()) return response
 
     def scriptName = args[0]
-    if (FilenameUtils.getExtension(scriptName) == '') scriptName += '.groovy'
+    if (FilenameUtils.getExtension(scriptName) == '') {
+      scriptName += '.groovy'
+    }
 
     def script = new CommandHelper().getScriptFromString(scriptName)
-    if (!script.exists()) return "[Error] The script $script does not exists!\n"
+    if (!script.exists()) {
+      return response.addError("The script '$script' does not exists!")
+    }
     
     // TODO: fix bug where if script is edited, the shell doesn't realize it
     def scriptArgs = args.size() > 1 ? args[1..args.size()-1] : []
     shell.run(script, scriptArgs)
-    return true
+    return response
   }
 
   /** @return help message if requested or error message */
-  private commandOptions(args) {
+  private CommandResponse commandOptions(args, response) {
     def stringWriter = new StringWriter()
     cli.writer = new PrintWriter(stringWriter)
     def options = cli.parse(args)
-    if (stringWriter.toString()) return stringWriter.toString()
+    if (stringWriter.toString()) {
+      return response.addInfo(stringWriter.toString())
+    }
 
-    if (!options) return ''
-    if (options.h || args.size() < 1) {
+    if (!options) {
+      return response
+    } else if (options.h || args.size() < 1) {
       cli.usage()
-      return stringWriter.toString()
+      return response.addInfo(stringWriter.toString())
     } else if (options.l) {
-      return listScripts()
+      return response.addInfo(listScripts())
     } else if (options.d) {
-      return deleteScript(options.d)
+      return response.addInfo(deleteScript(options.d))
     } else {
-      return ''
+      return response
     }
   }
 

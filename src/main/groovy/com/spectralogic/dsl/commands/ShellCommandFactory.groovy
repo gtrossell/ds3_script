@@ -10,13 +10,15 @@ class ShellCommandFactory {
     commands << new HelpCommand()
     commands << new RecordCommand(recorder, shell.getVariable('environment'))
     commands << new ExecuteCommand(shell)
+    commands << new ExitCommand()
   }
 
   def runCommand(commandName, args) {
     def execCommand = { name ->
       name = name.toLowerCase()
-      for (def i = 0; i < commands.size(); i++)
+      for (def i = 0; i < commands.size(); i++) {
         if (name in commands[i].commandNames()) return commands[i].run(args)
+      }
       return null
     }
 

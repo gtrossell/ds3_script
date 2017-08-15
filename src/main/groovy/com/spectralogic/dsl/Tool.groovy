@@ -28,7 +28,10 @@ class Tool extends Script {
       def args = line.split(' ')
       def command = args[0]
       args = 1 < args.size() ? args[1..args.size()-1] : []
-      return commandFactory.runCommand(command, args)
+      def response = commandFactory.runCommand(command, args)
+      response.log()
+      if (response.exit) System.exit(0) // TODO
+      return ''
     }
 
     /* shell evaluation */

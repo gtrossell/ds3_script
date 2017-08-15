@@ -23,34 +23,31 @@ class RecordCommand implements ShellCommand {
     this.environment = environment
     init()
 
-    cli = new CliBuilder(usage:':record, :r [options]')
-    // TODO: make a better header
+    cli = new CliBuilder(usage:':record, :r <name> [options]')
+    // TODO: make a better header?
     cli.header = 'First usage starts recording, second saves'
     cli.e('save environment in script', longOpt: 'environment')
-    cli.f('file name and/or location', longOpt: 'file', args:1, argName:'name')
     cli.d('script description', longOpt: 'desc', args:1, argName:'description')
     cli.h('display this message', longOpt:'help')
   }
 
-  String[] commandNames() { [':record', ':r'] }
-
-  String run(args) {
-    def message = commandOptions(args)
-    if (message) return message
+  CommandResponse run(args) {
+    def response = new CommandResponse()
+    if (!commandOptions(args, response).isEmpty()) return response
 
     if (!isRecording) {
       /* start recording */
       recordId = createScriptId()
       recorder.writeLine(startLine())
       isRecording = true
-      return "Started recording script"
+      return response.addInfo("Started recording script")
     } else {
       /* end recording */
       recorder.writeLine(endLine())
       def scriptLines = []
       def isScript = false
       recorder.getLogFile().eachLine { String line ->
-        if (line == endLine()) return
+        if (line == endLine()) return response
         if (isScript && line.startsWith(Globals.PROMPT)) {
           line = line.substring(Globals.PROMPT.size())
           if (!line.startsWith(':')) scriptLines << line
@@ -60,10 +57,15 @@ class RecordCommand implements ShellCommand {
 
       def scriptLoc = saveScript(scriptLines)
       init()
-      return "Saved script to '$scriptLoc'"
+      return response.addInfo("Saved script to '$scriptLoc'")
     }
   }
 
+  String[] commandNames() {
+    [':record', ':r']
+  }
+
+  /** Builds script lines and saves it to set or given location */
   private String saveScript(scriptLines) {
     if (!scriptFile)
       scriptFile = new File(Config.getScriptDir(), "${recordId}.groovy")
@@ -89,7 +91,7 @@ class RecordCommand implements ShellCommand {
     if (scriptName.contains('.')) scriptName = scriptName.split('\\.')[0]
     scriptDesc = scriptDesc ?: 'Spectra BlackPearl DSL script'
 
-    def lineLength = 30
+    def final lineLength = 30
     def lineComment = { c -> "/*" + c * (lineLength + 2) + "*/\n" }
     def comment = (
       lineComment('*') +
@@ -132,32 +134,26 @@ class RecordCommand implements ShellCommand {
   }
 
   /** @return help message if requested or error message */
-  private String commandOptions(args) {
+  private CommandResponse commandOptions(args, response) {
     def stringWriter = new StringWriter()
     cli.writer = new PrintWriter(stringWriter)
     def options = cli.parse(args)
     if (stringWriter.toString()) 
-      return stringWriter.toString()
+      return response.addInfo(stringWriter.toString())
 
     if (options.arguments()) {
       def file = new CommandHelper().getScriptFromString(options.arguments()[0])
       file = ensureExtension(file)
-      if (errorCheckFile(file)) return errorCheckFile(file)
+      if (errorCheckFile(file, response).error) return response
       this.scriptFile = file
     }
 
-    if (!options) 
-      return ''
-
+    if (!options) {
+      return response
+    }
     if (options.h) {
       cli.usage()
-      return stringWriter.toString()
-    }
-    if (options.f) {
-      def file = new CommandHelper().getScriptFromString(options.f)
-      file = ensureExtension(file)
-      if (errorCheckFile(file)) return errorCheckFile(file)
-      this.scriptFile = file
+      return response.addInfo(stringWriter.toString())
     }
     if (options.d) {
       this.scriptDesc = options.d
@@ -165,19 +161,19 @@ class RecordCommand implements ShellCommand {
     if (options.e) {
       this.isRecordEnv = true
     }
-    return ''
+    return response
   }
 
   /** @return Error message if there is something wrong with the file location */
-  private String errorCheckFile(File file) {
+  private CommandResponse errorCheckFile(File file, CommandResponse response) {
     if (file.exists()) {
-      return "[Error] The file $file already exists!\n"
+      return response.addError("The file $file already exists!")
     } else if (!file.getParentFile().exists()) {
-      return "[Error] The directory ${file.getParent()} does not exist!\n"
+      return response.addError("The directory ${file.getParent()} does not exist!")
     } else if (!(FilenameUtils.getExtension(file.toString()) in ['','groovy'])) {
-      return "[Error] The script extension must be 'groovy' or none."
+      return response.addError("The script extension must be 'groovy' or none.")
     } else {
-      return ''
+      return response
     }
   }
 
