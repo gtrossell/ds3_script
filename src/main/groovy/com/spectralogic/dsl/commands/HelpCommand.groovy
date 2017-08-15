@@ -7,7 +7,7 @@ class HelpCommand implements ShellCommand {
       "\t* :help, :h\n" +
       "\t* :record, :r\n" +
       "\t* :execute, :e\n" +
-      "\t* :exit\n"
+      "\t* :exit\n" +
       "\n" +
       "Use '<command> -h' for help on a specific command\n" +
       "\n" +

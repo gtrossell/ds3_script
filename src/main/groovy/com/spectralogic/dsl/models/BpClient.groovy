@@ -10,9 +10,9 @@ import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl Client */
 class BpClient extends Ds3ClientImpl {
-  private final logger
+  private final static logger
 
-  BpClient(Ds3ClientImpl ds3Client) {
+  BpClient(Ds3ClientImpl ds3Client) { // just net client
     super(ds3Client.getNetClient())
     logger = LoggerFactory.getLogger(BpClient.class)
   }
@@ -24,7 +24,7 @@ class BpClient extends Ds3ClientImpl {
       return new BpBucket(response, this)
     } catch (com.spectralogic.ds3client.networking.FailedRequestException e) {
       logger.error("Failed!", e)
-      return null
+      return null // custom error
     }
   }
 
@@ -32,9 +32,7 @@ class BpClient extends Ds3ClientImpl {
   List<String> buckets() {
     def buckets = []
     def response = this.getService(new GetServiceRequest())
-    response.getListAllMyBucketsResult().getBuckets().each{ bucket -> 
-      buckets << bucket.getName()
-    }
+    response.getListAllMyBucketsResult().getBuckets().each { buckets << it.getName() }
     return buckets
   }
 

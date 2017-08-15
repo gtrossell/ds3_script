@@ -18,9 +18,9 @@ import java.nio.file.StandardOpenOption
 
 /** Represents a BlackPearl Object */
 class BpObject extends Ds3Object {
-  BpBucket bucket
-  Ds3ClientImpl client
-  User owner
+  private final BpBucket bucket
+  private final Ds3ClientImpl client
+  private final User owner
   Map metadata
 
   BpObject(Contents contents, BpBucket bucket, Ds3ClientImpl client) {
@@ -29,6 +29,12 @@ class BpObject extends Ds3Object {
     this.owner = contents.getOwner()
     this.bucket = bucket
     this.client = client
+    this.metadata = [
+      name:       this.name, 
+      size:       this.size, 
+      owner:      this.owner,
+      bucketName: this.bucket.name
+    ]
   }
 
   /** 
@@ -87,18 +93,4 @@ class BpObject extends Ds3Object {
     return true
   }
 
-  /** @return size of object in bytes */
-  Long size() { 
-    this.size 
-  }
-
-  /** @return map of the metadata */
-  Map getMetadata() {
-    [
-      name:       this.name, 
-      size:       this.size, 
-      owner:      this.owner,
-      bucketName: this.bucket.name
-    ]
-  }
 }

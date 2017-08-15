@@ -15,6 +15,7 @@ abstract class SpectraDSL extends Script {
    * be directly referenced and this function is used before init 
    * @return BpClient with given attributes or environment variables
    */
+  //  factory
   def createBpClient(String endpoint="", String accessId="", 
                       String secretKey="", Boolean https=false) {
     Globals.createBpClient(endpoint, accessId, secretKey, https, environment)

@@ -16,10 +16,8 @@ class ShellCommandFactory {
   def runCommand(commandName, args) {
     def execCommand = { name ->
       name = name.toLowerCase()
-      for (def i = 0; i < commands.size(); i++) {
-        if (name in commands[i].commandNames()) return commands[i].run(args)
-      }
-      return null
+      def command = commands.find{ name in it.commandNames() }
+      return command ? command.run(args) : null
     }
 
     return execCommand(commandName) ?: execCommand(':help')

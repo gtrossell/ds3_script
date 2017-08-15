@@ -20,8 +20,8 @@ class Tool extends Script {
   ShellCommandFactory commandFactory
 
   /** Logic for parsing and evaluating a line */
-  def evaluate(GroovyShell shell, String line) {
-    if (line in [null, '']) return true
+  def evaluate(GroovyShell shell, String line) { // ret string
+    if (line in [null, '']) return true // guard
     
     /* command */
     if (line[0] == ':') {
@@ -36,7 +36,7 @@ class Tool extends Script {
 
     /* shell evaluation */
     try {
-      shell.evaluate(line)
+      return shell.evaluate(line)
     } catch (Exception e) {
       e.printStackTrace()
     }
@@ -62,7 +62,7 @@ class Tool extends Script {
 
       def line
       def result
-      while (true) {
+      while (true) { //try catch
         line = console.readLine()
         result = evaluate(shell, line)
         println Globals.RETURN_PROMPT + result

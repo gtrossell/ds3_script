@@ -19,10 +19,10 @@ import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
 class BpBucket extends GetBucketResponse {
-  private final logger
-  Ds3ClientImpl client
-  String name
-  ListBucketResult listBucketResult
+  private final static logger
+  private final Ds3ClientImpl client
+  private ListBucketResult listBucketResult
+  final String name
 
   BpBucket(GetBucketResponse response, Ds3ClientImpl client) {
     super(response.getListBucketResult(), 
@@ -37,7 +37,7 @@ class BpBucket extends GetBucketResponse {
   /** @return the current version of this bucket. Doesn't change this object */
   BpBucket reload() {
     this.listBucketResult = client.bucket(this.name).getListBucketResult()
-    this
+    return this
   }
 
   /** 
@@ -55,14 +55,14 @@ class BpBucket extends GetBucketResponse {
   }
 
   /** Deletes all objects inside it */
-  def empty() {
-    deleteObjects(*objects())
+  BpBucket empty() {
+    return deleteObjects(*objects())
   }
 
   /** Deletes each of the objects in the given list */
-  def deleteObjects(BpObject ...objects) {
-    objects.each { it.delete() }
-    reload()
+  BpBucket deleteObjects(BpObject ...objects) {
+    objects.each { it.delete() } // bulk delete 1000 at a time
+    return reload()
   }
 
   /**
@@ -70,11 +70,9 @@ class BpBucket extends GetBucketResponse {
    * @param remoteDir Directory on BP to use as a root for uploading (ie 'Dir1/')
    * Puts each file and file in each directory given into the bucket
    */
-  def putBulk(List<String> pathStrs, String remoteDir='') {
+  BpBucket putBulk(List<String> pathStrs, String remoteDir='') {
     def paths = []
-    pathStrs.each { pathStr ->
-      paths << Paths.get(pathStr)
-    }
+    pathStrs.each { paths << Paths.get(it) } // one linejj
     if (remoteDir && remoteDir[-1] != '/') remoteDir += '/'
 
     /* Group files into common directories */
@@ -90,7 +88,7 @@ class BpBucket extends GetBucketResponse {
       } else if (Files.isRegularFile(path)) {
         def pathStr = path.getParent().toString()
         if (objects[pathStr] == null) objects[pathStr] = []
-        objects[pathStr] << new Ds3Object((String) path.getFileName(), Files.size(path))
+        objects[pathStr] << new Ds3Object((String) path.getFileName(), Files.size(path)) // cast?
       } else {
         logger.warn("'{}' is not a directory or regular file, skipping", path)
       }
@@ -105,11 +103,11 @@ class BpBucket extends GetBucketResponse {
         new FileObjectPutter(Paths.get(dir)), remoteDir))
     }
 
-    reload()
+    return reload()
   }
 
-  def putBulk(String pathStr, String remoteDir='') {
-    putBulk([pathStr], remoteDir)
+  BpBucket putBulk(String pathStr, String remoteDir='') {
+    return putBulk([pathStr], remoteDir)
   }
 
   /** 
@@ -136,7 +134,7 @@ class BpBucket extends GetBucketResponse {
   }
 
   String toString() {
-    "name: $name, client: {$client}"
+    return "name: $name, client: {$client}"
   }
 
   /** Converts an array of Contents objects to ds3Objects */
@@ -145,4 +143,5 @@ class BpBucket extends GetBucketResponse {
     contents.each { bpObjects << new BpObject(it, this, this.client) }
     return bpObjects
   }
+
 }
