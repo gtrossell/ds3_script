@@ -79,9 +79,9 @@ class ExecuteCommand implements ShellCommand {
     def script = new CommandHelper().getScriptFromString(scriptName)
     if (script.exists()) {
       script.delete()
-      return "[Info] Deleted script $scriptName"
+      return "Deleted script $scriptName"
     } else {
-      return "[Info] No script named $scriptName"
+      return "No script named $scriptName"
     }
   }
 
