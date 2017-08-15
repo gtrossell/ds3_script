@@ -33,7 +33,7 @@ class Environment {
   String toString() {
     "endpoint: ${getEndpoint()}, " +
     "access key: ${getAccessKey()}, " +
-    "secret key: ${getSecretKey()}"
+    "secret key: ${'*' * getSecretKey().size()}"
   }
 
 }

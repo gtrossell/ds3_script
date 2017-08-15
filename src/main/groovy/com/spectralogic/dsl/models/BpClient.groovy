@@ -1,26 +1,29 @@
 package com.spectralogic.dsl.models
 
-import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.commands.GetBucketRequest
 import com.spectralogic.ds3client.commands.GetServiceRequest
 import com.spectralogic.ds3client.commands.PutBucketRequest
+import com.spectralogic.ds3client.Ds3ClientImpl
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl Client */
 class BpClient extends Ds3ClientImpl {
-  
+  private final logger
+
   BpClient(Ds3ClientImpl ds3Client) {
     super(ds3Client.getNetClient())
+    logger = LoggerFactory.getLogger(BpClient.class)
   }
 
   /** @return BpBucket of bucket with given name */
   BpBucket bucket(String bucketName) {
-    // TODO: if no bucket is found return null and issue warning
     try {
       def response = this.getBucket(new GetBucketRequest(bucketName))
       return new BpBucket(response, this)
     } catch (com.spectralogic.ds3client.networking.FailedRequestException e) {
-      println e
+      logger.error("Failed!", e)
       return null
     }
   }
@@ -35,21 +38,21 @@ class BpClient extends Ds3ClientImpl {
     return buckets
   }
 
-  /** @return BpBucket of newly created BP bucket */
+  /** @return newly created BpBucket */
   BpBucket createBucket(String name, String dataPolicyId="") {
-    // TODO: impliment dataPolicyId
-    if (this.bucket(name)) {
-      println "[Error] Bucket with name '$name' already exists!"
+    // TODO: implement dataPolicyId
+    if (bucket(name)) {
+      logger.error("Bucket with name '{}' already exists!", name)
       return null
     }
-    this.putBucket(new PutBucketRequest(name))
+    putBucket(new PutBucketRequest(name))
     bucket(name)
   }
 
   String toString() {
     def details = this.netClient.getConnectionDetails()
     "endpoint: ${details.getEndpoint()}, " +
-    "access_key: ${details.getCredentials().getClientId()}"
+      "access_key: ${details.getCredentials().getClientId()}"
   }
 
 }

@@ -19,6 +19,7 @@ Welcome to the Spectra DSL for BlackPearl!
 Use the ':help' command to get started
 ${'=' * width}"""
   }
+  private final static logger
 
   /** Returns a BP client */
   static def createBpClient(String endpoint="", String accessId="", 
@@ -27,7 +28,7 @@ ${'=' * width}"""
     // TODO: add real logging
     if (!environment) environment = new Environment()
     if (!(environment in Environment)) {
-      println "[Warning] Variable 'environment' should be of type spectra.helpers.Environment"
+      logger.warn("Variable 'environment' should be of type spectra.helpers.Environment")
       environment = new Environment()
     }
 
@@ -35,8 +36,8 @@ ${'=' * width}"""
     accessId = accessId ?: environment.getAccessKey()
     secretKey = secretKey ?: environment.getSecretKey()
     if (!endpoint || !accessId || !secretKey) {
-      println "[Error] Endpoint, Access ID, and/or Sectret Key is not set!\n" +
-              "\tTry setting the environment or method variable(s)"
+      logger.error("Endpoint, Access ID, and/or Sectret Key is not set! " +
+                    "Try setting the environment or method variable(s)")
       return null
     }
     

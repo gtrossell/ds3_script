@@ -85,11 +85,7 @@ class Tool extends Script {
   /** Builds object to pass imports into the shell */
   private buildImportCustomizer() {
     def importCustomizer = new ImportCustomizer()
-    importCustomizer.addImport('com.spectralogic.ds3client.models.common.Credentials')
-    importCustomizer.addImport('com.spectralogic.ds3client.Ds3ClientBuilder')
-    importCustomizer.addStarImports('com.spectralogic.ds3client.commands')
     importCustomizer.addImport('com.spectralogic.dsl.helpers.Environment')
-    
     return importCustomizer
   }
 

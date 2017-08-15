@@ -10,13 +10,15 @@ import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.commands.DeleteBucketRequest
 import com.spectralogic.ds3client.Ds3ClientImpl
-
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.Files
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
 class BpBucket extends GetBucketResponse {
+  private final logger
   Ds3ClientImpl client
   String name
   ListBucketResult listBucketResult
@@ -28,6 +30,7 @@ class BpBucket extends GetBucketResponse {
     this.listBucketResult = response.getListBucketResult()
     this.client = client
     this.name = response.getListBucketResult().getName()
+    logger = LoggerFactory.getLogger(BpBucket.class)
   }
 
   /** @return the current version of this bucket. Doesn't change this object */
@@ -43,7 +46,7 @@ class BpBucket extends GetBucketResponse {
    */
   Boolean delete() {
     if (this.objects()) {
-      println '[Error] Bucket must be empty to delete!'
+      logger.error("Bucket must be empty to delete!")
       return false
     }
     client.deleteBucket(new DeleteBucketRequest(this.name))
@@ -79,7 +82,7 @@ class BpBucket extends GetBucketResponse {
     def objects = [:] /* key: directory val: array of Ds3Objects */
     paths.each { path ->
       if (!Files.exists(path)) {
-        println "WARNING: '$path' does not exist, skipping"
+        logger.warn("'{}' does not exist, skipping", path)
       } else if (Files.isDirectory(path)) {
         def pathStr = path.toString()
         if (objects[pathStr] == null) objects[pathStr] = []
@@ -89,13 +92,13 @@ class BpBucket extends GetBucketResponse {
         if (objects[pathStr] == null) objects[pathStr] = []
         objects[pathStr] << new Ds3Object((String) path.getFileName(), Files.size(path))
       } else {
-        println "WARNING: '$path' is not a directory or regular file, skipping"
+        logger.warn("'{}' is not a directory or regular file, skipping", path)
       }
     }
 
     /* Put job that maintains subdirectory order and remoteDir prefix */
     objects.each { dir, objs ->
-      objs = objs.flatten() /* might be lists in list */
+      objs = objs.flatten()
       objs = helper.addPrefixToDs3ObjectsList(objs, remoteDir)
       def job = helper.startWriteJob(this.name, objs)
       job.transfer(new PrefixAdderObjectChannelBuilder(
@@ -107,28 +110,6 @@ class BpBucket extends GetBucketResponse {
 
   def putBulk(String pathStr, String remoteDir='') {
     putBulk([pathStr], remoteDir)
-  }
-
-  /**
-   * Same as putBulk with one file, but allows user to name the name the object 
-   * that is created. Also, it returns the created object
-   * @param objectName  name for the new object
-   * @param filePath    Location of the file to upload
-   * @return  BpObject of the newly uploaded object
-   */
-  def putObject(String objectName, Path path) {
-    // TODO: objectName can also include a path to be made in the bucket
-    // TODO: add true logging
-    // if (!Files.exists(path)) {
-    //   println "ERROR: File does not exist"
-    //   return null
-    // } else if (Files.isDirectory(path)) {
-    //   println "ERROR: Path given is a directory"
-    //   return null
-    // }
-
-    // def job = helper.startWriteJob(this.name, new Ds3Object((String) path.getFileName(), Files.size(path)))
-    // job.transfer(new FileObjectPutter(path.getParent()))
   }
 
   /** 
@@ -158,8 +139,7 @@ class BpBucket extends GetBucketResponse {
   }
 
   String toString() {
-    "name: $name, " +
-    "client: {$client}"
+    "name: $name, client: {$client}"
   }
 
   /** Converts an array of Contents objects to ds3Objects */
