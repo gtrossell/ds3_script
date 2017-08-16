@@ -1,5 +1,6 @@
 package com.spectralogic.dsl.models
 
+import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.commands.DeleteObjectRequest
 import com.spectralogic.ds3client.commands.DeleteObjectResponse
 import com.spectralogic.ds3client.commands.GetBucketResponse
@@ -41,16 +42,10 @@ class BpObject extends Ds3Object {
    * Deletes the object from the BP 
    * @return true if object was deleted 
    */
-  Boolean delete() {
-    try {
-      def deleteRequest = new DeleteObjectRequest(bucket.name, this.name)
-      def deleteResponse = client.deleteObject(deleteRequest)
-      bucket.reload()
-    } catch (Exception e) {
-      e.printStackTrace()
-      return false
-    }
-    return true
+  void delete() {
+    def deleteRequest = new DeleteObjectRequest(bucket.name, this.name)
+    def deleteResponse = client.deleteObject(deleteRequest)
+    bucket.reload()
   }
 
   /** 
@@ -59,7 +54,7 @@ class BpObject extends Ds3Object {
    * @param path  directory to write object to
    * @return true if the write was successful
    */
-  Boolean writeTo(String pathStr) {
+  void writeTo(String pathStr) {
     // TODO: write to a file option
     def path = Paths.get(pathStr)
     // TODO: test if this works
@@ -90,7 +85,6 @@ class BpObject extends Ds3Object {
         ))
       }
     }
-    return true
   }
 
 }

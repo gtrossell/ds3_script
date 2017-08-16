@@ -5,10 +5,11 @@ import static org.junit.Assert.assertNull
 
 import java.util.Random
 
+import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.dsl.models.BpClientFactory
 
 /** Tests BpBucket */
-public class BpBucketTest {
+public class BpBucketTest extends GroovyTestCase {
 
   @Test
   public void testBucket() throws IOException {
@@ -33,7 +34,7 @@ public class BpBucketTest {
     bucket.empty()
     assertEquals 0, bucket.objects().size()
     bucket.delete()
-    assertNull client.bucket(bucketName)
+    shouldFail { client.bucket(bucketName) }
   }
 
 }

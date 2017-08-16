@@ -1,5 +1,6 @@
 package com.spectralogic.dsl.models
 
+import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChannelBuilder
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers
 import com.spectralogic.ds3client.helpers.FileObjectPutter
@@ -79,7 +80,8 @@ class BpBucket extends GetBucketResponse {
     def objects = [:] /* key: directory val: array of Ds3Objects */
     paths.each { path ->
       if (!Files.exists(path)) {
-        logger.warn("'{}' does not exist, skipping", path)
+        // logger.warn("'{}' does not exist, skipping", path)
+        throw BpException("'$path' does not exist!")
       } else if (Files.isDirectory(path)) {
         def pathStr = path.toString()
         if (objects[pathStr] == null) objects[pathStr] = []
@@ -89,7 +91,8 @@ class BpBucket extends GetBucketResponse {
         if (objects[pathStr] == null) objects[pathStr] = []
         objects[pathStr] << new Ds3Object((String) path.getFileName(), Files.size(path)) // cast?
       } else {
-        logger.warn("'{}' is not a directory or regular file, skipping", path)
+        throw BpException("'$path' is not a directory or regular file")
+        // logger.warn("'{}' is not a directory or regular file, skipping", path)
       }
     }
 
@@ -129,7 +132,11 @@ class BpBucket extends GetBucketResponse {
    */
   BpObject object(String objectName) {
     def objs = objects(objectName)
-    return (objs.size() == 1 ? objs[0] : null)
+    if (objs.size() == 1) {
+      return objs[0]
+    } else {
+      throw new BpException("${objs.size()} objects named '$objectName' found!")
+    }
   }
 
   String toString() {

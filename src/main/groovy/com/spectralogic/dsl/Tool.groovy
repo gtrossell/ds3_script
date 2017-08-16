@@ -1,6 +1,7 @@
 package com.spectralogic.dsl
 
 import com.spectralogic.dsl.commands.ShellCommandFactory
+import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import com.spectralogic.ds3client.utils.Guard
@@ -79,6 +80,14 @@ class Tool extends Script {
     /* shell evaluation */
     try {
       return shell.evaluate(line)
+    } catch (BpException e) {
+      return e
+    } catch (org.apache.http.conn.ConnectTimeoutException e) {
+      return e
+    } catch (groovy.lang.MissingMethodException e) {
+      return e
+    } catch (groovy.lang.MissingPropertyException e) {
+      return e
     } catch (Exception e) {
       e.printStackTrace()
     }

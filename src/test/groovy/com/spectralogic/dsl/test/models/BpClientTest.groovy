@@ -6,7 +6,7 @@ import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNull
 
 /** Tests BpClient */
-public class BpClientTest {
+public class BpClientTest extends GroovyTestCase {
 
   @Test
   public void testClient() throws IOException {
@@ -16,7 +16,7 @@ public class BpClientTest {
     assertEquals bucketName, bucket.name
     assertEquals bucket.name, client.bucket(bucketName).name
     bucket.delete()
-    assertNull client.bucket(bucketName)
+    shouldFail { client.bucket(bucketName) }
   }
 
 }

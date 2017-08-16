@@ -7,7 +7,7 @@ import org.junit.Test
 import static org.junit.Assert.assertNull
 
 /** Tests BpObject */
-public class BpObjectTest {
+public class BpObjectTest extends GroovyTestCase {
 
   @Test
   public void testObject() throws IOException {
@@ -34,8 +34,8 @@ public class BpObjectTest {
     Files.delete(file)
 
     // delete
-    assert object.delete()
-    assertNull bucket.object(fileName)
+    object.delete()
+    shouldFail { bucket.object(fileName) }
     bucket.delete()
   }
 

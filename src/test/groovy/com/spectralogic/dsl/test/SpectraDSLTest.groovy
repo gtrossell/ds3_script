@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNull
  * Tests everything that the SpectraDSL class uses 
  * TODO: Test the actual SpectraDSL class
  */
-public class SpectraDSLTest {
+public class SpectraDSLTest extends GroovyTestCase {
   @Test
   public void testCreateBpClient() throws IOException {
     def env = new Environment()
@@ -24,6 +24,6 @@ public class SpectraDSLTest {
     def bucket = client.createBucket(bucketName)
     assertEquals bucketName, bucket.name
     bucket.delete()
-    assertNull client.bucket(bucketName)
+    shouldFail { client.bucket(bucketName) }
   }
 }

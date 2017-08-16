@@ -1,10 +1,12 @@
 package com.spectralogic.dsl.models
 
+import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.commands.GetBucketRequest
 import com.spectralogic.ds3client.commands.GetServiceRequest
 import com.spectralogic.ds3client.commands.PutBucketRequest
 import com.spectralogic.ds3client.Ds3ClientImpl
+import com.spectralogic.ds3client.networking.FailedRequestException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -21,29 +23,25 @@ class BpClient extends Ds3ClientImpl {
     try {
       def response = this.getBucket(new GetBucketRequest(bucketName))
       return new BpBucket(response, this)
-    } catch (com.spectralogic.ds3client.networking.FailedRequestException e) {
-      logger.error("Failed!", e)
-      return null // custom error
+    } catch (FailedRequestException e) {
+      throw new BpException(e)
     }
   }
 
   /** @return the names of the buckets */
   List<String> buckets() {
-    def buckets = []
     def response = this.getService(new GetServiceRequest())
-    response.getListAllMyBucketsResult().getBuckets().each { buckets << it.getName() }
-    return buckets
+    return response.getListAllMyBucketsResult().getBuckets().collect { it.getName() }
   }
 
   /** @return newly created BpBucket */
   BpBucket createBucket(String name, String dataPolicyId="") {
-    // TODO: implement dataPolicyId
-    if (bucket(name)) {
-      logger.error("Bucket with name '{}' already exists!", name)
-      return null
+    try {
+      putBucket(new PutBucketRequest(name))
+      bucket(name)
+    } catch (FailedRequestException e) {
+      throw new BpException(e)
     }
-    putBucket(new PutBucketRequest(name))
-    bucket(name)
   }
 
   String toString() {
