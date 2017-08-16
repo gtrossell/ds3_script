@@ -3,6 +3,7 @@ package com.spectralogic.dsl
 import com.spectralogic.dsl.commands.ShellCommandFactory
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
+import com.spectralogic.ds3client.utils.Guard
 import java.io.File
 import java.io.IOException
 import jline.console.ConsoleReader
@@ -16,8 +17,8 @@ import org.codehaus.groovy.runtime.InvokerHelper
 class Tool extends Script {
 
   /** Logic for parsing and evaluating a line */
-  def evaluate(shell, line, commandFactory) { // ret string
-    if (line in [null, '']) return true // guard
+  def evaluate(shell, line, commandFactory) { // TODO: return string only?
+    if (new Guard().isStringNullOrEmpty(line)) return true
     
     /* command */
     if (line[0] == ':') {
