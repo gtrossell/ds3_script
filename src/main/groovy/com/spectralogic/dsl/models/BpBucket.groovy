@@ -71,14 +71,12 @@ class BpBucket extends GetBucketResponse {
    * Puts each file and file in each directory given into the bucket
    */
   BpBucket putBulk(List<String> pathStrs, String remoteDir='') {
-    def paths = []
-    pathStrs.each { paths << Paths.get(it) } // one linejj
     if (remoteDir && remoteDir[-1] != '/') remoteDir += '/'
 
     /* Group files into common directories */
     def helper = Ds3ClientHelpers.wrap(this.client)
     def objects = [:] /* key: directory val: array of Ds3Objects */
-    paths.each { path ->
+    pathStrs.collect { Paths.get(it) }.each { path ->
       if (!Files.exists(path)) {
         // logger.warn("'{}' does not exist, skipping", path)
         throw BpException("'$path' does not exist!")
@@ -145,9 +143,7 @@ class BpBucket extends GetBucketResponse {
 
   /** Converts an array of Contents objects to ds3Objects */
   private contentsToBpObjects(contents) {
-    def bpObjects = []
-    contents.each { bpObjects << new BpObject(it, this, this.client) }
-    return bpObjects
+    return contents.collect { new BpObject(it, this, this.client) }
   }
 
 }

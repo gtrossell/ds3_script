@@ -122,11 +122,7 @@ class RecordCommand implements ShellCommand {
         }
       }
 
-      def commentLines = []
-      textLines.each { String line ->
-        commentLines << padComment(lineLength, line.trim())
-      }
-      return commentLines.join()
+      return textLines.collect { padComment(lineLength, it.trim()) }.join()
     } else {
       def padding = lineLength - text.size()
       return "/* " + text + (' ' * padding) + " */\n"
