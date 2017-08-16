@@ -16,29 +16,11 @@ import org.codehaus.groovy.runtime.InvokerHelper
  */
 class Tool extends Script {
 
-  /** Logic for parsing and evaluating a line */
-  def evaluate(shell, line, commandFactory) { // TODO: return string only?
-    if (new Guard().isStringNullOrEmpty(line)) return true
-    
-    /* command */
-    if (line[0] == ':') {
-      def args = line.split(' ')
-      def command = args[0]
-      args = 1 < args.size() ? args[1..args.size()-1] : []
-      def response = commandFactory.runCommand(command, args)
-      response.log()
-      if (response.exit) System.exit(0) // TODO
-      return ''
-    }
-
-    /* shell evaluation */
-    try {
-      return shell.evaluate(line)
-    } catch (Exception e) {
-      e.printStackTrace()
-    }
+  static void main(String[] args) {
+    InvokerHelper.runScript(Tool, args)
   }
 
+  /** REPL handler */
   def run() {
     def shell = new ShellBuilder().build(this.class.classLoader)
     def recorder = new LogRecorder()
@@ -53,6 +35,7 @@ class Tool extends Script {
 
       /* Run script passed in */
       if (args.size() > 0) {
+        // TODO: add groovy extension?
         def scriptArgs = args.size() > 1 ? args[1..args.size()-1] : []
         shell.run(new File(args[0]), scriptArgs)
       }
@@ -78,8 +61,27 @@ class Tool extends Script {
     }
   }
 
-  static void main(String[] args) {
-    InvokerHelper.runScript(Tool, args)
+  /** Logic for parsing and evaluating a line */
+  def evaluate(shell, line, commandFactory) { // TODO: return string only?
+    if (new Guard().isStringNullOrEmpty(line)) return true
+    
+    /* command */
+    if (line[0] == ':') {
+      def args = line.split(' ')
+      def command = args[0]
+      args = 1 < args.size() ? args[1..args.size()-1] : []
+      def response = commandFactory.runCommand(command, args)
+      response.log()
+      if (response.exit) System.exit(0) // TODO
+      return ''
+    }
+
+    /* shell evaluation */
+    try {
+      return shell.evaluate(line)
+    } catch (Exception e) {
+      e.printStackTrace()
+    }
   }
 
 }
