@@ -5,13 +5,14 @@ import static org.junit.Assert.assertNull
 
 import java.util.Random
 
-import com.spectralogic.dsl.helpers.Globals
+import com.spectralogic.dsl.models.BpClientFactory
 
 /** Tests BpBucket */
 public class BpBucketTest {
+
   @Test
   public void testBucket() throws IOException {
-    def client = Globals.createBpClient()
+    def client = new BpClientFactory().create()
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)
 
@@ -34,4 +35,5 @@ public class BpBucketTest {
     bucket.delete()
     assertNull client.bucket(bucketName)
   }
+
 }

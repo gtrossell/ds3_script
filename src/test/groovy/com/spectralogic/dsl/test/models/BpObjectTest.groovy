@@ -1,17 +1,17 @@
-import org.junit.Test
-import static org.junit.Assert.assertNull
-
+import com.spectralogic.dsl.models.BpClientFactory
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Random
+import org.junit.Test
 
-import com.spectralogic.dsl.helpers.Globals
+import static org.junit.Assert.assertNull
 
 /** Tests BpObject */
 public class BpObjectTest {
+
   @Test
   public void testObject() throws IOException {
-    def client = Globals.createBpClient()
+    def client = new BpClientFactory().create()
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)
     
@@ -38,4 +38,5 @@ public class BpObjectTest {
     assertNull bucket.object(fileName)
     bucket.delete()
   }
+
 }

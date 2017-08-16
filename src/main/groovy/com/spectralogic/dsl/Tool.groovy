@@ -1,15 +1,12 @@
 package com.spectralogic.dsl
 
 import com.spectralogic.dsl.commands.ShellCommandFactory
-import com.spectralogic.dsl.helpers.Environment
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import java.io.File
 import java.io.IOException
 import jline.console.ConsoleReader
 import jline.TerminalFactory
-import org.codehaus.groovy.control.CompilerConfiguration
-import org.codehaus.groovy.control.customizers.ImportCustomizer
 import org.codehaus.groovy.runtime.InvokerHelper
 
 /** 
@@ -17,10 +14,9 @@ import org.codehaus.groovy.runtime.InvokerHelper
  * It Handles the terminal and handles all user interaction
  */
 class Tool extends Script {
-  ShellCommandFactory commandFactory
 
   /** Logic for parsing and evaluating a line */
-  def evaluate(GroovyShell shell, String line) { // ret string
+  def evaluate(shell, line, commandFactory) { // ret string
     if (line in [null, '']) return true // guard
     
     /* command */
@@ -43,9 +39,9 @@ class Tool extends Script {
   }
 
   def run() {
-    def shell = new GroovyShell(this.class.classLoader, buildBinding(), buildConfig())
+    def shell = new ShellBuilder().build(this.class.classLoader)
     def recorder = new LogRecorder()
-    commandFactory = new ShellCommandFactory(shell, recorder)
+    def commandFactory = new ShellCommandFactory(shell, recorder)
     
     recorder.init()
     // TODO: add autocomplete for file paths
@@ -64,7 +60,7 @@ class Tool extends Script {
       def result
       while (true) { //try catch
         line = console.readLine()
-        result = evaluate(shell, line)
+        result = evaluate(shell, line, commandFactory)
         println Globals.RETURN_PROMPT + result
         recorder.record(line, result.toString())
       }
@@ -83,32 +79,6 @@ class Tool extends Script {
 
   static void main(String[] args) {
     InvokerHelper.runScript(Tool, args)
-  }
-
-  /** Builds object to pass imports into the shell */
-  private buildImportCustomizer() {
-    def importCustomizer = new ImportCustomizer()
-    importCustomizer.addImport('com.spectralogic.dsl.helpers.Environment')
-    return importCustomizer
-  }
-
-  /** Builds shell configuration */
-  private buildConfig() {
-    def config = new CompilerConfiguration()
-    config.addCompilationCustomizers(buildImportCustomizer())
-    config.scriptBaseClass = 'com.spectralogic.dsl.SpectraDSL'
-    return config
-  }
-
-  /** Builds shell binding */
-  private buildBinding() {
-    def binding = new Binding()
-    def environment = new Environment()
-    if (environment.ready()) {
-      binding.setVariable('client', Globals.createBpClient())
-    }
-    binding.setVariable('environment', environment)
-    return binding
   }
 
 }

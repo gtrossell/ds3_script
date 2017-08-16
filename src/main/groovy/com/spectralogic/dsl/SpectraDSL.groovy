@@ -1,6 +1,6 @@
 package com.spectralogic.dsl
 
-import com.spectralogic.dsl.helpers.Globals
+import com.spectralogic.dsl.models.BpClientFactory
 import java.nio.file.Path
 import java.nio.file.Paths
 
@@ -18,13 +18,13 @@ abstract class SpectraDSL extends Script {
   //  factory
   def createBpClient(String endpoint="", String accessId="", 
                       String secretKey="", Boolean https=false) {
-    Globals.createBpClient(endpoint, accessId, secretKey, https, environment)
+    return new BpClientFactory().createBpClient(endpoint, accessId, secretKey, https, environment)
   }
 
   /** Creates directory or file path from string  */
   // TODO: depricate?
   def Path filePath(String dirName) {
-    Paths.get(dirName)
+    return Paths.get(dirName)
   }
 
 }
