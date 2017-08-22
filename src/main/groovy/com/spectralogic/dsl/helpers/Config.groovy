@@ -1,37 +1,29 @@
 package com.spectralogic.dsl.helpers
 
-/**
- * Config keeps all of the strings and options that are able to be changed
- * This might be merged with Environment in the future so that configuration
- * can come from environment variables
- */
+/** Config keeps the location of important directories */
 class Config {
-  static String homeDir = ''
-  static String logDir = ''
-  static String scriptDir = ''
+  private static String homeDir
+  private static String logDir
+  private static String scriptDir
 
   def static getHomeDir() {
-    if (!homeDir)
-      homeDir = new File("").getAbsoluteFile().toString()
+    if (!homeDir) homeDir = new File("").getAbsoluteFile().toString()
     return addTrailingSlash(homeDir)
   }
 
   def static getScriptDir() {
-    if (!scriptDir)
-      scriptDir = getHomeDir() + "scripts/"
+    if (!scriptDir) scriptDir = getHomeDir() + "scripts/"
     return addTrailingSlash(scriptDir)
   }
 
   def static getLogDir() {
-    if (!logDir)
-      logDir = getHomeDir() + "log/"
+    if (!logDir) logDir = getHomeDir() + "log/"
     return addTrailingSlash(logDir)
   }
 
   private static addTrailingSlash(path) {
-    if (path[path.size() - 1] != '/')
-      path += '/'
-    path
+    if (path[path.size() - 1] != '/') path += '/'
+    return path
   }
 
 }

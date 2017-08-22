@@ -5,11 +5,11 @@ class ExitCommand implements ShellCommand {
   CommandResponse run(args) {
     def response = new CommandResponse()
     response.exit = true
-    response
+    return response
   }
 
   String[] commandNames() {
-    [':exit'] 
+    return [':exit'] 
   }
 
 }

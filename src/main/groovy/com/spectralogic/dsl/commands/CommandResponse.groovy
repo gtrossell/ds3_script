@@ -5,39 +5,47 @@ import org.slf4j.LoggerFactory
 
 class CommandResponse {
   private final logger
-  List<String> info
-  List<String> warn
-  List<String> error
+  private List<String> message
+  private List<String> info
+  private List<String> warn
+  private List<String> error
   Boolean exit
 
   CommandResponse() {
-    info = []
-    warn = []
-    error = []
-    exit = false
-    logger = LoggerFactory.getLogger(CommandResponse.class)
+    message = []
+    info    = []
+    warn    = []
+    error   = []
+    exit    = false
+    logger  = LoggerFactory.getLogger(CommandResponse.class)
   }
 
-  def CommandResponse addInfo(String message) {
+  CommandResponse addMessage(String message) {
+    this.message << message
+    return this
+  }
+
+  CommandResponse addInfo(String message) {
     info << message
-    this
+    return this
   }
 
-  def CommandResponse addWarn(String message) {
+  CommandResponse addWarn(String message) {
     warn << message
-    this
+    return this
   }
 
-  def CommandResponse addError(String message) {
+  CommandResponse addError(String message) {
     error << message
-    this
+    return this
   }
 
-  def Boolean isEmpty() {
+  Boolean isEmpty() {
     !info && !warn && !error
   }
 
-  def log() {
+  void log() {
+    message.each { println it }
     info.each { logger.info(it) }
     warn.each { logger.warn(it) }
     error.each { logger.error(it) }

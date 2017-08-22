@@ -62,7 +62,7 @@ class RecordCommand implements ShellCommand {
   }
 
   String[] commandNames() {
-    [':record', ':r']
+    return [':record', ':r']
   }
 
   /** Builds script lines and saves it to set or given location */
@@ -149,7 +149,7 @@ class RecordCommand implements ShellCommand {
     }
     if (options.h) {
       cli.usage()
-      return response.addInfo(stringWriter.toString())
+      return response.addMessage(stringWriter.toString())
     }
     if (options.d) {
       this.scriptDesc = options.d

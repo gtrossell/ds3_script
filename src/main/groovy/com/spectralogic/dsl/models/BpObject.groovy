@@ -22,7 +22,7 @@ class BpObject extends Ds3Object {
   private final BpBucket bucket
   private final Ds3ClientImpl client
   private final User owner
-  Map metadata
+  final Map metadata
 
   BpObject(Contents contents, BpBucket bucket, Ds3ClientImpl client) {
     this.name = contents.getKey()
@@ -43,8 +43,7 @@ class BpObject extends Ds3Object {
    * @return true if object was deleted 
    */
   void delete() {
-    def deleteRequest = new DeleteObjectRequest(bucket.name, this.name)
-    def deleteResponse = client.deleteObject(deleteRequest)
+    def deleteResponse = client.deleteObject(new DeleteObjectRequest(bucket.name, name))
     bucket.reload()
   }
 
@@ -55,9 +54,8 @@ class BpObject extends Ds3Object {
    * @return true if the write was successful
    */
   void writeTo(String pathStr) {
-    // TODO: write to a file option
     def path = Paths.get(pathStr)
-    // TODO: test if this works
+
     if (!Files.exists(path)) Files.createDirectory(path)
     
     /* convert BpObject to Ds3Object */

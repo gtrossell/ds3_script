@@ -6,14 +6,14 @@ import static org.junit.Assert.assertNull
 import java.util.Random
 
 import com.spectralogic.dsl.exceptions.BpException
-import com.spectralogic.dsl.models.BpClientFactory
+import com.spectralogic.dsl.models.BpClientBuilder
 
 /** Tests BpBucket */
 public class BpBucketTest extends GroovyTestCase {
 
   @Test
   public void testBucket() throws IOException {
-    def client = new BpClientFactory().create()
+    def client = new BpClientBuilder().create()
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)
 

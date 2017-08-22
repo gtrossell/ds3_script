@@ -3,7 +3,7 @@ package com.spectralogic.dsl
 import com.spectralogic.dsl.helpers.Environment
 import org.codehaus.groovy.control.CompilerConfiguration
 import org.codehaus.groovy.control.customizers.ImportCustomizer
-import com.spectralogic.dsl.models.BpClientFactory
+import com.spectralogic.dsl.models.BpClientBuilder
 
 class ShellBuilder {
 
@@ -24,7 +24,7 @@ class ShellBuilder {
     def binding = new Binding()
     def environment = new Environment()
     if (environment.ready()) {
-      binding.setVariable('client', new BpClientFactory().create())
+      binding.setVariable('client', new BpClientBuilder().create())
     }
     binding.setVariable('environment', environment)
     return binding

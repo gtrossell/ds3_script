@@ -1,8 +1,8 @@
 package com.spectralogic.dsl.helpers
 
 class LogRecorder {
-  String logDir
-  Date now
+  private final String logDir
+  private final Date now
 
   LogRecorder() {
     now = new Date()

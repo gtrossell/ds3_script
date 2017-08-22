@@ -1,5 +1,5 @@
 import com.spectralogic.dsl.helpers.Environment
-import com.spectralogic.dsl.models.BpClientFactory
+import com.spectralogic.dsl.models.BpClientBuilder
 import org.junit.Test
 import java.util.Random
 
@@ -18,7 +18,7 @@ public class SpectraDSLTest extends GroovyTestCase {
     assert !(env.getEndpoint() in invalidVars)
     assert !(env.getAccessKey() in invalidVars)
     assert !(env.getSecretKey() in invalidVars)
-    def client = new BpClientFactory().create()
+    def client = new BpClientBuilder().create()
     /* have to create a bucket to test if the connect s good */
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)

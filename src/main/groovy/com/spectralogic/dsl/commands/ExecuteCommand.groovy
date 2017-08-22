@@ -20,7 +20,7 @@ class ExecuteCommand implements ShellCommand {
   }
 
   String[] commandNames() {
-    [':execute', ':e']
+    return [':execute', ':e']
   }
 
   CommandResponse run(args) {
@@ -56,7 +56,7 @@ class ExecuteCommand implements ShellCommand {
       return response
     } else if (options.h || args.size() < 1) {
       cli.usage()
-      return response.addInfo(stringWriter.toString())
+      return response.addMessage(stringWriter.toString())
     } else if (options.l) {
       return response.addInfo(listScripts())
     } else if (options.d) {
