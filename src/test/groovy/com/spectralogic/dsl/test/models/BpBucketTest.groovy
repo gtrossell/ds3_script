@@ -30,11 +30,11 @@ public class BpBucketTest extends GroovyTestCase {
     assertEquals 2, bucket.objects('txt2.txt', 'txt3.txt').size()
     assert 10000 < bucket.object('txt2.txt').size
 
-    assertFalse bucket.delete()
+    shouldFail BpException.class, { bucket.delete() }
     bucket.empty()
     assertEquals 0, bucket.objects().size()
     bucket.delete()
-    shouldFail { client.bucket(bucketName) }
+    shouldFail BpException.class, { client.bucket(bucketName) }
   }
 
 }

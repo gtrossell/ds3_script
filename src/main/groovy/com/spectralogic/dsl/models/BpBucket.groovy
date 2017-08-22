@@ -45,13 +45,11 @@ class BpBucket extends GetBucketResponse {
    * accidentally deleted
    * @return true if bucket was deleted
    */
-  Boolean delete() {
+  void delete() {
     if (this.objects()) {
-      logger.error("Bucket must be empty to delete!")
-      return false
+      throw new BpException("Bucket must be empty to delete!")
     }
     client.deleteBucket(new DeleteBucketRequest(this.name))
-    return true
   }
 
   /** Deletes all objects inside it */
@@ -76,27 +74,27 @@ class BpBucket extends GetBucketResponse {
     /* Group files into common directories */
     def helper = Ds3ClientHelpers.wrap(this.client)
     def objects = [:] /* key: directory val: array of Ds3Objects */
-    pathStrs.collect { Paths.get(it) }.each { path ->
+    def addObjects = { pathStr, ds3Objects ->
+      if (objects[pathStr] == null) objects[pathStr] = []
+      objects[pathStr] = (objects[pathStr] << ds3Objects).flatten()
+    }
+
+    pathStrs.each {
+      def path = Paths.get(it)
       if (!Files.exists(path)) {
-        // logger.warn("'{}' does not exist, skipping", path)
         throw BpException("'$path' does not exist!")
       } else if (Files.isDirectory(path)) {
-        def pathStr = path.toString()
-        if (objects[pathStr] == null) objects[pathStr] = []
-        objects[pathStr] << helper.listObjectsForDirectory(path)
+        addObjects(path.toString(), helper.listObjectsForDirectory(path))
       } else if (Files.isRegularFile(path)) {
-        def pathStr = path.getParent().toString()
-        if (objects[pathStr] == null) objects[pathStr] = []
-        objects[pathStr] << new Ds3Object((String) path.getFileName(), Files.size(path)) // cast?
+        addObjects(path.getParent().toString(), 
+          new Ds3Object(path.getFileName().toString(), Files.size(path)))
       } else {
         throw BpException("'$path' is not a directory or regular file")
-        // logger.warn("'{}' is not a directory or regular file, skipping", path)
       }
     }
 
     /* Put job that maintains subdirectory order and remoteDir prefix */
     objects.each { dir, objs ->
-      objs = objs.flatten()
       objs = helper.addPrefixToDs3ObjectsList(objs, remoteDir)
       def job = helper.startWriteJob(this.name, objs)
       job.transfer(new PrefixAdderObjectChannelBuilder(
