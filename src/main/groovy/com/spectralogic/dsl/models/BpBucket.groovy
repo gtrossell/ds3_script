@@ -9,6 +9,7 @@ import com.spectralogic.ds3client.models.Contents
 import com.spectralogic.ds3client.models.ListBucketResult
 import com.spectralogic.ds3client.models.bulk.Ds3Object
 import com.spectralogic.ds3client.commands.DeleteBucketRequest
+import com.spectralogic.ds3client.commands.DeleteObjectsRequest
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
@@ -57,9 +58,16 @@ class BpBucket extends GetBucketResponse {
     return deleteObjects(*objects())
   }
 
-  /** Deletes each of the objects in the given list */
+  /** Recursively delete objects in max 1000 object bulks */
   BpBucket deleteObjects(BpObject ...objects) {
-    objects.each { it.delete() } // bulk delete 1000 at a time
+    if (objects.size() < 1) return this
+    
+    def bulkSize = Math.min(1000, objects.size())
+    def objectNames = objects[0..bulkSize - 1].collect { it.name }
+    client.deleteObjects(new DeleteObjectsRequest(name, objectNames))
+    
+    if (bulkSize < objects.size()) deleteObjects(*objects[bulkSize..-1])
+
     return reload()
   }
 
