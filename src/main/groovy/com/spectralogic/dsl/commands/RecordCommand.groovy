@@ -24,7 +24,6 @@ class RecordCommand implements ShellCommand {
     init()
 
     cli = new CliBuilder(usage:':record, :r <name> [options]')
-    // TODO: make a better header?
     cli.header = 'First usage starts recording, second saves'
     cli.e('save environment in script', longOpt: 'environment')
     cli.d('script description', longOpt: 'desc', args:1, argName:'description')
@@ -109,12 +108,12 @@ class RecordCommand implements ShellCommand {
   }
 
   /** Pads/divides a comment to keep the comment body uniform length */
-  private String padComment(Integer lineLength, String text) {
+  private String padComment(lineLength, text) {
     if (text.size() > lineLength) {
-      // split line up into shorter lines while not splitting words
+      /** split line up into shorter lines while not splitting words */
       def textLines = ['']
       def words = text.split(' ')
-      words.each { String word ->
+      words.each { word ->
         if (textLines[-1].size() + 1 + word.size() > lineLength) {
           textLines << word
         } else {
@@ -134,8 +133,9 @@ class RecordCommand implements ShellCommand {
     def stringWriter = new StringWriter()
     cli.writer = new PrintWriter(stringWriter)
     def options = cli.parse(args)
-    if (stringWriter.toString()) 
+    if (stringWriter.toString()) {
       return response.addInfo(stringWriter.toString())
+    }
 
     if (options.arguments()) {
       def file = new CommandHelper().getScriptFromString(options.arguments()[0])
@@ -149,7 +149,7 @@ class RecordCommand implements ShellCommand {
     }
     if (options.h) {
       cli.usage()
-      return response.addMessage(stringWriter.toString())
+      return response.setMessage(stringWriter.toString())
     }
     if (options.d) {
       this.scriptDesc = options.d
@@ -192,8 +192,13 @@ class RecordCommand implements ShellCommand {
     if (!scriptDir.exists()) scriptDir.mkdirs()
   }
 
-  private startLine() { "[START] $recordId" }
-  private endLine() { "[END] $recordId" }
+  private startLine() { 
+    return "[START] $recordId" 
+  }
+
+  private endLine() { 
+    return "[END] $recordId"
+  }
 
   /** Creates unique name for a recording session  */
   private createScriptId() {

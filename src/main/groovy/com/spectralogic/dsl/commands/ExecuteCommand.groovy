@@ -56,7 +56,7 @@ class ExecuteCommand implements ShellCommand {
       return response
     } else if (options.h || args.size() < 1) {
       cli.usage()
-      return response.addMessage(stringWriter.toString())
+      return response.setMessage(stringWriter.toString())
     } else if (options.l) {
       return response.addInfo(listScripts())
     } else if (options.d) {

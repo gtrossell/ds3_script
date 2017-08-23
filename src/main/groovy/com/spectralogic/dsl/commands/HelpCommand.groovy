@@ -3,7 +3,7 @@ package com.spectralogic.dsl.commands
 class HelpCommand implements ShellCommand {
 
   CommandResponse run(args) {
-    return new CommandResponse().addMessage("The available commands are:\n" +
+    return new CommandResponse().setMessage("The available commands are:\n" +
       "\t* :help, :h\n" +
       "\t* :record, :r\n" +
       "\t* :execute, :e\n" +

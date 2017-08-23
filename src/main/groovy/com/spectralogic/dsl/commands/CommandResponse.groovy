@@ -5,14 +5,14 @@ import org.slf4j.LoggerFactory
 
 class CommandResponse {
   private final logger
-  private List<String> message
+  private String message
   private List<String> info
   private List<String> warn
   private List<String> error
   Boolean exit
 
   CommandResponse() {
-    message = []
+    message = ''
     info    = []
     warn    = []
     error   = []
@@ -20,8 +20,8 @@ class CommandResponse {
     logger  = LoggerFactory.getLogger(CommandResponse.class)
   }
 
-  CommandResponse addMessage(String message) {
-    this.message << message
+  CommandResponse setMessage(String message) {
+    this.message = message
     return this
   }
 
@@ -41,11 +41,14 @@ class CommandResponse {
   }
 
   Boolean isEmpty() {
-    !info && !warn && !error
+    !info && !warn && !error && !message
+  }
+
+  String getMessage() {
+    return message
   }
 
   void log() {
-    message.each { println it }
     info.each { logger.info(it) }
     warn.each { logger.warn(it) }
     error.each { logger.error(it) }

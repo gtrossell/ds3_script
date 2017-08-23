@@ -13,23 +13,26 @@ import jline.console.ConsoleReader
 import jline.TerminalFactory
 import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.slf4j.LoggerFactory
 
 /** 
  * This is the main class for the Spectra DSL tool.
  * It Handles the terminal and handles all user interaction
  */
 class Tool extends Script {
+  private final static logger
   private final recorder
 
   static void main(String[] args) {
+    logger = LoggerFactory.getLogger(Tool.class)
     InvokerHelper.runScript(Tool, args)
   }
 
   /** REPL handler */
   def run() {
+    recorder = new LogRecorder()
     def shell = new ShellBuilder().build(this.class.classLoader)
     def commandFactory = new ShellCommandFactory(shell, recorder)
-    recorder = new LogRecorder()
     
     recorder.init()
     // TODO: add autocomplete for file paths
@@ -40,22 +43,20 @@ class Tool extends Script {
     try {
       /* Run script passed in */
       if (args.size() > 0) {
-        // TODO: add groovy extension?
+        if (!args[0].endsWith('.groovy')) args[0] += '.groovy'
         def scriptArgs = args.size() > 1 ? args[1..args.size()-1] : []
         shell.run(new File(args[0]), scriptArgs)
       }
 
-      def line
-      def result
       while (true) {
         try {
-          line = console.readLine()
-          result = evaluate(shell, line, commandFactory)
+          def line = console.readLine()
+          def result = evaluate(shell, line, commandFactory)
           println Globals.RETURN_PROMPT + result
           recorder.record(line, result.toString())
         } catch (BpException | ConnectTimeoutException | MissingMethodException | 
                   MissingPropertyException | RuntimeException e) {
-          logger.error(e)
+          logger.error('Exception: ', e)
         }
       }
 
@@ -67,11 +68,11 @@ class Tool extends Script {
   }
 
   /** Logic for parsing and evaluating a line */
-  private String evaluate(shell, line, commandFactory) { // TODO: return string only?
+  private String evaluate(shell, line, commandFactory) {
     if (new Guard().isStringNullOrEmpty(line)) return ''
     
-    /* command */
     if (line.startsWith(':')) {
+      /* command */
       def args = line.split(' ')
       def command = args[0]
       args = 1 < args.size() ? args[1..-1] : []
@@ -79,11 +80,11 @@ class Tool extends Script {
       response.log()
       
       if (response.exit) exit()
-      return ''
+      return response.getMessage()
+    } else {
+      /* shell evaluation */
+      return shell.evaluate(line)
     }
-
-    /* shell evaluation */
-    return shell.evaluate(line)
   }
 
   private void exit() {
