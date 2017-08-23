@@ -3,7 +3,7 @@ package com.spectralogic.dsl.commands
 import com.spectralogic.dsl.helpers.LogRecorder
 
 class ShellCommandFactory {
-  List<ShellCommand> commands
+  private List<ShellCommand> commands
 
   ShellCommandFactory(GroovyShell shell, LogRecorder recorder) {
     commands = []
@@ -14,13 +14,8 @@ class ShellCommandFactory {
   }
 
   def runCommand(commandName, args) {
-    def execCommand = { name ->
-      name = name.toLowerCase()
-      def command = commands.find{ name in it.commandNames() }
-      return command ? command.run(args) : null
-    }
-
-    return execCommand(commandName) ?: execCommand(':help')
+    def command = commands.find { commandName.toLowerCase() in it.commandNames() }
+    return command ? command.run(args) : new HelpCommand().run()
   }
 
 }
