@@ -4,19 +4,14 @@ import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChannelBuilder
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers
 import com.spectralogic.ds3client.helpers.FileObjectPutter
-import com.spectralogic.ds3client.models.ChecksumType
-import com.spectralogic.ds3client.models.Contents
 import com.spectralogic.ds3client.models.ListBucketResult
 import com.spectralogic.ds3client.models.bulk.Ds3Object
 import com.spectralogic.ds3client.commands.DeleteBucketRequest
 import com.spectralogic.ds3client.commands.DeleteObjectsRequest
 import com.spectralogic.ds3client.commands.GetBucketResponse
-import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
@@ -61,13 +56,21 @@ class BpBucket extends GetBucketResponse {
   /** Recursively delete objects in max 1000 object bulks */
   BpBucket deleteObjects(BpObject ...objects) {
     if (objects.size() < 1) return this
-    
+
+
+    def objIterator = objects.iterator()
+
+    while (objIterator) {
+      def currentBatch = objIterator.take(1_000)
+      client.deleteObjects(new DeleteObjectsRequest(name, currentBatch.toList().collectMany { it.name}))
+    }
+/*
     def bulkSize = Math.min(1000, objects.size())
     def objectNames = objects[0..bulkSize - 1].collect { it.name }
     client.deleteObjects(new DeleteObjectsRequest(name, objectNames))
     
     if (bulkSize < objects.size()) deleteObjects(*objects[bulkSize..-1])
-
+*/
     return reload()
   }
 
