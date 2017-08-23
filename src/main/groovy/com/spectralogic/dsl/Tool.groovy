@@ -35,7 +35,7 @@ class Tool extends Script {
     def commandFactory = new ShellCommandFactory(shell, recorder)
     
     recorder.init()
-    // TODO: add autocomplete for file paths
+    
     def console = new ConsoleReader()
     console.setPrompt(Globals.PROMPT)
     println Globals.initMessage(console.getTerminal().getWidth())

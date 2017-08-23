@@ -58,7 +58,7 @@ class ExecuteCommand implements ShellCommand {
       cli.usage()
       return response.setMessage(stringWriter.toString())
     } else if (options.l) {
-      return response.addInfo(listScripts())
+      return response.setMessage(listScripts())
     } else if (options.d) {
       return response.addInfo(deleteScript(options.d))
     } else {

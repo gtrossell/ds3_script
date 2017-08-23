@@ -41,7 +41,7 @@ class CommandResponse {
   }
 
   Boolean isEmpty() {
-    !info && !warn && !error && !message
+    return !info && !warn && !error && !message
   }
 
   String getMessage() {
