@@ -23,6 +23,7 @@ import org.slf4j.LoggerFactory
 class BpBucket extends GetBucketResponse {
   private final static logger = LoggerFactory.getLogger(BpBucket.class)
   private final Ds3ClientImpl client
+  private final helper
   private ListBucketResult listBucketResult
   final String name
 
@@ -30,8 +31,9 @@ class BpBucket extends GetBucketResponse {
     super(response.getListBucketResult(), 
           response.getChecksum(), 
           response.getChecksumType())
-    this.listBucketResult = response.getListBucketResult()
     this.client = client
+    this.helper = Ds3ClientHelpers.wrap(client)
+    this.listBucketResult = response.getListBucketResult()
     this.name = response.getListBucketResult().getName()
   }
 
@@ -55,18 +57,18 @@ class BpBucket extends GetBucketResponse {
 
   /** Deletes all objects inside it */
   BpBucket empty() {
-    return deleteObjects(*objects())
+    return deleteObjects(*contentsToBpObjects(helper.listObjects(name)))
   }
 
   /** Recursively delete objects in max 1000 object bulks */
   BpBucket deleteObjects(BpObject ...objects) {
     if (objects.size() < 1) return this
     
-    def bulkSize = Math.min(1000, objects.size())
-    def objectNames = objects[0..bulkSize - 1].collect { it.name }
-    client.deleteObjects(new DeleteObjectsRequest(name, objectNames))
-    
-    if (bulkSize < objects.size()) deleteObjects(*objects[bulkSize..-1])
+    def objIterator = objects.iterator()
+    while (objIterator) {
+      def currentBatch = objIterator.take(1_000)
+      client.deleteObjects(new DeleteObjectsRequest(name, currentBatch.collect { it.name }))
+    }
 
     return reload()
   }
@@ -80,7 +82,6 @@ class BpBucket extends GetBucketResponse {
     if (remoteDir && remoteDir[-1] != '/') remoteDir += '/'
 
     /* Group files into common directories */
-    def helper = Ds3ClientHelpers.wrap(this.client)
     def objects = [:] /* key: directory val: array of Ds3Objects */
     def addObjects = { pathStr, ds3Objects ->
       if (objects[pathStr] == null) objects[pathStr] = []
