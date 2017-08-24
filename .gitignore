@@ -12,3 +12,4 @@ scripts/
 build/
 .gradle/
 run.sh
+run.py
