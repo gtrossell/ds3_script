@@ -4,19 +4,14 @@ import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChannelBuilder
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers
 import com.spectralogic.ds3client.helpers.FileObjectPutter
-import com.spectralogic.ds3client.models.ChecksumType
-import com.spectralogic.ds3client.models.Contents
 import com.spectralogic.ds3client.models.ListBucketResult
 import com.spectralogic.ds3client.models.bulk.Ds3Object
 import com.spectralogic.ds3client.commands.DeleteBucketRequest
 import com.spectralogic.ds3client.commands.DeleteObjectsRequest
 import com.spectralogic.ds3client.commands.GetBucketResponse
-import com.spectralogic.ds3client.commands.interfaces.AbstractResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */

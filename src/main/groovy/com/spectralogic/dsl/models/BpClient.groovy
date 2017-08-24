@@ -1,13 +1,11 @@
 package com.spectralogic.dsl.models
 
 import com.spectralogic.dsl.exceptions.BpException
-import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.commands.GetBucketRequest
 import com.spectralogic.ds3client.commands.GetServiceRequest
 import com.spectralogic.ds3client.commands.PutBucketRequest
 import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.networking.FailedRequestException
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl Client */

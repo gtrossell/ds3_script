@@ -1,17 +1,12 @@
 package com.spectralogic.dsl.models
 
-import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.commands.DeleteObjectRequest
-import com.spectralogic.ds3client.commands.DeleteObjectResponse
-import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.commands.GetObjectRequest
 import com.spectralogic.ds3client.commands.spectrads3.GetBulkJobSpectraS3Request
 import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.models.bulk.Ds3Object
 import com.spectralogic.ds3client.models.Contents
 import com.spectralogic.ds3client.models.User
-
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.Files
 import java.nio.channels.FileChannel

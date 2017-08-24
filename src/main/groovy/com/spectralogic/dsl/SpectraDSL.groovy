@@ -1,8 +1,6 @@
 package com.spectralogic.dsl
 
 import com.spectralogic.dsl.models.BpClientBuilder
-import java.nio.file.Path
-import java.nio.file.Paths
 
 /** functions available to the user from the shell */
 abstract class SpectraDSL extends Script {

@@ -6,7 +6,6 @@ import com.spectralogic.dsl.helpers.Environment
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import org.apache.commons.io.FilenameUtils
-import java.util.Random
 
 class RecordCommand implements ShellCommand {
   CliBuilder cli

@@ -5,12 +5,7 @@ import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import com.spectralogic.ds3client.utils.Guard
-import groovy.lang.MissingMethodException
-import groovy.lang.MissingPropertyException
-import java.io.File
-import java.io.IOException
 import jline.console.ConsoleReader
-import jline.TerminalFactory
 import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.slf4j.LoggerFactory
@@ -20,17 +15,15 @@ import org.slf4j.LoggerFactory
  * It Handles the terminal and handles all user interaction
  */
 class Tool extends Script {
-  private final static logger
-  private final recorder
+  private final static logger = LoggerFactory.getLogger(Tool.class)
+  private final static recorder = new LogRecorder()
 
   static void main(String[] args) {
-    logger = LoggerFactory.getLogger(Tool.class)
     InvokerHelper.runScript(Tool, args)
   }
 
   /** REPL handler */
   def run() {
-    recorder = new LogRecorder()
     def shell = new ShellBuilder().build(this.class.classLoader)
     def commandFactory = new ShellCommandFactory(shell, recorder)
     
@@ -44,7 +37,7 @@ class Tool extends Script {
       /* Run script passed in */
       if (args.size() > 0) {
         if (!args[0].endsWith('.groovy')) args[0] += '.groovy'
-        def scriptArgs = args.size() > 1 ? args[1..args.size()-1] : []
+        def scriptArgs = args.size() > 1 ? args[1..-1] : []
         shell.run(new File(args[0]), scriptArgs)
       }
 
@@ -54,8 +47,7 @@ class Tool extends Script {
           def result = evaluate(shell, line, commandFactory)
           println Globals.RETURN_PROMPT + result
           recorder.record(line, result.toString())
-        } catch (BpException | ConnectTimeoutException | MissingMethodException | 
-                  MissingPropertyException | RuntimeException e) {
+        } catch (BpException | RuntimeException | ConnectTimeoutException e) {
           logger.error('Exception: ', e)
         }
       }

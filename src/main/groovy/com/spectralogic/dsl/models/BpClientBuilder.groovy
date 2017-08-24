@@ -1,11 +1,9 @@
 package com.spectralogic.dsl.models
 
 import com.spectralogic.dsl.exceptions.BpException
-import com.spectralogic.ds3client.Ds3Client
 import com.spectralogic.ds3client.Ds3ClientBuilder
 import com.spectralogic.ds3client.models.common.Credentials
 import com.spectralogic.dsl.helpers.Environment
-import com.spectralogic.dsl.models.BpClient
 import org.slf4j.LoggerFactory
 
 class BpClientBuilder {
