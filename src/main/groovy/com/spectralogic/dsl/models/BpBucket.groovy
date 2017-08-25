@@ -82,10 +82,10 @@ class BpBucket extends GetBucketResponse {
     def files = paths[false] ?: []
 
     /* grouped files */
-    files.groupBy { it.getParent() }.each { dir, fileBundle ->
-      def bundleIterator = fileBundle.iterator()
-      while (bundleIterator) {
-        def objs = bundleIterator.take(maxPut).collect { new Ds3Object(it.getFileName().toString(), Files.size(it)) }
+    files.groupBy { it.getParent() }.each { dir, fileGroup ->
+      def groupIterator = fileGroup.iterator()
+      while (groupIterator) {
+        def objs = groupIterator.take(maxPut).collect { new Ds3Object(it.getFileName().toString(), Files.size(it)) }
         def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
         job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
       }
