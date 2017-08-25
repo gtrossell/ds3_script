@@ -124,8 +124,8 @@ class BpBucket extends GetBucketResponse {
     def nameIterator = objectNames.iterator()
     while (nameIterator) {
       def names = nameIterator.take(Globals.MAX_BULK_LOAD).collect()
-      def objs = objects(*names).collect { new Ds3Object(it.getName()) }
-      def bulkRequest = new GetBulkJobSpectraS3Request(name, objs)
+      def dS3Objects = objects(*names).collect { new Ds3Object(it.getName()) }
+      def bulkRequest = new GetBulkJobSpectraS3Request(name, dS3Objects)
       def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
 
       def list = bulkResponse.getMasterObjectList()
