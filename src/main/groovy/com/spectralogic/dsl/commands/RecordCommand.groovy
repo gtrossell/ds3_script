@@ -174,8 +174,9 @@ class RecordCommand implements ShellCommand {
 
   /** @return same file but with .groovy extension if none is given */
   private File ensureExtension(File file) {
-    if (FilenameUtils.getExtension(file.toString()) == '')
+    if (!FilenameUtils.getExtension(file.toString())) {
       file = new File(file.toString() + '.groovy')
+    }
     return file
   }
 

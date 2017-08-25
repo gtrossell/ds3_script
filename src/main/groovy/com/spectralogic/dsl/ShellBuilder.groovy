@@ -7,7 +7,7 @@ import com.spectralogic.dsl.models.BpClientBuilder
 
 class ShellBuilder {
 
-  GroovyShell build(classLoader) {
+  GroovyShell build(ClassLoader classLoader) {
     return new GroovyShell(classLoader, buildBinding(), buildConfig())
   }
 
