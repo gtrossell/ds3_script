@@ -28,7 +28,7 @@ class BpBucketTest extends GroovyTestCase {
     bucket.empty()
     assertEquals 0, bucket.objects().size()
     bucket.delete()
-    shouldFail BpException.class, { client.bucket(bucketName) }
+    shouldFail { client.bucket(bucketName) }
   }
 
 }

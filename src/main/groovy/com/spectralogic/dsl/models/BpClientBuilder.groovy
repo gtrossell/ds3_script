@@ -30,7 +30,7 @@ class BpClientBuilder {
     }
     
     def cred = new Credentials(accessId, secretKey)
-    new BpClient(Ds3ClientBuilder.create(endpoint, cred).withHttps(https).build())
+    new BpClient(Ds3ClientBuilder.create(endpoint, cred).withHttps(https).build().getNetClient())
   }
 
 }

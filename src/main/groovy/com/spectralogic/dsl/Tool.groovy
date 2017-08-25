@@ -1,5 +1,6 @@
 package com.spectralogic.dsl
 
+import com.spectralogic.ds3client.networking.FailedRequestException
 import com.spectralogic.dsl.commands.ShellCommandFactory
 import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.dsl.helpers.Globals
@@ -47,7 +48,7 @@ class Tool extends Script {
           def result = evaluate(shell, line, commandFactory)
           println Globals.RETURN_PROMPT + result
           recorder.record(line, result.toString())
-        } catch (BpException | RuntimeException | ConnectTimeoutException e) {
+        } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException e) {
           logger.error('Exception: ', e)
         }
       }

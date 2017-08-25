@@ -1,29 +1,24 @@
 package com.spectralogic.dsl.models
 
+import com.spectralogic.ds3client.networking.NetworkClient
 import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.commands.GetBucketRequest
 import com.spectralogic.ds3client.commands.GetServiceRequest
 import com.spectralogic.ds3client.commands.PutBucketRequest
 import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.networking.FailedRequestException
-import org.slf4j.LoggerFactory
 
 /** Represents a BlackPearl Client */
 class BpClient extends Ds3ClientImpl {
-  private final static logger = LoggerFactory.getLogger(BpClient.class)
 
-  BpClient(Ds3ClientImpl ds3Client) { // just net client
-    super(ds3Client.getNetClient())
+  BpClient(NetworkClient netClient) {
+    super(netClient)
   }
 
   /** @return BpBucket of bucket with given name */
   BpBucket bucket(String bucketName) {
-    try {
-      def response = this.getBucket(new GetBucketRequest(bucketName))
-      return new BpBucket(response, this)
-    } catch (FailedRequestException e) {
-      throw new BpException(e)
-    }
+    def response = this.getBucket(new GetBucketRequest(bucketName))
+    return new BpBucket(response, this)
   }
 
   /** @return the names of the buckets */
