@@ -10,7 +10,7 @@ import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.slf4j.LoggerFactory
 
-/** 
+/**
  * This is the main class for the Spectra DSL tool.
  * It Handles the terminal and handles all user interaction
  */
@@ -79,7 +79,7 @@ class Tool extends Script {
     }
   }
 
-  private void exit() {
+  private static void exit() {
     recorder.close()
     System.exit(0)
   }
