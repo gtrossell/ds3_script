@@ -1,16 +1,9 @@
 package com.spectralogic.dsl.models
 
-import com.spectralogic.ds3client.commands.DeleteObjectRequest
-import com.spectralogic.ds3client.commands.GetObjectRequest
-import com.spectralogic.ds3client.commands.spectrads3.GetBulkJobSpectraS3Request
 import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.models.bulk.Ds3Object
 import com.spectralogic.ds3client.models.Contents
 import com.spectralogic.ds3client.models.User
-import java.nio.file.Paths
-import java.nio.file.Files
-import java.nio.channels.FileChannel
-import java.nio.file.StandardOpenOption
 
 /** Represents a BlackPearl Object */
 class BpObject extends Ds3Object {
@@ -26,58 +19,26 @@ class BpObject extends Ds3Object {
     this.bucket = bucket
     this.client = client
     this.metadata = [
-      name:       this.name, 
-      size:       this.size, 
+      name:       this.name,
+      size:       this.size,
       owner:      this.owner,
       bucketName: this.bucket.name
     ]
   }
 
   /** 
-   * Deletes the object from the BP 
-   * @return true if object was deleted 
+   * Deletes the object from the BP
    */
   void delete() {
-    def deleteResponse = client.deleteObject(new DeleteObjectRequest(bucket.name, name))
-    bucket.reload()
+    bucket.deleteObjects(this)
   }
 
-  /** 
-   * Write object to given directory.
-   * It will create the directory path if it does not exist
-   * @param path  directory to write object to
-   * @return true if the write was successful
+  /**
+   * Uses BpBucket.getBulk
+   * @param pathStr directory to write object to
    */
   void writeTo(String pathStr) {
-    def path = Paths.get(pathStr)
-
-    if (!Files.exists(path)) Files.createDirectory(path)
-    
-    /* convert BpObject to Ds3Object */
-    def objectList = [new Ds3Object(this.getName())]
-    def bulkRequest = new GetBulkJobSpectraS3Request(bucket.name, objectList)
-    def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
-    
-    def list = bulkResponse.getMasterObjectList()
-    for (objects in list.getObjects()) {
-      for (obj in objects.getObjects()) {
-        def channel = FileChannel.open(
-          path.resolve(obj.getName()),
-          StandardOpenOption.WRITE,
-          StandardOpenOption.CREATE
-        )
-        
-        channel.position(obj.getOffset());
-        
-        client.getObject(new GetObjectRequest(
-          bucket.name,
-          obj.getName(),
-          channel,
-          list.getJobId().toString(),
-          obj.getOffset()
-        ))
-      }
-    }
+    bucket.getBulk([name], pathStr)
   }
 
 }

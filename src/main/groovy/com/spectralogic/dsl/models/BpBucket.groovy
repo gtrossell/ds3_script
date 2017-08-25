@@ -1,5 +1,7 @@
 package com.spectralogic.dsl.models
 
+import com.spectralogic.ds3client.commands.GetObjectRequest
+import com.spectralogic.ds3client.commands.spectrads3.GetBulkJobSpectraS3Request
 import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChannelBuilder
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers
@@ -10,14 +12,14 @@ import com.spectralogic.ds3client.commands.DeleteBucketRequest
 import com.spectralogic.ds3client.commands.DeleteObjectsRequest
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
+
+import java.nio.channels.FileChannel
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-import org.slf4j.LoggerFactory
+import java.nio.file.StandardOpenOption
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
 class BpBucket extends GetBucketResponse {
-  private final static logger = LoggerFactory.getLogger(BpBucket.class)
   private final Ds3ClientImpl client
   private final helper
   private ListBucketResult listBucketResult
@@ -57,7 +59,7 @@ class BpBucket extends GetBucketResponse {
   }
 
   /** Recursively delete objects in max 1000 object bulks */
-  BpBucket deleteObjects(BpObject ...objects) {
+  BpBucket deleteObjects(BpObject... objects) {
     if (objects.size() < 1) return this
     
     def objIterator = objects.iterator()
@@ -75,7 +77,7 @@ class BpBucket extends GetBucketResponse {
    * Puts each file and each directory's files given into the bucket. Maintains the subdirectory
    * structure when putting directories.
    */
-  def putBulk(List<String> pathStrs, String remoteDir='') {
+  BpBucket putBulk(List<String> pathStrs, String remoteDir='') {
     final maxPut = 200_000
     def paths = pathStrs.collect { Paths.get(it) }.groupBy { Files.isDirectory(it) }
     def dirs = paths[true] ?: []
@@ -108,11 +110,47 @@ class BpBucket extends GetBucketResponse {
     return putBulk([pathStr], remoteDir)
   }
 
+  /**
+   * Writes objects to specified directory
+   * @param objectNames names of the objects to get
+   * @param pathStr directory to write to
+   */
+  void getBulk(List<String> objectNames, String pathStr) {
+    def path = Paths.get(pathStr)
+    if (Files.isRegularFile(path)) throw new BpException("$pathSTr is not a directory!")
+    if (!Files.exists(path)) Files.createDirectory(path)
+
+    def objs = objects(*objectNames).collect { new Ds3Object(it.getName()) }
+    def bulkRequest = new GetBulkJobSpectraS3Request(name, objs)
+    def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
+
+    def list = bulkResponse.getMasterObjectList()
+    for (objects in list.getObjects()) {
+      for (obj in objects.getObjects()) {
+        def channel = FileChannel.open(
+                path.resolve(obj.getName()),
+                StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE
+        )
+
+        channel.position(obj.getOffset())
+
+        client.getObject(new GetObjectRequest(
+                name,
+                obj.getName(),
+                channel,
+                list.getJobId().toString(),
+                obj.getOffset()
+        ))
+      }
+    }
+  }
+
   /** 
    * @param objectNames objects names to return
    * @return list all objects in bucket or objects with given names 
    */
-  List<BpObject> objects(String ...objectNames) {
+  List<BpObject> objects(String... objectNames) {
     def wantedObjects
     if (objectNames.length == 0) {
       wantedObjects = listBucketResult.objects
