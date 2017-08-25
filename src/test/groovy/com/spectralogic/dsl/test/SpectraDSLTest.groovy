@@ -1,18 +1,13 @@
 import com.spectralogic.dsl.helpers.Environment
 import com.spectralogic.dsl.models.BpClientBuilder
 import org.junit.Test
-import java.util.Random
-
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNull
-
 /**
  * Tests everything that the SpectraDSL class uses 
  * TODO: Test the actual SpectraDSL class
  */
-public class SpectraDSLTest extends GroovyTestCase {
+class SpectraDSLTest extends GroovyTestCase {
   @Test
-  public void testCreateBpClient() throws IOException {
+  void testCreateBpClient() throws IOException {
     def env = new Environment()
     def invalidVars = [null, '']
     assert !(env.getEndpoint() in invalidVars)

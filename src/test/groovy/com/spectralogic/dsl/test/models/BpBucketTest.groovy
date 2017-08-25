@@ -1,18 +1,12 @@
-import org.junit.Test
-import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertFalse
-import static org.junit.Assert.assertNull
-
-import java.util.Random
-
 import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.dsl.models.BpClientBuilder
+import org.junit.Test
 
 /** Tests BpBucket */
-public class BpBucketTest extends GroovyTestCase {
+class BpBucketTest extends GroovyTestCase {
 
   @Test
-  public void testBucket() throws IOException {
+  void testBucket() throws IOException {
     def client = new BpClientBuilder().create()
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)

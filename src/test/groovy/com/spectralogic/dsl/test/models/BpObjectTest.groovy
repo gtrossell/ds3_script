@@ -1,16 +1,14 @@
 import com.spectralogic.dsl.models.BpClientBuilder
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.Random
 import org.junit.Test
 
-import static org.junit.Assert.assertNull
+import java.nio.file.Files
+import java.nio.file.Paths
 
 /** Tests BpObject */
-public class BpObjectTest extends GroovyTestCase {
+class BpObjectTest extends GroovyTestCase {
 
   @Test
-  public void testObject() throws IOException {
+  void testObject() throws IOException {
     def client = new BpClientBuilder().create()
     def bucketName = 'test_bucket_' + (new Random().nextInt(10 ** 4))
     def bucket = client.createBucket(bucketName)
