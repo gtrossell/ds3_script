@@ -6,22 +6,22 @@ class Config {
   private static String logDir
   private static String scriptDir
 
-  def static getHomeDir() {
+  static String getHomeDir() {
     if (!homeDir) homeDir = new File("").getAbsoluteFile().toString()
     return addTrailingSlash(homeDir)
   }
 
-  def static getScriptDir() {
+  static String getScriptDir() {
     if (!scriptDir) scriptDir = getHomeDir() + "scripts/"
     return addTrailingSlash(scriptDir)
   }
 
-  def static getLogDir() {
+  static String getLogDir() {
     if (!logDir) logDir = getHomeDir() + "log/"
     return addTrailingSlash(logDir)
   }
 
-  private static addTrailingSlash(path) {
+  static String addTrailingSlash(String path) {
     if (path[path.size() - 1] != '/') path += '/'
     return path
   }
