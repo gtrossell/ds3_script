@@ -29,12 +29,8 @@ class BpClient extends Ds3ClientImpl {
 
   /** @return newly created BpBucket */
   BpBucket createBucket(String name, String dataPolicyId="") {
-    try {
-      putBucket(new PutBucketRequest(name))
-      bucket(name)
-    } catch (FailedRequestException e) {
-      throw new BpException(e)
-    }
+    putBucket(new PutBucketRequest(name))
+    bucket(name)
   }
 
   String toString() {
