@@ -2,6 +2,9 @@ import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.dsl.models.BpClientBuilder
 import org.junit.Test
 
+import java.nio.file.Files
+import java.nio.file.Paths
+
 /** Tests BpBucket */
 class BpBucketTest extends GroovyTestCase {
 
@@ -17,12 +20,21 @@ class BpBucketTest extends GroovyTestCase {
     bucket.putBulk(["${homePath}/test-data/dir1/txt1.txt",
                     "${homePath}/test-data/dir1/txt2.txt",
                     "${homePath}/test-data/dir1/txt3.txt"])
-    // TODO: prevent user from having two named the same?
+
     assertEquals 5, bucket.objects().size()
     assertEquals bucket.objects().size(), bucket.reload().objects().size()
     assertEquals 'txt1.txt', bucket.object('txt1.txt').name
     assertEquals 2, bucket.objects('txt2.txt', 'txt3.txt').size()
     assert 10000 < bucket.object('txt2.txt').size
+
+    def objNames = ['txt1.txt','txt2.txt','txt3.txt']
+    shouldFail { bucket.getBulk(['doesnt_exist.txt'], "${homePath}/test-data/tmp/") }
+    bucket.getBulk(objNames, "${homePath}/test-data/tmp/")
+    objNames.each {
+      def file = Paths.get("${homePath}/test-data/tmp/$it")
+      assert Files.exists(file)
+      Files.delete(file)
+    }
 
     shouldFail BpException.class, { bucket.delete() }
     bucket.empty()
