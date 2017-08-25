@@ -11,6 +11,7 @@ import com.spectralogic.ds3client.commands.DeleteObjectsRequest
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import org.slf4j.LoggerFactory
 
@@ -69,40 +70,35 @@ class BpBucket extends GetBucketResponse {
   }
 
   /**
-   * @param paths Directories and files to upload
-   * @param remoteDir Directory on BP to use as a root for uploading (ie 'Dir1/')
-   * Puts each file and file in each directory given into the bucket
+   * @param pathStrs Directories and files to upload
+   * @param remoteDir Directory on BP to put to
+   * Puts each file and each directory's files given into the bucket. Maintains the subdirectory
+   * structure when putting directories.
    */
-  BpBucket putBulk(List<String> pathStrs, String remoteDir='') {
-    if (remoteDir && remoteDir[-1] != '/') remoteDir += '/'
+  def putBulk(List<String> pathStrs, String remoteDir='') {
+    final maxPut = 200_000
+    def paths = pathStrs.collect { Paths.get(it) }.groupBy { Files.isDirectory(it) }
+    def dirs = paths[true] ?: []
+    def files = paths[false] ?: []
 
-    /* Group files into common directories */
-    def objects = [:] /* key: directory val: array of Ds3Objects */
-    def addObjects = { pathStr, ds3Objects ->
-      if (objects[pathStr] == null) objects[pathStr] = []
-      objects[pathStr] = (objects[pathStr] << ds3Objects).flatten()
-    }
-
-    pathStrs.each {
-      def path = Paths.get(it)
-      if (!Files.exists(path)) {
-        throw BpException("'$path' does not exist!")
-      } else if (Files.isDirectory(path)) {
-        addObjects(path.toString(), helper.listObjectsForDirectory(path))
-      } else if (Files.isRegularFile(path)) {
-        addObjects(path.getParent().toString(), 
-          new Ds3Object(path.getFileName().toString(), Files.size(path)))
-      } else {
-        throw BpException("'$path' is not a directory or regular file")
+    /* grouped files */
+    files.groupBy { it.getParent() }.each { dir, fileBundle ->
+      def bundleIterator = fileBundle.iterator()
+      while (bundleIterator) {
+        def objs = bundleIterator.take(maxPut).collect { new Ds3Object(it.getFileName().toString(), Files.size(it)) }
+        def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
+        job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
       }
     }
 
-    /* Put job that maintains subdirectory order and remoteDir prefix */
-    objects.each { dir, objs ->
-      objs = helper.addPrefixToDs3ObjectsList(objs, remoteDir)
-      def job = helper.startWriteJob(this.name, objs)
-      job.transfer(new PrefixAdderObjectChannelBuilder(
-        new FileObjectPutter(Paths.get(dir)), remoteDir))
+    /* directories */
+    dirs.each { dir ->
+      def objIterator = helper.listObjectsForDirectory(dir).iterator()
+      while (objIterator) {
+        def objs = objIterator.take(maxPut).collect()
+        def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
+        job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
+      }
     }
 
     return reload()
