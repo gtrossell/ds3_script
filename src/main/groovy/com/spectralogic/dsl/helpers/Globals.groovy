@@ -7,7 +7,7 @@ package com.spectralogic.dsl.helpers
 class Globals {
   final static String PROMPT = 'spectra> '
   final static String RETURN_PROMPT = '===> '
-  private final static logger
+  final static MAX_BULK_LOAD = 200_000
   
   static def initMessage(width) {
     """

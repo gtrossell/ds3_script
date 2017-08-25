@@ -12,6 +12,8 @@ import com.spectralogic.ds3client.commands.DeleteBucketRequest
 import com.spectralogic.ds3client.commands.DeleteObjectsRequest
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.ds3client.Ds3ClientImpl
+import com.spectralogic.dsl.helpers.Globals
+import jdk.nashorn.internal.objects.Global
 
 import java.nio.channels.FileChannel
 import java.nio.file.Files
@@ -78,7 +80,6 @@ class BpBucket extends GetBucketResponse {
    * structure when putting directories.
    */
   BpBucket putBulk(List<String> pathStrs, String remoteDir='') {
-    final maxPut = 200_000
     def paths = pathStrs.collect { Paths.get(it) }.groupBy { Files.isDirectory(it) }
     def dirs = paths[true] ?: []
     def files = paths[false] ?: []
@@ -87,7 +88,7 @@ class BpBucket extends GetBucketResponse {
     files.groupBy { it.getParent() }.each { dir, fileGroup ->
       def groupIterator = fileGroup.iterator()
       while (groupIterator) {
-        def objs = groupIterator.take(maxPut).collect { new Ds3Object(it.getFileName().toString(), Files.size(it)) }
+        def objs = groupIterator.take(Globals.MAX_BULK_LOAD).collect { new Ds3Object(it.getFileName().toString(), Files.size(it)) }
         def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
         job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
       }
@@ -97,7 +98,7 @@ class BpBucket extends GetBucketResponse {
     dirs.each { dir ->
       def objIterator = helper.listObjectsForDirectory(dir).iterator()
       while (objIterator) {
-        def objs = objIterator.take(maxPut).collect()
+        def objs = objIterator.take(Globals.MAX_BULK_LOAD).collect()
         def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
         job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
       }
@@ -120,28 +121,32 @@ class BpBucket extends GetBucketResponse {
     if (Files.isRegularFile(path)) throw new BpException("$pathSTr is not a directory!")
     if (!Files.exists(path)) Files.createDirectory(path)
 
-    def objs = objects(*objectNames).collect { new Ds3Object(it.getName()) }
-    def bulkRequest = new GetBulkJobSpectraS3Request(name, objs)
-    def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
+    def nameIterator = objectNames.iterator()
+    while (nameIterator) {
+      def names = nameIterator.take(Globals.MAX_BULK_LOAD).collect()
+      def objs = objects(*names).collect { new Ds3Object(it.getName()) }
+      def bulkRequest = new GetBulkJobSpectraS3Request(name, objs)
+      def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
 
-    def list = bulkResponse.getMasterObjectList()
-    for (objects in list.getObjects()) {
-      for (obj in objects.getObjects()) {
-        def channel = FileChannel.open(
-                path.resolve(obj.getName()),
-                StandardOpenOption.WRITE,
-                StandardOpenOption.CREATE
-        )
+      def list = bulkResponse.getMasterObjectList()
+      for (objects in list.getObjects()) {
+        for (obj in objects.getObjects()) {
+          def channel = FileChannel.open(
+                  path.resolve(obj.getName()),
+                  StandardOpenOption.WRITE,
+                  StandardOpenOption.CREATE
+          )
 
-        channel.position(obj.getOffset())
+          channel.position(obj.getOffset())
 
-        client.getObject(new GetObjectRequest(
-                name,
-                obj.getName(),
-                channel,
-                list.getJobId().toString(),
-                obj.getOffset()
-        ))
+          client.getObject(new GetObjectRequest(
+                  name,
+                  obj.getName(),
+                  channel,
+                  list.getJobId().toString(),
+                  obj.getOffset()
+          ))
+        }
       }
     }
   }
