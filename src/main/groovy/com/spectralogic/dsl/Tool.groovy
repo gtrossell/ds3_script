@@ -50,8 +50,9 @@ class Tool extends Script {
           def result = evaluate(shell, line, commandFactory)
           println Globals.RETURN_PROMPT + result
           recorder.record(line, result.toString())
+        } catch (UserInterruptException) {
+          exit()
         } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException e) {
-          if (e in UserInterruptException) exit()
           logger.error('Exception: ', e)
         }
       }
