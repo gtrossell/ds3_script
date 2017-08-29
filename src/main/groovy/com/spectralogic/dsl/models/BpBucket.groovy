@@ -11,9 +11,7 @@ import com.spectralogic.ds3client.models.bulk.Ds3Object
 import com.spectralogic.ds3client.commands.DeleteBucketRequest
 import com.spectralogic.ds3client.commands.DeleteObjectsRequest
 import com.spectralogic.ds3client.commands.GetBucketResponse
-import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.dsl.helpers.Globals
-import jdk.nashorn.internal.objects.Global
 
 import java.nio.channels.FileChannel
 import java.nio.file.Files
@@ -22,12 +20,12 @@ import java.nio.file.StandardOpenOption
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
 class BpBucket extends GetBucketResponse {
-  private final Ds3ClientImpl client
+  private final BpClient client
   private final helper
   private ListBucketResult listBucketResult
   final String name
 
-  BpBucket(GetBucketResponse response, Ds3ClientImpl client) {
+  BpBucket(GetBucketResponse response, BpClient client) {
     super(response.getListBucketResult(), 
           response.getChecksum(), 
           response.getChecksumType())
