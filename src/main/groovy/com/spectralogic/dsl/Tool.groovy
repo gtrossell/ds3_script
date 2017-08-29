@@ -7,6 +7,7 @@ import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import com.spectralogic.ds3client.utils.Guard
 import jline.console.ConsoleReader
+import jline.console.UserInterruptException
 import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.slf4j.LoggerFactory
@@ -32,6 +33,7 @@ class Tool extends Script {
     
     def console = new ConsoleReader()
     console.setPrompt(Globals.PROMPT)
+    console.setHandleUserInterrupt(true)
     println Globals.initMessage(console.getTerminal().getWidth())
 
     try {
@@ -49,6 +51,7 @@ class Tool extends Script {
           println Globals.RETURN_PROMPT + result
           recorder.record(line, result.toString())
         } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException e) {
+          if (e in UserInterruptException) exit()
           logger.error('Exception: ', e)
         }
       }
