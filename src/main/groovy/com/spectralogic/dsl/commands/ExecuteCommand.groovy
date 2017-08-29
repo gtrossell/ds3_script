@@ -1,7 +1,7 @@
 package com.spectralogic.dsl.commands
 
 import com.spectralogic.dsl.helpers.CommandHelper
-import com.spectralogic.dsl.helpers.Config
+import com.spectralogic.dsl.helpers.Globals
 import groovy.io.FileType
 import org.apache.commons.io.FilenameUtils
 
@@ -38,7 +38,7 @@ class ExecuteCommand implements ShellCommand {
     }
     
     // TODO: fix bug where if script is edited, the shell doesn't realize it
-    def scriptArgs = args.size() > 1 ? args[1..args.size()-1] : []
+    def scriptArgs = args.size() > 1 ? args[1..-1] : []
     shell.run(script, scriptArgs)
     return response
   }
@@ -68,7 +68,7 @@ class ExecuteCommand implements ShellCommand {
 
   private listScripts() {
     def scripts = []
-    new File(Config.getScriptDir()).eachFileRecurse (FileType.FILES) { file ->
+    new File(Globals.SCRIPT_DIR).eachFileRecurse (FileType.FILES) { file ->
       scripts << ' - ' + FilenameUtils.removeExtension(file.getName())
     }
     return 'Available scripts:\n' + scripts.join('\n')

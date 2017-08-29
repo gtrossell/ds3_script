@@ -6,10 +6,7 @@ class LogRecorder {
 
   LogRecorder() {
     now = new Date()
-    logDir = Config.logDir
-    if (logDir[logDir.size()-1] != '/') {
-      logDir += '/'
-    }
+    logDir = Globals.LOG_DIR
 
     /* create log dir */
     def dir = new File(logDir)

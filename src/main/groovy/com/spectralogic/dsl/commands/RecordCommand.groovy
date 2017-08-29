@@ -1,7 +1,6 @@
 package com.spectralogic.dsl.commands
 
 import com.spectralogic.dsl.helpers.CommandHelper
-import com.spectralogic.dsl.helpers.Config
 import com.spectralogic.dsl.helpers.Environment
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
@@ -66,7 +65,7 @@ class RecordCommand implements ShellCommand {
   /** Builds script lines and saves it to set or given location */
   private String saveScript(scriptLines) {
     if (!scriptFile)
-      scriptFile = new File(Config.getScriptDir(), "${recordId}.groovy")
+      scriptFile = new File(Globals.SCRIPT_DIR, "${recordId}.groovy")
 
     /* set environment vars */
     if (isRecordEnv) {
@@ -188,7 +187,7 @@ class RecordCommand implements ShellCommand {
     this.isRecording  = false
     this.isRecordEnv  = false
 
-    File scriptDir = new File(Config.getScriptDir())
+    File scriptDir = new File(Globals.SCRIPT_DIR)
     if (!scriptDir.exists()) scriptDir.mkdirs()
   }
 

@@ -7,9 +7,9 @@ class CommandHelper {
   File getScriptFromString(String pathStr) {
     def file
     if (!pathStr.contains('/')) {
-      file = new File(Config.getScriptDir(), pathStr)
+      file = new File(Globals.SCRIPT_DIR, pathStr)
     } else if (pathStr[0] == '.') {
-      file = new File(Config.getHomeDir(), pathStr.substring(1))
+      file = new File(Globals.HOME_DIR, pathStr.substring(1))
     } else {
       file = new File(pathStr)
     }
