@@ -10,7 +10,9 @@ import jline.console.ConsoleReader
 import jline.console.UserInterruptException
 import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.codehaus.groovy.tools.shell.util.SimpleCompletor
 import org.slf4j.LoggerFactory
+
 
 /**
  * This is the main class for the Spectra DSL tool.
@@ -46,13 +48,13 @@ class Tool extends Script {
 
       while (true) {
         try {
+          setAutoComplete(console, shell)
           def line = console.readLine()
           def result = evaluate(shell, line, commandFactory)
           println Globals.RETURN_PROMPT + result
           recorder.record(line, result.toString())
-        } catch (UserInterruptException) {
-          exit()
         } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException e) {
+          if (e in UserInterruptException) exit()
           logger.error('Exception: ', e)
         }
       }
@@ -64,8 +66,17 @@ class Tool extends Script {
     }
   }
 
+  private static setAutoComplete(ConsoleReader console, GroovyShell shell) {
+    def phrases = []
+    shell.getContext().variables.each { name, obj ->
+      phrases.add(name)
+      phrases.addAll(obj.class.getDeclaredMethods().findAll { !it.isSynthetic() }.collect { "${name}.${it.name}()".toString() })
+    }
+    console.addCompleter(new SimpleCompletor(phrases.toArray(new String[phrases.size()])))
+  }
+
   /** Logic for parsing and evaluating a line */
-  private String evaluate(shell, line, commandFactory) {
+  private static String evaluate(shell, line, commandFactory) {
     if (new Guard().isStringNullOrEmpty(line)) return ''
     
     if (line.startsWith(':')) {
