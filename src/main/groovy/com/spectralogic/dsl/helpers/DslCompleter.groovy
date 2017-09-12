@@ -17,22 +17,30 @@ class DslCompleter implements Completer {
   int complete(String buffer, int cursor, List<CharSequence> candidates) {
     if (Guard.isStringNullOrEmpty(buffer) || cursor == 0) {
       candidates.addAll(cleanseDuplicatesAndSort(findMatchingGlobals('').keySet().toList()))
-      return -1
+      return 0
     }
 
     def elementList = splitElements(findElements(buffer[0..cursor - 1]))
     def matching = findMatchingGlobals(elementList[0])
     for (def i = 1; i < elementList.size() && matching.size() == 1; i++) {
-      matching = findMatchingFieldsAndMethods((matching.keySet() as String[])[0], (matching.values() as Class[])[0])
+      matching = findMatchingFieldsAndMethods(elementList[i], matching.values()[0] as Class)
+
+      if (i < elementList.size() - 1) {
+        matching = getExactMatches(elementList[i].replaceAll("[()]", ""), matching)
+      }
+
     }
+//    TODO: supply no candidates if the loop terminates early
 
     candidates.addAll(cleanseDuplicatesAndSort(matching.keySet().toList()))
 
-    return cursor
+    return 0 < elementList.size() ? cursor - elementList[-1].size() : cursor
   }
 
   /** Prevent duplicates and sort the candidates */
   private List<CharSequence> cleanseDuplicatesAndSort(List<String> candidates) {
+    if (Guard.isNullOrEmpty(candidates)) return []
+//    TODO: overhaul this
     def cleaned = []
     candidates = candidates.sort()
     for (def i = 0; i < candidates.size() - 1; i++) {
@@ -40,14 +48,17 @@ class DslCompleter implements Completer {
       if (candidates[i + 1].startsWith(candidates[i])) i++
     }
 
-    return (cleaned << candidates.last()).unique()
+    return (cleaned << candidates[-1]).unique()
   }
 
   /** Find matching global variables and methods and their respective class or return type */
   private Map findMatchingGlobals(String prefix) {
+    if (prefix == null) return [:]
+
     def matching = [:]
     matching << shell.context.variables.findAll { it.key.toString().startsWith(prefix) }.collectEntries {
-                  [(it.key) : it.class] }
+                  [(it.key) : it.value.class]
+                }
     matching << SpectraDSL.class.declaredMethods.findAll {
                   Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix)
                 }.collectEntries {
@@ -58,28 +69,78 @@ class DslCompleter implements Completer {
   }
 
   /** Finds matching fields and methods of a class and their respective class or return type */
-  private Map findMatchingFieldsAndMethods(String prefix, Class aClass) {
-    def matching = [:]
-    matching << aClass.fields.findAll { it.name.startsWith(prefix) }.collectEntries { [(it.name) : it.class] }
-    matching << aClass.methods.findAll { it.name.startsWith(prefix) }.collectEntries {
-                  [(it.name + (it.parameterTypes.length == 0 ? "()" : "(")) : it.returnType] }
+  private Map findMatchingFieldsAndMethods(String prefix, Class clazz) {
+    if (prefix.endsWith('(') || prefix.endsWith(')')) {
+      return findMatchingMethods(prefix.replaceAll("[()]", ""), clazz)
+    } else {
+      def matching = [:]
+      matching << findMatchingMethods(prefix, clazz)
+      matching << findMatchingFields(prefix, clazz)
+      return matching
+    }
+  }
 
-    return matching
+  private Map findMatchingFields(String prefix, Class clazz) {
+    def matchingMethods = findMatchingMethods(prefix, clazz)
+    /* Public fields are still private but have a getter. */
+    return clazz.declaredFields.findAll { it.name.startsWith(prefix) && !it.synthetic &&
+            matchingMethods.containsKey(fieldToGetter(it.name)) }.collectEntries {
+              [(it.name) : it.class]
+            }
+  }
+
+  private Map findMatchingMethods(String prefix, Class clazz) {
+    return clazz.declaredMethods.findAll { !it.synthetic && Modifier.isPublic(it.modifiers) &&
+            it.name.startsWith(prefix) }.collectEntries {
+              [(it.name + (it.parameterTypes.length == 0 ? "()" : "(")) : it.returnType]
+            }
+  }
+
+  /** Takes a map created by the above methods and returns methods/fields/vars that match exactly */
+  private Map getExactMatches(String name, Map<String, Class> matching) {
+    return matching.findAll { it.key.toString().replaceAll("[()]", "") == name }
+  }
+
+  /** convert a field's name to it's getter name */
+  private String fieldToGetter(String field) {
+    if (Guard.isStringNullOrEmpty(field)) return ""
+
+    return "get" + field.replaceFirst(field[0], field[0].toUpperCase()) + "()"
   }
 
   /** splits the elements into raw method/variable names ('test.method(arg)' -> ['test', 'method()']) */
   private List<String> splitElements(String elements) {
+    if (Guard.isStringNullOrEmpty(elements)) return []
+
     def elementList = []
-    elements.split('\\.').each { part ->\
-      def chars = part.toCharArray()
-      for (def i = 0; i < chars.size(); i++) {
-        if (!Character.isJavaIdentifierPart(chars[i]) || i == chars.size() - 1) {
-          elementList << part[0..i]
+    def element = ""
+    def parenthesisStack = 0
+    for (character in elements) {
+      if (character == '(') {
+        parenthesisStack++
+        if (!element.isEmpty()) {
+          elementList << element + "()"
+          element = ""
         }
       }
+
+      if (parenthesisStack == 0) {
+        if (character == '.' && !element.isEmpty()) {
+          elementList << element
+          element = ""
+        } else if (character != '.') {
+          element += character
+        }
+      }
+
+      if (character == ')') parenthesisStack--
     }
 
-    return elementList
+    if (0 < element.size()) {
+      elementList << element
+    }
+
+    return elements[-1] == '.' ? elementList << '' : elementList
   }
 
   /**
@@ -87,14 +148,24 @@ class DslCompleter implements Completer {
    * @return chain of methods/objects that the cursor is on
    */
   private String findElements(String buffer) {
-    if (!(buffer[-1] == '.' || Character.isJavaIdentifierPart(buffer[-1].toCharacter()))) return ''
+    if (!isElementCharacter(buffer[-1].toCharacter())) return ''
 
-    for (def i = buffer.size() - 1; i > 0; i--) {
-      if (!(buffer[i] == '.' || Character.isJavaIdentifierPart(buffer.charAt(i)))) {
+    /* used to ignore everything in parenthesis */
+    def parenthesisStack = 0
+    for (def i = buffer.size() - 1; 0 < i; i--) {
+      if (buffer[i] == ')') parenthesisStack++
+
+      if (parenthesisStack == 0 && !isElementCharacter(buffer.charAt(i))) {
         return buffer[++i..-1]
       }
+
+      if (buffer[i] == '(') parenthesisStack--
     }
     return buffer
+  }
+
+  private Boolean isElementCharacter(Character c) {
+    return c == '.'.toCharacter() || Character.isJavaIdentifierPart(c)
   }
 
 }
