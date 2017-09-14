@@ -30,9 +30,10 @@ class DslCompleter implements Completer {
       }
 
     }
-//    TODO: supply no candidates if the loop terminates early
 
     candidates.addAll(cleanseDuplicatesAndSort(matching.keySet().toList()))
+
+
 
     return 0 < elementList.size() ? cursor - elementList[-1].size() : cursor
   }
@@ -40,15 +41,14 @@ class DslCompleter implements Completer {
   /** Prevent duplicates and sort the candidates */
   private List<CharSequence> cleanseDuplicatesAndSort(List<String> candidates) {
     if (Guard.isNullOrEmpty(candidates)) return []
-//    TODO: overhaul this
-    def cleaned = []
+
     candidates = candidates.sort()
-    for (def i = 0; i < candidates.size() - 1; i++) {
-      cleaned << candidates[i]
-      if (candidates[i + 1].startsWith(candidates[i])) i++
+    List<String> cleaned = [candidates[0]]
+    for (candidate in candidates) {
+      if (!candidate.startsWith(cleaned[-1])) cleaned << candidate
     }
 
-    return (cleaned << candidates[-1]).unique()
+    return cleaned
   }
 
   /** Find matching global variables and methods and their respective class or return type */
