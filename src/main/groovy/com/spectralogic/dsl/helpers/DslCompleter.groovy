@@ -22,18 +22,21 @@ class DslCompleter implements Completer {
 
     def elementList = splitElements(findElements(buffer[0..cursor - 1]))
     def matching = findMatchingGlobals(elementList[0])
+//    println "\nMATCHING: '$matching'"
     for (def i = 1; i < elementList.size() && matching.size() == 1; i++) {
       matching = findMatchingFieldsAndMethods(elementList[i], matching.values()[0] as Class)
-
+      
       if (i < elementList.size() - 1) {
         matching = getExactMatches(elementList[i].replaceAll("[()]", ""), matching)
       }
-
     }
 
     candidates.addAll(cleanseDuplicatesAndSort(matching.keySet().toList()))
 
+//    TODO: if only one method option, add another that contains the parameters
+    if (candidates.size() == 1 && candidates[0].toString().endsWith('(')) {
 
+    }
 
     return 0 < elementList.size() ? cursor - elementList[-1].size() : cursor
   }
@@ -53,19 +56,29 @@ class DslCompleter implements Completer {
 
   /** Find matching global variables and methods and their respective class or return type */
   private Map findMatchingGlobals(String prefix) {
-    if (prefix == null) return [:]
+    if (prefix == null) return [:] // TODO: maybe don't need this?
 
-    def matching = [:]
-    matching << shell.context.variables.findAll { it.key.toString().startsWith(prefix) }.collectEntries {
-                  [(it.key) : it.value.class]
-                }
-    matching << SpectraDSL.class.declaredMethods.findAll {
-                  Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix)
-                }.collectEntries {
-                  [(it.name + (it.parameterTypes.length == 0 ? "()" : "(")) : it.returnType ]
-                }
+    if (prefix.endsWith('(')) {
+      return findMatchingGlobalMethods(prefix.replaceAll("[(]", ""))
+    } else if (prefix.endsWith(')')) {
+      def entry =  findMatchingGlobalMethods(prefix.replaceAll("[()]", "")).find { it.key.endsWith(')') }
+      return [(entry.key): entry.value]
+    } else {
+      def matching = [:]
+      matching << findMatchingGlobalMethods(prefix)
+      matching << shell.context.variables.findAll { it.key.toString().startsWith(prefix) }.collectEntries {
+        [(it.key) : it.value.class]
+      }
+      return matching
+    }
+  }
 
-    return matching
+  private Map findMatchingGlobalMethods(String prefix) {
+    return SpectraDSL.class.declaredMethods.findAll {
+      Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix)
+    }.collectEntries {
+      [(it.name + (it.parameterTypes.length == 0 ? "()" : "(")) : it.returnType ]
+    }
   }
 
   /** Finds matching fields and methods of a class and their respective class or return type */
