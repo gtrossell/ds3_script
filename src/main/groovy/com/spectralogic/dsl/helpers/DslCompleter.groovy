@@ -13,9 +13,7 @@ import java.lang.reflect.Modifier
  * TODO: parse strings
  * TODO: parse array elements (ie arr[i])
  * TODO: parse map elements
- * TODO: notify user of method parameters
  * TODO: field completion doesn't work (ex client.bucket().name)
- * TODO: change what cursor is returned?
  */
 class DslCompleter implements Completer {
   private final GroovyShell shell
@@ -31,7 +29,10 @@ class DslCompleter implements Completer {
       return 0
     }
 
-    def elementList = splitElements(findElements(buffer[0..cursor - 1]))
+    /* for tabbing a method for parameter options */
+    def paramOptions = buffer[cursor - 1] == '('
+    def bufferEnd = paramOptions ? cursor - 2 : cursor - 1
+    def elementList = splitElements(findElements(buffer[0..bufferEnd]))
     def matching = findMatchingGlobals(elementList[0])
     Class prevMatchingClass = SpectraDSL.class
     for (def i = 1; i < elementList.size() && matching.size() == 1; i++) {
@@ -43,14 +44,14 @@ class DslCompleter implements Completer {
       }
     }
 
-    /* limit candidate to exact match */
-//    if (buffer[-1] == '(') {
-//      println matching
-//    }
+    /* limit candidates to exact method match */
+    if (paramOptions) {
+      elementList[-1] = elementList[-1] + "(" /* makes sure cursor return is correct */
+      matching = matching.findAll { it.key.toString().startsWith(elementList[-1]) }
+    }
 
     candidates.addAll(cleanseDuplicatesAndSort(matching.keySet().toList()))
 
-//    TODO: make this work when tabbing in an empty method (ie buffer = "method(")
     /* In case of a single method option, add candidates that describe parameter options */
     if (candidates.size() == 1 && candidates.first().toString().endsWith('(')) {
       def methods = prevMatchingClass.methods.findAll {
@@ -150,8 +151,6 @@ class DslCompleter implements Completer {
   private List<String> splitElements(String elements) {
     if (Guard.isStringNullOrEmpty(elements)) return []
 
-    /* if element end is an  */
-
     def elementList = []
     def element = ""
     def parenthesisStack = 0
@@ -190,7 +189,7 @@ class DslCompleter implements Completer {
   private String findElements(String buffer) {
     if (!isElementCharacter(buffer[-1].toCharacter())) return ''
 
-    /* used to ignore everything in parenthesis */
+    /* ignore everything in parenthesis */
     def parenthesisStack = 0
     for (def i = buffer.size() - 1; 0 < i; i--) {
       if (buffer[i] == ')') parenthesisStack++
