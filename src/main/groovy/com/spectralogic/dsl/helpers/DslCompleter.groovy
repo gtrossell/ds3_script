@@ -6,6 +6,17 @@ import jline.console.completer.Completer
 
 import java.lang.reflect.Modifier
 
+/**
+ * JLine Auto completer for the DSL shell
+ * Currently is able to parse methods, variables, and fields
+ *
+ * TODO: parse strings
+ * TODO: parse array elements (ie arr[i])
+ * TODO: parse map elements
+ * TODO: notify user of method parameters
+ * TODO: field completion doesn't work (ex client.bucket().name)
+ * TODO: change what cursor is returned?
+ */
 class DslCompleter implements Completer {
   private final GroovyShell shell
 
@@ -22,20 +33,34 @@ class DslCompleter implements Completer {
 
     def elementList = splitElements(findElements(buffer[0..cursor - 1]))
     def matching = findMatchingGlobals(elementList[0])
-//    println "\nMATCHING: '$matching'"
+    Class prevMatchingClass = SpectraDSL.class
     for (def i = 1; i < elementList.size() && matching.size() == 1; i++) {
+      prevMatchingClass = (Class) matching.values().first()
       matching = findMatchingFieldsAndMethods(elementList[i], matching.values()[0] as Class)
-      
+
       if (i < elementList.size() - 1) {
         matching = getExactMatches(elementList[i].replaceAll("[()]", ""), matching)
       }
     }
 
+    /* limit candidate to exact match */
+//    if (buffer[-1] == '(') {
+//      println matching
+//    }
+
     candidates.addAll(cleanseDuplicatesAndSort(matching.keySet().toList()))
 
-//    TODO: if only one method option, add another that contains the parameters
-    if (candidates.size() == 1 && candidates[0].toString().endsWith('(')) {
+//    TODO: make this work when tabbing in an empty method (ie buffer = "method(")
+    /* In case of a single method option, add candidates that describe parameter options */
+    if (candidates.size() == 1 && candidates.first().toString().endsWith('(')) {
+      def methods = prevMatchingClass.methods.findAll {
+        it.name == candidates.first().toString().replaceAll("[()]", "")
+      }
 
+      candidates.addAll(methods.collect { method ->
+        def params = method.parameters.collect { it.type.name.split('\\.')[-1].replace(';', '') }
+        return "${candidates.first().toString()}${params.join(', ')})"
+      }.sort { it.size() })
     }
 
     return 0 < elementList.size() ? cursor - elementList[-1].size() : cursor
@@ -56,7 +81,7 @@ class DslCompleter implements Completer {
 
   /** Find matching global variables and methods and their respective class or return type */
   private Map findMatchingGlobals(String prefix) {
-    if (prefix == null) return [:] // TODO: maybe don't need this?
+    if (prefix == null) return [:]
 
     if (prefix.endsWith('(')) {
       return findMatchingGlobalMethods(prefix.replaceAll("[(]", ""))
@@ -124,6 +149,8 @@ class DslCompleter implements Completer {
   /** splits the elements into raw method/variable names ('test.method(arg)' -> ['test', 'method()']) */
   private List<String> splitElements(String elements) {
     if (Guard.isStringNullOrEmpty(elements)) return []
+
+    /* if element end is an  */
 
     def elementList = []
     def element = ""
