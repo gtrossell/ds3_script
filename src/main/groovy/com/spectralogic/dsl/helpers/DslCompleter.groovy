@@ -13,7 +13,6 @@ import java.lang.reflect.Modifier
  * TODO: parse strings
  * TODO: parse array elements (ie arr[i])
  * TODO: parse map elements
- * TODO: field completion doesn't work (ex client.bucket().name)
  */
 class DslCompleter implements Completer {
   private final GroovyShell shell
@@ -39,9 +38,11 @@ class DslCompleter implements Completer {
       prevMatchingClass = (Class) matching.values().first()
       matching = findMatchingFieldsAndMethods(elementList[i], matching.values()[0] as Class)
 
+//      println matching
       if (i < elementList.size() - 1) {
         matching = getExactMatches(elementList[i].replaceAll("[()]", ""), matching)
       }
+//      println elementList[i] + ": " + matching
     }
 
     /* limit candidates to exact method match */
@@ -120,12 +121,11 @@ class DslCompleter implements Completer {
   }
 
   private Map findMatchingFields(String prefix, Class clazz) {
-    def matchingMethods = findMatchingMethods(prefix, clazz)
-    /* Public fields are still private but have a getter. */
-    return clazz.declaredFields.findAll { it.name.startsWith(prefix) && !it.synthetic &&
-            matchingMethods.containsKey(fieldToGetter(it.name)) }.collectEntries {
-              [(it.name) : it.class]
-            }
+    def classMethodNames = clazz.methods.collect { it.name }
+    return clazz.declaredFields.findAll { it.name.startsWith(prefix) &&
+            classMethodNames.contains(fieldToGetter(it.name)) }.collectEntries {
+      [(it.name) : it.type]
+    }
   }
 
   private Map findMatchingMethods(String prefix, Class clazz) {
@@ -142,9 +142,9 @@ class DslCompleter implements Completer {
 
   /** convert a field's name to it's getter name */
   private String fieldToGetter(String field) {
-    if (Guard.isStringNullOrEmpty(field)) return ""
+    if (Guard.isStringNullOrEmpty(field) || !field[0].matches("[a-zA-Z]")) return ""
 
-    return "get" + field.replaceFirst(field[0], field[0].toUpperCase()) + "()"
+    return "get" + field.replaceFirst(field[0], field[0].toUpperCase())
   }
 
   /** splits the elements into raw method/variable names ('test.method(arg)' -> ['test', 'method()']) */
