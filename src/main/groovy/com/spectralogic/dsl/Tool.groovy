@@ -13,7 +13,6 @@ import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
 import org.slf4j.LoggerFactory
 
-
 /**
  * This is the main class for the Spectra DSL tool.
  * It Handles the terminal and handles all user interaction
@@ -49,8 +48,6 @@ class Tool extends Script {
 
       while (true) {
         try {
-//          setAutoComplete(console, shell)
-
           def line = console.readLine()
           def result = evaluate(shell, line, commandFactory)
           println Globals.RETURN_PROMPT + result
@@ -67,17 +64,6 @@ class Tool extends Script {
       exit()
     }
   }
-
-//  private static setAutoComplete(ConsoleReader console, GroovyShell shell) {
-//    def phrases = []
-//    shell.getContext().variables.each { name, obj ->
-//      phrases.add(name)
-//      phrases.addAll(obj.class.getDeclaredMethods().findAll { !it.isSynthetic() }.collect { "${name}.${it.name}()".toString() })
-//    }
-//    console.addCompleter(new SimpleCompletor(phrases.toArray(new String[phrases.size()])))
-//
-//    console.addCompleter(new FileNameCompleter()) // TODO: make sure '\' is accepted for file locations
-//  }
 
   /** Logic for parsing and evaluating a line */
   private static String evaluate(shell, line, commandFactory) {
