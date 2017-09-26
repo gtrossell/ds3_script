@@ -13,6 +13,8 @@ import java.lang.reflect.Modifier
  * TODO: parse strings
  * TODO: parse array elements (ie arr[i])
  * TODO: parse map elements
+ * TODO: fields aren't working again
+ * TODO: createBpClient(, createBpClient() is redundant
  */
 class DslCompleter implements Completer {
   private final GroovyShell shell
@@ -35,14 +37,12 @@ class DslCompleter implements Completer {
     def matching = findMatchingGlobals(elementList[0])
     Class prevMatchingClass = SpectraDSL.class
     for (def i = 1; i < elementList.size() && matching.size() == 1; i++) {
-      prevMatchingClass = (Class) matching.values().first()
-      matching = findMatchingFieldsAndMethods(elementList[i], matching.values()[0] as Class)
+      prevMatchingClass = matching.values().first()
+      matching = findMatchingFieldsAndMethods(elementList[i], matching.values()[0])
 
-//      println matching
       if (i < elementList.size() - 1) {
         matching = getExactMatches(elementList[i].replaceAll("[()]", ""), matching)
       }
-//      println elementList[i] + ": " + matching
     }
 
     /* limit candidates to exact method match */
@@ -82,7 +82,7 @@ class DslCompleter implements Completer {
   }
 
   /** Find matching global variables and methods and their respective class or return type */
-  private Map findMatchingGlobals(String prefix) {
+  private Map<String, Class> findMatchingGlobals(String prefix) {
     if (prefix == null) return [:]
 
     if (prefix.endsWith('(')) {
@@ -100,7 +100,7 @@ class DslCompleter implements Completer {
     }
   }
 
-  private Map findMatchingGlobalMethods(String prefix) {
+  private Map<String, Class> findMatchingGlobalMethods(String prefix) {
     return SpectraDSL.class.declaredMethods.findAll {
       Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix)
     }.collectEntries {
@@ -109,7 +109,7 @@ class DslCompleter implements Completer {
   }
 
   /** Finds matching fields and methods of a class and their respective class or return type */
-  private Map findMatchingFieldsAndMethods(String prefix, Class clazz) {
+  private Map<String, Class> findMatchingFieldsAndMethods(String prefix, Class clazz) {
     if (prefix.endsWith('(') || prefix.endsWith(')')) {
       return findMatchingMethods(prefix.replaceAll("[()]", ""), clazz)
     } else {
@@ -120,15 +120,16 @@ class DslCompleter implements Completer {
     }
   }
 
-  private Map findMatchingFields(String prefix, Class clazz) {
-    def classMethodNames = clazz.methods.collect { it.name }
+  /** Finds public fields by matching them to getter methods */
+  private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
+    def classMethodNames = clazz.methods.collect { it.name.toLowerCase() }
     return clazz.declaredFields.findAll { it.name.startsWith(prefix) &&
-            classMethodNames.contains(fieldToGetter(it.name)) }.collectEntries {
+            classMethodNames.contains("get" + it.name) }.collectEntries {
       [(it.name) : it.type]
     }
   }
 
-  private Map findMatchingMethods(String prefix, Class clazz) {
+  private Map<String, Class> findMatchingMethods(String prefix, Class clazz) {
     return clazz.declaredMethods.findAll { !it.synthetic && Modifier.isPublic(it.modifiers) &&
             it.name.startsWith(prefix) }.collectEntries {
               [(it.name + (it.parameterTypes.length == 0 ? "()" : "(")) : it.returnType]
@@ -136,17 +137,10 @@ class DslCompleter implements Completer {
   }
 
   /** Takes a map created by the above methods and returns methods/fields/vars that match exactly */
-  private Map getExactMatches(String name, Map<String, Class> matching) {
+  private Map<String, Class> getExactMatches(String name, Map<String, Class> matching) {
     return matching.findAll { it.key.toString().replaceAll("[()]", "") == name }
   }
-
-  /** convert a field's name to it's getter name */
-  private String fieldToGetter(String field) {
-    if (Guard.isStringNullOrEmpty(field) || !field[0].matches("[a-zA-Z]")) return ""
-
-    return "get" + field.replaceFirst(field[0], field[0].toUpperCase())
-  }
-
+  
   /** splits the elements into raw method/variable names ('test.method(arg)' -> ['test', 'method()']) */
   private List<String> splitElements(String elements) {
     if (Guard.isStringNullOrEmpty(elements)) return []
