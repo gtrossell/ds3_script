@@ -1,12 +1,12 @@
 package com.spectralogic.dsl.models
 
+import com.spectralogic.ds3client.commands.spectrads3.PutBucketSpectraS3Request
+import com.spectralogic.ds3client.commands.spectrads3.PutBulkJobSpectraS3Request
 import com.spectralogic.ds3client.networking.NetworkClient
-import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.commands.GetBucketRequest
 import com.spectralogic.ds3client.commands.GetServiceRequest
 import com.spectralogic.ds3client.commands.PutBucketRequest
 import com.spectralogic.ds3client.Ds3ClientImpl
-import com.spectralogic.ds3client.networking.FailedRequestException
 
 /** Represents a BlackPearl Client */
 class BpClient extends Ds3ClientImpl {
@@ -29,8 +29,8 @@ class BpClient extends Ds3ClientImpl {
 
   /** @return newly created BpBucket */
   BpBucket createBucket(String name, String dataPolicyId="") {
-    putBucket(new PutBucketRequest(name))
-    bucket(name)
+    putBucketSpectraS3(new PutBucketSpectraS3Request(name).withDataPolicyId(dataPolicyId))
+    return bucket(name)
   }
 
   String toString() {
