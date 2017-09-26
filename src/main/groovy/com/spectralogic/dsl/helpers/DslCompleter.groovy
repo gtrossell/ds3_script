@@ -13,8 +13,6 @@ import java.lang.reflect.Modifier
  * TODO: parse strings
  * TODO: parse array elements (ie arr[i])
  * TODO: parse map elements
- * TODO: fields aren't working again
- * TODO: createBpClient(, createBpClient() is redundant
  */
 class DslCompleter implements Completer {
   private final GroovyShell shell
@@ -63,6 +61,8 @@ class DslCompleter implements Completer {
         def params = method.parameters.collect { it.type.name.split('\\.')[-1].replace(';', '') }
         return "${candidates.first().toString()}${params.join(', ')})"
       }.sort { it.size() })
+
+      if (1 < candidates.size() && candidates[1] == candidates[0] + ')') candidates.remove(0)
     }
 
     return 0 < elementList.size() ? cursor - elementList[-1].size() : cursor
