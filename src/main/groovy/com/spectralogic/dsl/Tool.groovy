@@ -27,12 +27,12 @@ class Tool extends Script {
 
   /** REPL handler */
   def run() {
-    def shell = new ShellBuilder().build(this.class.classLoader)
-    def commandFactory = new ShellCommandFactory(shell, recorder)
-    
     recorder.init()
-    
+
+    def shell = new ShellBuilder().build(this.class.classLoader)
     def console = new ConsoleReader()
+    def commandFactory = new ShellCommandFactory(shell, recorder, console)
+
     console.setPrompt(Globals.PROMPT)
     console.setHandleUserInterrupt(true)
     console.addCompleter(new DslCompleter(shell))
