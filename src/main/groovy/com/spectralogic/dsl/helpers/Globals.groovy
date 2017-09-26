@@ -12,11 +12,11 @@ class Globals {
   final static LOG_DIR = HOME_DIR + 'log/'
   final static SCRIPT_DIR = HOME_DIR + 'scripts/'
 
-  static def initMessage(width) {
+  static initMessage(width) {
     """
 Welcome to the Spectra DSL for BlackPearl!
 Use the ':help' command to get started
-${'=' * width}"""
+${'=' * (width - 1)}"""
   }
 
 }
