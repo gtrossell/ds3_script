@@ -4,7 +4,7 @@ package com.spectralogic.dsl.commands
 interface ShellCommand {
 
   /** main method */
-  CommandResponse run(args)
+  CommandResponse run(List args)
 
   /** @return array of strings that this command will run on */
   String[] commandNames()

@@ -23,7 +23,7 @@ class ExecuteCommand implements ShellCommand {
     return [':execute', ':e']
   }
 
-  CommandResponse run(args) {
+  CommandResponse run(List args) {
     def response = new CommandResponse()
     if (!commandOptions(args, response).isEmpty()) return response
 

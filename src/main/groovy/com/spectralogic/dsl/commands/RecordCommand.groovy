@@ -28,7 +28,7 @@ class RecordCommand implements ShellCommand {
     cli.h('display this message', longOpt:'help')
   }
 
-  CommandResponse run(args) {
+  CommandResponse run(List args) {
     def response = new CommandResponse()
     if (!commandOptions(args, response).isEmpty()) return response
 

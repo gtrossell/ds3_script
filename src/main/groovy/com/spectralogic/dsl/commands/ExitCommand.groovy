@@ -2,7 +2,7 @@ package com.spectralogic.dsl.commands
 
 class ExitCommand implements ShellCommand {
 
-  CommandResponse run(args) {
+  CommandResponse run(List args) {
     def response = new CommandResponse()
     response.exit = true
     return response
