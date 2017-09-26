@@ -1,11 +1,9 @@
 package com.spectralogic.dsl.models
 
 import com.spectralogic.ds3client.commands.spectrads3.PutBucketSpectraS3Request
-import com.spectralogic.ds3client.commands.spectrads3.PutBulkJobSpectraS3Request
 import com.spectralogic.ds3client.networking.NetworkClient
 import com.spectralogic.ds3client.commands.GetBucketRequest
 import com.spectralogic.ds3client.commands.GetServiceRequest
-import com.spectralogic.ds3client.commands.PutBucketRequest
 import com.spectralogic.ds3client.Ds3ClientImpl
 
 /** Represents a BlackPearl Client */
