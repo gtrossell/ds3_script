@@ -2,7 +2,7 @@ package com.spectralogic.dsl.exceptions
 
 class BpException extends Exception {
 
-  BpException(message) {
+  BpException(String message) {
     super(message)
   }
 
