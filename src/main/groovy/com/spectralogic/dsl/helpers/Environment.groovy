@@ -4,9 +4,11 @@ package com.spectralogic.dsl.helpers
 class Environment {
   private env
 
-  Environment() { this.env = System.getenv() }
+  Environment() {
+    this.env = System.getenv()
+  }
   
-  Environment(Map env) { 
+  Environment(Map env) {
     def sysEnv = System.getenv()
     this.env = [:]
     this.env['DS3_ENDPOINT'] = env['DS3_ENDPOINT'] ?: sysEnv['DS3_ENDPOINT']
@@ -14,10 +16,19 @@ class Environment {
     this.env['DS3_SECRET_KEY'] = env['DS3_SECRET_KEY'] ?: sysEnv['DS3_SECRET_KEY']
   }
 
-  def getEndpoint() { env['DS3_ENDPOINT'] }
-  def getAccessKey() { env['DS3_ACCESS_KEY'] }
-  def getSecretKey() { env['DS3_SECRET_KEY'] }
-  def getEnvironment() {
+  String getEndpoint() {
+    env['DS3_ENDPOINT']
+  }
+
+  String getAccessKey() {
+    env['DS3_ACCESS_KEY']
+  }
+
+  String getSecretKey() {
+    env['DS3_SECRET_KEY']
+  }
+
+  Map<String, String> getEnvironment() {
     [
       'DS3_ENDPOINT':   getEndpoint(),
       'DS3_ACCESS_KEY': getAccessKey(),
