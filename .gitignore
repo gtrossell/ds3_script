@@ -1,5 +1,4 @@
 *.class
-*.jar
 .idea/
 *.swp
 tests/
