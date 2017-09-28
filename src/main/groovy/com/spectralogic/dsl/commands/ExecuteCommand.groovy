@@ -19,16 +19,19 @@ class ExecuteCommand implements ShellCommand {
     cli.d('delete script in script folder', longOpt:'delete', args:1, argName:'script')
   }
 
+  @Override
   String[] commandNames() {
     return [':execute', ':e']
   }
 
+  @Override
   CommandResponse run(List args) {
     def response = new CommandResponse()
     if (!commandOptions(args, response).isEmpty()) return response
 
     def scriptName = args[0]
-    if (FilenameUtils.getExtension(scriptName) == '') {
+    if (FilenameUtils.getExtension(scriptName) == '') { // TODO: extensions make not be working!
+      println "HERE"
       scriptName += '.groovy'
     }
 
@@ -44,7 +47,7 @@ class ExecuteCommand implements ShellCommand {
   }
 
   /** @return help message if requested or error message */
-  private CommandResponse commandOptions(args, response) {
+  private CommandResponse commandOptions(List args, CommandResponse response) {
     def stringWriter = new StringWriter()
     cli.writer = new PrintWriter(stringWriter)
     def options = cli.parse(args)
@@ -60,7 +63,7 @@ class ExecuteCommand implements ShellCommand {
     } else if (options.l) {
       return response.setMessage(listScripts())
     } else if (options.d) {
-      return response.addInfo(deleteScript(options.d))
+      return response.addInfo(deleteScript(options.d as String))
     } else {
       return response
     }
@@ -74,8 +77,8 @@ class ExecuteCommand implements ShellCommand {
     return 'Available scripts:\n' + scripts.join('\n')
   }
 
-  private deleteScript(scriptName) {
-    if (FilenameUtils.getExtension(scriptName) == '') scriptName += '.groovy'
+  private deleteScript(String scriptName) {
+    if (FilenameUtils.getExtension(scriptName) == '') scriptName += '.groovy' // TODO: needs testing!
     def script = new CommandHelper().getScriptFromString(scriptName)
     if (script.exists()) {
       script.delete()

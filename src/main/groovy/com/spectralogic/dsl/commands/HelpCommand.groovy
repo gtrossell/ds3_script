@@ -2,6 +2,7 @@ package com.spectralogic.dsl.commands
 
 class HelpCommand implements ShellCommand {
 
+  @Override
   CommandResponse run(List args) {
     return new CommandResponse().setMessage("The available commands are:\n" +
       "\t* :help, :h\n" +
@@ -16,6 +17,7 @@ class HelpCommand implements ShellCommand {
       "\t* environment -> environment created from environment variables\n")
   }
 
+  @Override
   String[] commandNames() {
     return [':help', ':h']
   }

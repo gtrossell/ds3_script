@@ -28,18 +28,17 @@ class RecordCommand implements ShellCommand {
     cli.h('display this message', longOpt:'help')
   }
 
+  @Override
   CommandResponse run(List args) {
     def response = new CommandResponse()
     if (!commandOptions(args, response).isEmpty()) return response
 
-    if (!isRecording) {
-      /* start recording */
+    if (!isRecording) /* start recording */ {
       recordId = createScriptId()
       recorder.writeLine(startLine())
       isRecording = true
       return response.addInfo("Started recording script")
-    } else {
-      /* end recording */
+    } else /* end recording */ {
       recorder.writeLine(endLine())
       def scriptLines = []
       def isScript = false
@@ -58,12 +57,13 @@ class RecordCommand implements ShellCommand {
     }
   }
 
+  @Override
   String[] commandNames() {
     return [':record', ':r']
   }
 
   /** Builds script lines and saves it to set or given location */
-  private String saveScript(scriptLines) {
+  private String saveScript(List scriptLines) {
     if (!scriptFile)
       scriptFile = new File(Globals.SCRIPT_DIR, "${recordId}.groovy")
 
@@ -89,7 +89,7 @@ class RecordCommand implements ShellCommand {
     scriptDesc = scriptDesc ?: 'Spectra BlackPearl DSL script'
 
     def final lineLength = 30
-    def lineComment = { c -> "/*" + c * (lineLength + 2) + "*/\n" }
+    def lineComment = { String c -> "/*" + c * (lineLength + 2) + "*/\n" }
     def comment = (
       lineComment('*') +
       padComment(lineLength, scriptName) +
@@ -106,7 +106,7 @@ class RecordCommand implements ShellCommand {
   }
 
   /** Pads/divides a comment to keep the comment body uniform length */
-  private String padComment(lineLength, text) {
+  private String padComment(Integer lineLength, String text) {
     if (text.size() > lineLength) {
       /** split line up into shorter lines while not splitting words */
       def textLines = ['']
@@ -119,7 +119,7 @@ class RecordCommand implements ShellCommand {
         }
       }
 
-      return textLines.collect { padComment(lineLength, it.trim()) }.join()
+      return textLines.collect { padComment(lineLength, it.trim()) }.join('')
     } else {
       def padding = lineLength - text.size()
       return "/* " + text + (' ' * padding) + " */\n"
@@ -127,7 +127,7 @@ class RecordCommand implements ShellCommand {
   }
 
   /** @return help message if requested or error message */
-  private CommandResponse commandOptions(args, response) {
+  private CommandResponse commandOptions(args, CommandResponse response) {
     def stringWriter = new StringWriter()
     cli.writer = new PrintWriter(stringWriter)
     def options = cli.parse(args)
@@ -138,7 +138,7 @@ class RecordCommand implements ShellCommand {
     if (options.arguments()) {
       def file = new CommandHelper().getScriptFromString(options.arguments()[0])
       file = ensureExtension(file)
-      if (errorCheckFile(file, response).error) return response
+      if (errorCheckFile(file, response).hasErrors()) return response
       this.scriptFile = file
     }
 

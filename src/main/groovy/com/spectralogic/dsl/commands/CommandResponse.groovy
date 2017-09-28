@@ -43,6 +43,10 @@ class CommandResponse {
     return !info && !warn && !error && !message
   }
 
+  Boolean hasErrors() {
+    return error
+  }
+
   String getMessage() {
     return message
   }
