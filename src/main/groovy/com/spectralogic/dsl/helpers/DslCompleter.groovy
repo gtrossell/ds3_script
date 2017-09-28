@@ -13,6 +13,7 @@ import java.lang.reflect.Modifier
  * TODO: parse strings
  * TODO: parse array elements (ie arr[i])
  * TODO: parse map elements
+ * TODO: autocomplete groovy collections
  */
 class DslCompleter implements Completer {
   private final GroovyShell shell
@@ -28,8 +29,9 @@ class DslCompleter implements Completer {
       return 0
     }
 
-    /* for tabbing a method for parameter options */
+    /* tabbing a method for parameter options */
     def paramOptions = buffer[cursor - 1] == '('
+
     def bufferEnd = paramOptions ? cursor - 2 : cursor - 1
     def elementList = splitElements(findElements(buffer[0..bufferEnd]))
     def matching = findMatchingGlobals(elementList[0])
@@ -43,7 +45,7 @@ class DslCompleter implements Completer {
       }
     }
 
-    /* limit candidates to exact method match */
+    /* limit candidates to exact method match if tabbing a method for parameter options */
     if (paramOptions) {
       elementList[-1] = elementList[-1] + "(" /* makes sure cursor return is correct */
       matching = matching.findAll { it.key.toString().startsWith(elementList[-1]) }
@@ -51,16 +53,20 @@ class DslCompleter implements Completer {
 
     candidates.addAll(cleanseDuplicatesAndSort(matching.keySet().toList()))
 
-    /* In case of a single method option, add candidates that describe parameter options */
+    /* if only one candidate and it's a method, add candidates that describe parameter options */
     if (candidates.size() == 1 && candidates.first().toString().endsWith('(')) {
       def methods = prevMatchingClass.methods.findAll {
         it.name == candidates.first().toString().replaceAll("[()]", "")
       }
 
-      candidates.addAll(methods.collect { method ->
-        def params = method.parameters.collect { it.type.name.split('\\.')[-1].replace(';', '') }
-        return "${candidates.first().toString()}${params.join(', ')})"
-      }.sort { it.size() })
+      candidates.addAll(
+        methods.collect { method ->
+          def params = method.parameters.collect {
+            it.type.name.split('\\.')[-1].replace(';', '')
+          }
+          return "${candidates.first().toString()}${params.join(', ')})"
+        }.sort { it.size() }
+      )
 
       if (1 < candidates.size() && candidates[1] == candidates[0] + ')') candidates.remove(0)
     }
@@ -89,13 +95,17 @@ class DslCompleter implements Completer {
       return findMatchingGlobalMethods(prefix.replaceAll("[(]", ""))
     } else if (prefix.endsWith(')')) {
       def entry =  findMatchingGlobalMethods(prefix.replaceAll("[()]", "")).find { it.key.endsWith(')') }
+
       return [(entry.key): entry.value]
     } else {
       def matching = [:]
       matching << findMatchingGlobalMethods(prefix)
-      matching << shell.context.variables.findAll { it.key.toString().startsWith(prefix) }.collectEntries {
+      matching << shell.context.variables.findAll {
+        it.key.toString().startsWith(prefix)
+      }.collectEntries {
         [(it.key) : it.value.class]
       }
+
       return matching
     }
   }
@@ -123,17 +133,19 @@ class DslCompleter implements Completer {
   /** Finds public fields by matching them to getter methods */
   private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
     def classMethodNames = clazz.methods.collect { it.name.toLowerCase() }
-    return clazz.declaredFields.findAll { it.name.startsWith(prefix) &&
-            classMethodNames.contains("get" + it.name) }.collectEntries {
+    return clazz.declaredFields.findAll {
+      it.name.startsWith(prefix) && classMethodNames.contains("get" + it.name)
+    }.collectEntries {
       [(it.name) : it.type]
     }
   }
 
   private Map<String, Class> findMatchingMethods(String prefix, Class clazz) {
-    return clazz.declaredMethods.findAll { !it.synthetic && Modifier.isPublic(it.modifiers) &&
-            it.name.startsWith(prefix) }.collectEntries {
-              [(it.name + (it.parameterTypes.length == 0 ? "()" : "(")) : it.returnType]
-            }
+    return clazz.declaredMethods.findAll {
+      !it.synthetic && Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix)
+    }.collectEntries {
+      [(it.name + (it.parameterTypes.length == 0 ? "()" : "(")) : it.returnType]
+    }
   }
 
   /** Takes a map created by the above methods and returns methods/fields/vars that match exactly */
@@ -169,9 +181,7 @@ class DslCompleter implements Completer {
       if (character == ')') parenthesisStack--
     }
 
-    if (0 < element.size()) {
-      elementList << element
-    }
+    if (0 < element.size()) elementList << element
 
     return elements[-1] == '.' ? elementList << '' : elementList
   }
@@ -181,6 +191,8 @@ class DslCompleter implements Completer {
    * @return chain of methods/objects that the cursor is on
    */
   private String findElements(String buffer) {
+    def isElementCharacter = { Character c -> c == '.'.toCharacter() || Character.isJavaIdentifierPart(c) }
+
     if (!isElementCharacter(buffer[-1].toCharacter())) return ''
 
     /* ignore everything in parenthesis */
@@ -194,11 +206,8 @@ class DslCompleter implements Completer {
 
       if (buffer[i] == '(') parenthesisStack--
     }
-    return buffer
-  }
 
-  private Boolean isElementCharacter(Character c) {
-    return c == '.'.toCharacter() || Character.isJavaIdentifierPart(c)
+    return buffer
   }
 
 }
