@@ -8,7 +8,7 @@ import java.lang.reflect.Modifier
 
 /**
  * JLine Auto completer for the DSL shell
- * Currently is able to parse methods, variables, and fields
+ * Currently is able to parse methods, variables, parameters, and method parameter classes
  *
  * TODO: parse strings
  * TODO: parse array elements (ie arr[i])
