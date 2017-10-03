@@ -25,7 +25,8 @@ Use ```:help``` to view all of the commands and ```<command> -h``` to see a comm
 
 ```:exit``` exits the command window, equivalent to `Ctrl-C`.
 
-```:record``` records the current shell session to  a script file to be used for later.
+```:record``` records the current shell session to  a script file to be used for later. If an exception is thrown during
+the recording, that line is not recorded. *this may change in the future. 
 
 ```:execute``` executes the script passed to it.
 
@@ -43,7 +44,7 @@ Example:
 
 ### Shortcuts
 You can use tab completion to view available variables, fields, methods, and method parameters. 
-Pressing `Esc` and then `Backspace` will delete the current char set. 
+`Esc-Backspace` will delete the current char set. 
 `Ctrl-C` will safely exit the shell. 
 
 
@@ -68,39 +69,36 @@ client = createBpClient()
 client = createBpClient(https=true)
 // using arguments
 client = createBpClient(endpoint, accessKey, secretKey)
-
-// create client from custom environment
-envVars = ['DS3_ENDPOINT': '', 'DS3_ACCESS_KEY': '', 'DS3_SECRET_KEY': '']
-customEnv = new Environment(envVars)
-client = createBpClient(environment=customEnv)
 ```
 
 #### Buckets
 ```groovy
 bucket = client.createBucket('test_bucket')
-
+ 
 assert bucket == client.bucket('test_bucket')
 assert client == bucket.client
 assert 'test_bucket' == bucket.name
 assert client.buckets() == ['test_bucket']
-
+ 
 bucket.putBulk('/path/to/example.txt')
-bucket.objects()  // shows example.txt object
-bucket.empty()    // deletes all objects in bucket
-
+bucket.objects()            // shows example.txt object
+bucket.getBulk(['example.txt'], "./downloads/")
+bucket.deleteAllObjects()
+assert 0 == bucket.objects().size()
+ 
 bucket.putBulk('/path/to/example.txt', 'remoteDir')
-bucket.objects()  // shows object at remoteDir/example.txt
+bucket.objects()            // shows object at remoteDir/example.txt
 object = bucket.object('remoteDir/example.txt')
 bucket.deleteObjects(object)
-
-bucket.delete()   // bucket must be empty to delete
+assert 0 == bucket.objects().size()
+ 
+bucket.delete()             // bucket must be empty to delete
 ```
 
 #### Objects
 ```groovy
 object = bucket.object('test_object')
 object.metadata
-object.size()    // size of object in bytes
 object.writeTo('/path/to/destination')
 object.delete()  // deletes object from bucket
 ```
