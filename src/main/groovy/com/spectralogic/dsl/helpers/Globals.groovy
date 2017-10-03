@@ -10,7 +10,7 @@ class Globals {
   final static MAX_BULK_LOAD = 200_000
   final static HOME_DIR = new File("").getAbsoluteFile().toString() + '/'
   final static LOG_DIR = HOME_DIR + 'log/'
-  final static SCRIPT_DIR = HOME_DIR + 'scripts/'
+  final static SCRIPT_DIR = HOME_DIR
 
   static initMessage(width) {
     """
