@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory
 /**
  * This is the main class for the Spectra DSL tool.
  * It Handles the terminal and handles all user interaction
+ * TODO: change where logs/scripts directories are placed
  */
 class Tool extends Script {
   private final static logger = LoggerFactory.getLogger(Tool.class)
@@ -27,9 +28,17 @@ class Tool extends Script {
 
   /** REPL handler */
   def run() {
-    recorder.init()
 
     def shell = new ShellBuilder().build(this.class.classLoader)
+
+    if (args.size() > 0) {
+      if (!args[0].endsWith('.groovy')) args[0] += '.groovy'
+      def scriptArgs = args.size() > 1 ? args[1..-1] : []
+      shell.run(new File(args[0]), scriptArgs)
+      exit()
+    }
+
+    recorder.init()
     def console = new ConsoleReader()
     def commandFactory = new ShellCommandFactory(shell, recorder, console)
 
@@ -41,9 +50,11 @@ class Tool extends Script {
     try {
       /* Run script passed in */
       if (args.size() > 0) {
+        println "HERE"
         if (!args[0].endsWith('.groovy')) args[0] += '.groovy'
         def scriptArgs = args.size() > 1 ? args[1..-1] : []
         shell.run(new File(args[0]), scriptArgs)
+        exit()
       }
 
       while (true) {
