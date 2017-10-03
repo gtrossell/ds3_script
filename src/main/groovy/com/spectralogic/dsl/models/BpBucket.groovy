@@ -54,7 +54,7 @@ class BpBucket extends GetBucketResponse {
   }
 
   /** Deletes all objects inside it */
-  BpBucket deleteAll() {
+  BpBucket deleteAllObjects() {
     return deleteObjects(*contentsToBpObjects(helper.listObjects(name)))
   }
 
