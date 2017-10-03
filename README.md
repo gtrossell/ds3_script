@@ -61,7 +61,7 @@ variables
 * environment -> Environment object that represents set environment variables
 
 #### Clients
-```
+```groovy
 // create client from environment variables
 client = createBpClient()
 // with https
@@ -76,7 +76,7 @@ client = createBpClient(environment=customEnv)
 ```
 
 #### Buckets
-```
+```groovy
 bucket = client.createBucket('test_bucket')
 
 assert bucket == client.bucket('test_bucket')
@@ -97,7 +97,7 @@ bucket.delete()   // bucket must be empty to delete
 ```
 
 #### Objects
-```
+```groovy
 object = bucket.object('test_object')
 object.metadata
 object.size()    // size of object in bytes
