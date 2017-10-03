@@ -1,6 +1,8 @@
 apply plugin: 'groovy'
 apply plugin: 'application'
 
+version = 0.5
+
 repositories {
     mavenCentral()
     mavenLocal()
