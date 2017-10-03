@@ -29,9 +29,8 @@ class ExecuteCommand implements ShellCommand {
     def response = new CommandResponse()
     if (!commandOptions(args, response).isEmpty()) return response
 
-    def scriptName = args[0]
-    if (FilenameUtils.getExtension(scriptName) == '') { // TODO: extensions make not be working!
-      println "HERE"
+    String scriptName = args[0]
+    if (FilenameUtils.getExtension(scriptName) == '') {
       scriptName += '.groovy'
     }
 
@@ -72,13 +71,15 @@ class ExecuteCommand implements ShellCommand {
   private listScripts() {
     def scripts = []
     new File(Globals.SCRIPT_DIR).eachFileRecurse (FileType.FILES) { file ->
-      scripts << ' - ' + FilenameUtils.removeExtension(file.getName())
+      if (file.name.endsWith('.groovy')) {
+        scripts << ' - ' + FilenameUtils.removeExtension(file.getName())
+      }
     }
     return 'Available scripts:\n' + scripts.join('\n')
   }
 
   private deleteScript(String scriptName) {
-    if (FilenameUtils.getExtension(scriptName) == '') scriptName += '.groovy' // TODO: needs testing!
+    if (FilenameUtils.getExtension(scriptName) == '') scriptName += '.groovy'
     def script = new CommandHelper().getScriptFromString(scriptName)
     if (script.exists()) {
       script.delete()
