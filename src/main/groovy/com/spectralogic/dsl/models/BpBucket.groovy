@@ -116,8 +116,11 @@ class BpBucket extends GetBucketResponse {
    */
   void getBulk(List<String> objectNames, String pathStr) {
     def path = Paths.get(pathStr)
-    if (Files.isRegularFile(path)) throw new BpException("$pathSTr is not a directory!")
-    if (!Files.exists(path)) Files.createDirectory(path)
+    if (Files.isRegularFile(path)) {
+      throw new BpException("$pathStr is not a directory!")
+    } else if (!Files.exists(path)) {
+      Files.createDirectory(path)
+    }
 
     def nameIterator = objectNames.iterator()
     while (nameIterator) {
