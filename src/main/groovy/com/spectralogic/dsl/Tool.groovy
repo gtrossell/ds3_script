@@ -1,5 +1,6 @@
 package com.spectralogic.dsl
 
+import ch.qos.logback.classic.Level
 import com.spectralogic.ds3client.networking.FailedRequestException
 import com.spectralogic.dsl.commands.ShellCommandFactory
 import com.spectralogic.dsl.exceptions.BpException
@@ -11,16 +12,15 @@ import jline.console.ConsoleReader
 import jline.console.UserInterruptException
 import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
-import org.slf4j.LoggerFactory
+import sun.rmi.runtime.Log
 
 /**
  * This is the main class for the Spectra DSL tool.
  * It Handles the terminal and handles all user interaction
- * TODO: change where log directory(s) is placed
  */
 class Tool extends Script {
-  private final static logger = LoggerFactory.getLogger(Tool.class)
-  private final static recorder = new LogRecorder()
+//  private final static logger = LoggerFactory.getLogger(Tool.class)
+//  private final static recorder = new LogRecorder()
 
   static void main(String[] args) {
     InvokerHelper.runScript(Tool, args)
@@ -29,35 +29,56 @@ class Tool extends Script {
   /** REPL handler */
   def run() {
 
+    /* Cli to pass a script, turn on logging, or set log directory */
+    def cli = new CliBuilder(usage:'bpsh <scripts> -l <log directory>', stopAtNonOption: false)
+    cli.l('display all files', longOpt:'log', args:1, argName:'log file directory', optionalArg:true)
+    def options = cli.parse(args)
+
+    if (options.l) {
+      if (options.l instanceof String) {
+        Globals.logDir = options.l as String
+      }
+      LogRecorder.configureLogging(Level.TRACE)
+    } else {
+      LogRecorder.configureLogging(Level.OFF)
+    }
+
     def shell = new ShellBuilder().build(this.class.classLoader)
 
     /* Run script passed in */
-    if (args.size() > 0) {
-      if (!args[0].endsWith('.groovy')) args[0] += '.groovy'
-      def scriptArgs = args.size() > 1 ? args[1..-1] : []
-      shell.run(new File(args[0]), scriptArgs)
+    def arguments = options.arguments()
+    if (arguments.size() > 0) {
+      if (!arguments[0].endsWith('.groovy')) arguments[0] += '.groovy'
+      def scriptArgs = arguments.size() > 1 ? arguments[1..-1] : []
+      shell.run(new File(arguments[0]), scriptArgs)
       exit()
     }
 
-    recorder.init()
     def console = new ConsoleReader()
-    def commandFactory = new ShellCommandFactory(shell, recorder, console)
-
     console.setPrompt(Globals.PROMPT)
     console.setHandleUserInterrupt(true)
     console.addCompleter(new DslCompleter(shell))
     println Globals.initMessage(console.getTerminal().getWidth())
 
+    def commandFactory = new ShellCommandFactory(shell, console)
+
     try {
       while (true) {
         try {
           def line = console.readLine()
+          LogRecorder.LOGGER.info("${Globals.PROMPT} $line")
+
           def result = evaluate(shell, line, commandFactory)
-          println Globals.RETURN_PROMPT + result
-          recorder.record(line, result.toString())
+          LogRecorder.LOGGER.info("${Globals.RETURN_PROMPT} $result")
+
+          console.println(Globals.RETURN_PROMPT + result)
         } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException e) {
           if (e in UserInterruptException) exit()
-          logger.error('Exception: ', e)
+
+          console.println(Globals.RETURN_PROMPT + e)
+
+          LogRecorder.LOGGER.error(e.toString())
+          LogRecorder.LOGGER.error(e.getStackTrace().join('\n'))
         }
       }
     } catch (Exception e) {
@@ -88,7 +109,7 @@ class Tool extends Script {
   }
 
   private static void exit() {
-    recorder.close()
+    LogRecorder.LOGGER.info("Exited normally.")
     System.exit(0)
   }
 
