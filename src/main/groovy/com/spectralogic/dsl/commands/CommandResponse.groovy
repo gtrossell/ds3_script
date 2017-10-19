@@ -1,22 +1,11 @@
 package com.spectralogic.dsl.commands
 
-import org.slf4j.LoggerFactory
-
 class CommandResponse {
-  private final logger
-  private String message
-  private List<String> info
-  private List<String> warn
-  private List<String> error
-  Boolean exit
+  private message = ''
+  Boolean exit = false
 
-  CommandResponse() {
-    message = ''
-    info    = []
-    warn    = []
-    error   = []
-    exit    = false
-    logger  = LoggerFactory.getLogger(CommandResponse.class)
+  String getMessage() {
+    return message
   }
 
   CommandResponse setMessage(String message) {
@@ -24,37 +13,21 @@ class CommandResponse {
     return this
   }
 
-  CommandResponse addInfo(String message) {
-    info << message
+  CommandResponse appendMessage(String message) {
+    this.message += "\n$message"
     return this
   }
 
-  CommandResponse addWarn(String message) {
-    warn << message
-    return this
+  CommandResponse addInfo(String info) {
+    appendMessage("[INFO] $info")
   }
 
-  CommandResponse addError(String message) {
-    error << message
-    return this
+  CommandResponse addError(String error) {
+    appendMessage("[ERROR] $error")
   }
 
   Boolean isEmpty() {
-    return !info && !warn && !error && !message
-  }
-
-  Boolean hasErrors() {
-    return error
-  }
-
-  String getMessage() {
-    return message
-  }
-
-  void log() {
-    info.each { logger.info(it) }
-    warn.each { logger.warn(it) }
-    error.each { logger.error(it) }
+    return !message
   }
 
 }

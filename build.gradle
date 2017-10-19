@@ -17,7 +17,7 @@ dependencies {
 //    compile group: 'org.slf4j', name: 'slf4j-simple', version: '1.7.21'
     compile 'ch.qos.logback:logback-core:1.2.3'
     compile 'ch.qos.logback:logback-classic:1.2.3'
-    compile 'jline:jline:2.14.2'
+    compile 'jline:jline:2.14.5'
     compile group: 'commons-cli', name: 'commons-cli', version: '1.2'
 
     testCompile gradleTestKit()

@@ -62,45 +62,12 @@ class LogRecorder {
     }
   }
 
-  /** records a command and response to the current log file */
-//  def record(String input="", String output="") {
-//    def file = getLogFile()
-//    file << getInputLinePrefix() + input + '\n'
-//    file << getOutputLinePrefix() + output + '\n'
-//  }
-
-//  def writeLine(String line) {
-//    getLogFile() << "$line\n"
-//  }
-
-//  def start() {
-//    now = new Date()
-//    if (Globals.logDir.empty) {
-//      throw new FileNotFoundException("Log directory not set.")
-//    }
-//  }
-
-//  def end() {
-//    // TODO
-//  }
-
-//  def getInputLinePrefix() {
-//    Globals.PROMPT
-//  }
-
-//  def getOutputLinePrefix() {
-//    Globals.RETURN_PROMPT
-//  }
-
-//  def getLogFile() {
-//    def day = now.date.toString()
-//    day = day.size() < 2 ? '0' + day : day
-//    def month = (now.month + 1).toString()
-//    month = month.size() < 2 ? '0' + month : month
-//    def year = now.year + 1900
-//    def logFile = new File("${logDir}${year}-${month}-${day}.log")
-//    if (!logFile.exists()) logFile.write('')
-//    logFile
-//  }
+  static String loggerStatus() {
+    if (Globals.logDir.empty) {
+      return "Log directory is unset. Set using :log -l <directory>"
+    } else {
+      return "Logging to ${Globals.logDir} is ${LOGGER.level == Level.OFF ? 'disabled.' : 'enabled.'}"
+    }
+  }
 
 }

@@ -12,7 +12,6 @@ import jline.console.ConsoleReader
 import jline.console.UserInterruptException
 import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
-import sun.rmi.runtime.Log
 
 /**
  * This is the main class for the Spectra DSL tool.
@@ -38,7 +37,7 @@ class Tool extends Script {
       if (options.l instanceof String) {
         Globals.logDir = options.l as String
       }
-      LogRecorder.configureLogging(Level.TRACE)
+      LogRecorder.configureLogging(Level.ALL)
     } else {
       LogRecorder.configureLogging(Level.OFF)
     }
@@ -66,16 +65,20 @@ class Tool extends Script {
       while (true) {
         try {
           def line = console.readLine()
+
           LogRecorder.LOGGER.info("${Globals.PROMPT} $line")
 
           def result = evaluate(shell, line, commandFactory)
-          LogRecorder.LOGGER.info("${Globals.RETURN_PROMPT} $result")
 
+          LogRecorder.LOGGER.info("${Globals.RETURN_PROMPT} $result")
+//          printResult(console, result)
           console.println(Globals.RETURN_PROMPT + result)
-        } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException e) {
+
+        } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException | FileNotFoundException e) {
           if (e in UserInterruptException) exit()
 
           console.println(Globals.RETURN_PROMPT + e)
+          console.println(e.getStackTrace().join('\n'))
 
           LogRecorder.LOGGER.error(e.toString())
           LogRecorder.LOGGER.error(e.getStackTrace().join('\n'))
@@ -85,6 +88,17 @@ class Tool extends Script {
       e.printStackTrace()
     } finally {
       exit()
+    }
+  }
+
+  private static void printResult(ConsoleReader console, String result) {
+    if (result.contains('\n')) {
+      /* ConsoleReader.println does not support '\n' */
+      def lines = result.split('\n')
+      console.println(Globals.RETURN_PROMPT + lines[0])
+      lines[1..-1].each { console.println(it) }
+    } else {
+      console.println(Globals.RETURN_PROMPT + result)
     }
   }
 
@@ -98,9 +112,12 @@ class Tool extends Script {
       def command = args[0]
       args = 1 < args.size() ? args[1..-1] : []
       def response = commandFactory.runCommand(command, args)
-      response.log()
+//      response.log()
       
-      if (response.exit) exit()
+      if (response.exit) {
+        exit()
+      }
+
       return response.getMessage()
     } else {
       /* shell evaluation */
