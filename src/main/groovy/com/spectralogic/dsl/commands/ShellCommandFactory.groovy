@@ -11,7 +11,7 @@ class ShellCommandFactory {
     commands << new HelpCommand()
     commands << new RecordCommand(shell.getVariable('environment') as Environment, console)
     commands << new ExecuteCommand(shell)
-    commands << new ExitCommand()
+    commands << new QuitCommand()
     commands << new ClearCommand(console)
     commands << new LogCommand()
   }
