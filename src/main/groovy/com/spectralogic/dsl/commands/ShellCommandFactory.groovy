@@ -1,7 +1,6 @@
 package com.spectralogic.dsl.commands
 
 import com.spectralogic.dsl.helpers.Environment
-import com.spectralogic.dsl.helpers.LogRecorder
 import jline.console.ConsoleReader
 
 class ShellCommandFactory {
@@ -10,7 +9,7 @@ class ShellCommandFactory {
   ShellCommandFactory(GroovyShell shell, ConsoleReader console) {
     commands = []
     commands << new HelpCommand()
-    commands << new RecordCommand(shell.getVariable('environment') as Environment)
+    commands << new RecordCommand(shell.getVariable('environment') as Environment, console)
     commands << new ExecuteCommand(shell)
     commands << new ExitCommand()
     commands << new ClearCommand(console)

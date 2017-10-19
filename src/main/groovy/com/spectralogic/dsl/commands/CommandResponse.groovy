@@ -2,6 +2,7 @@ package com.spectralogic.dsl.commands
 
 class CommandResponse {
   private message = ''
+  Boolean hasErrors = false
   Boolean exit = false
 
   String getMessage() {
@@ -23,8 +24,11 @@ class CommandResponse {
   }
 
   CommandResponse addError(String error) {
+    hasErrors = true
     appendMessage("[ERROR] $error")
   }
+
+
 
   Boolean isEmpty() {
     return !message

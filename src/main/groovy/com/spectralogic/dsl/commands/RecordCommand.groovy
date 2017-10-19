@@ -3,29 +3,35 @@ package com.spectralogic.dsl.commands
 import com.spectralogic.dsl.helpers.CommandHelper
 import com.spectralogic.dsl.helpers.Environment
 import com.spectralogic.dsl.helpers.Globals
-import com.spectralogic.dsl.helpers.LogRecorder
+import jline.console.ConsoleReader
 import org.apache.commons.io.FilenameUtils
 
 class RecordCommand implements ShellCommand {
-  CliBuilder cli
-  LogRecorder recorder
-  Environment environment
-  String recordId
-  File scriptFile
-  String scriptDesc
-  Boolean isRecording
-  Boolean isRecordEnv
+  private CliBuilder cli
+  private Environment environment
+  private int startLineIndex
+  private String scriptName
+  private File scriptFile
+  private String scriptDesc
+  private Boolean isRecording
+  private Boolean isRecordEnv
+  private ConsoleReader console
 
-  RecordCommand(LogRecorder recorder, Environment environment) {
-    this.recorder = recorder
+  RecordCommand(Environment environment, console) {
     this.environment = environment
+    this.console = console
     init()
 
-    cli = new CliBuilder(usage:':record, :r <name> [options]')
+    cli = new CliBuilder(usage:':record, :r <name> [options]', stopAtNonOption: false)
     cli.header = 'First usage starts recording, second saves'
     cli.e('save environment in script', longOpt: 'environment')
     cli.d('script description', longOpt: 'desc', args:1, argName:'description')
     cli.h('display this message', longOpt:'help')
+  }
+
+  @Override
+  String[] commandNames() {
+    return [':record', ':r']
   }
 
   @Override
@@ -34,22 +40,17 @@ class RecordCommand implements ShellCommand {
     if (!commandOptions(args, response).isEmpty()) return response
 
     if (!isRecording) /* start recording */ {
-      recordId = createScriptId()
-      recorder.writeLine(startLine())
+      startLineIndex = console.history.size()
       isRecording = true
       return response.addInfo("Started recording script")
     } else /* end recording */ {
-      recorder.writeLine(endLine())
-      def scriptLines = []
-      def isScript = false
-      recorder.getLogFile().eachLine { String line ->
-        if (line == endLine()) return response
-        if (isScript && line.startsWith(Globals.PROMPT)) {
-          line = line.substring(Globals.PROMPT.size())
-          if (!line.startsWith(':')) scriptLines << line
-        }
-        if (line == startLine()) isScript = true
+      if (scriptName.empty) {
+        return response.addError("Must give script a name using :record <name>")
       }
+
+      def scriptLines = console.history.entries().findAll {
+        it.index() >= startLineIndex && it.index() < console.history.entries().size() - 1
+      }.collect { it.value() }
 
       def scriptLoc = saveScript(scriptLines)
       init()
@@ -57,22 +58,28 @@ class RecordCommand implements ShellCommand {
     }
   }
 
-  @Override
-  String[] commandNames() {
-    return [':record', ':r']
+  /** sets fields to their default values */
+  private void init() {
+    this.scriptDesc   = ''
+    this.startLineIndex = -1
+    this.scriptName = ''
+    this.scriptFile   = null
+    this.isRecording  = false
+    this.isRecordEnv  = false
+
+    def scriptDir = new File(Globals.SCRIPT_DIR)
+    if (!scriptDir.exists()) scriptDir.mkdirs()
   }
 
   /** Builds script lines and saves it to set or given location */
   private String saveScript(List scriptLines) {
-    if (!scriptFile)
-      scriptFile = new File(Globals.SCRIPT_DIR, "${recordId}.groovy")
 
     /* set environment vars */
     if (isRecordEnv) {
-      def tmpEnv = "tmpEnvironmentFor_$recordId"
+      def tmpEnv = "tmpEnvironmentFor_$scriptName"
       def saveEnvLine = "$tmpEnv = environment"
       def envLineBuilder = new StringBuilder('environment = new Environment([')
-      environment.getEnvironment().each{ key, val -> 
+      environment.getEnvironment().each{ key, val ->
         envLineBuilder.append("'$key':'$val',")
       }
       envLineBuilder.setCharAt(envLineBuilder.length() - 1, ']' as char)
@@ -138,8 +145,9 @@ class RecordCommand implements ShellCommand {
     if (options.arguments()) {
       def file = new CommandHelper().getScriptFromString(options.arguments()[0])
       file = ensureExtension(file)
-      if (errorCheckFile(file, response).hasErrors()) return response
+      if (errorCheckFile(file, response).hasErrors) return response
       this.scriptFile = file
+      this.scriptName = options.arguments()[0]
     }
 
     if (!options) {
@@ -179,28 +187,4 @@ class RecordCommand implements ShellCommand {
     return file
   }
 
-  /** sets fields to their default values */
-  private void init() {
-    this.recordId     = ''
-    this.scriptDesc   = ''
-    this.scriptFile   = null
-    this.isRecording  = false
-    this.isRecordEnv  = false
-
-    File scriptDir = new File(Globals.SCRIPT_DIR)
-    if (!scriptDir.exists()) scriptDir.mkdirs()
-  }
-
-  private startLine() { 
-    return "[START] $recordId" 
-  }
-
-  private endLine() { 
-    return "[END] $recordId"
-  }
-
-  /** Creates unique name for a recording session  */
-  private createScriptId() {
-    'script_' + (new Random().nextInt(10 ** 6))
-  }
 }
