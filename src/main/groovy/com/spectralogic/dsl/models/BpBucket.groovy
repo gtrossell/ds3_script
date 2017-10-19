@@ -152,6 +152,10 @@ class BpBucket extends GetBucketResponse {
     }
   }
 
+  BpBucket getBulk(String objectName, String pathStr='') {
+    return getBulk([objectName], pathStr)
+  }
+
   /** 
    * @param objectNames objects names to return
    * @return list all objects in bucket or objects with given names 
