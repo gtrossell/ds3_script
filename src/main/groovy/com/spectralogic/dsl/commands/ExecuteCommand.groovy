@@ -70,7 +70,7 @@ class ExecuteCommand implements ShellCommand {
 
   private listScripts() {
     def scripts = []
-    new File(Globals.SCRIPT_DIR).eachFileRecurse (FileType.FILES) { file ->
+    new File(Globals.SCRIPT_DIR).eachFile (FileType.FILES) { file ->
       if (file.name.endsWith('.groovy')) {
         scripts << ' - ' + FilenameUtils.removeExtension(file.getName())
       }
