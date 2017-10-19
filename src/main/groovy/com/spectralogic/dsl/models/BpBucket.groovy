@@ -114,7 +114,7 @@ class BpBucket extends GetBucketResponse {
    * @param objectNames names of the objects to get
    * @param pathStr directory to write to
    */
-  void getBulk(List<String> objectNames, String pathStr) {
+  void getBulk(List<String> objectNames, String pathStr='') {
     def path = Paths.get(pathStr)
     if (Files.isRegularFile(path)) {
       throw new BpException("$pathStr is not a directory!")
