@@ -48,8 +48,9 @@ class RecordCommand implements ShellCommand {
         return response.addError("Must give script a name using :record <name>")
       }
 
+      def endLineIndex = console.history.entries().size() - 1
       def scriptLines = console.history.entries().findAll {
-        it.index() >= startLineIndex && it.index() < console.history.entries().size() - 1
+        startLineIndex <= it.index() && it.index() < endLineIndex && !it.value().toString().startsWith(':')
       }.collect { it.value() }
 
       def scriptLoc = saveScript(scriptLines)
