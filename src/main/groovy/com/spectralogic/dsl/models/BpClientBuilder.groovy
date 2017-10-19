@@ -25,7 +25,7 @@ class BpClientBuilder {
     accessId = accessId ?: environment.getAccessKey()
     secretKey = secretKey ?: environment.getSecretKey()
     if (!endpoint || !accessId || !secretKey) {
-      return new BpException("Endpoint, Access ID, and/or Sectret Key is not set! " +
+      throw new BpException("Endpoint, Access ID, and/or Secret Key is not set! " +
                               "Try setting the environment or method variable(s)")
     }
     

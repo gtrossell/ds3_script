@@ -71,9 +71,7 @@ class Tool extends Script {
           def result = evaluate(shell, line, commandFactory)
 
           LogRecorder.LOGGER.info("${Globals.RETURN_PROMPT} $result")
-//          printResult(console, result)
           console.println(Globals.RETURN_PROMPT + result)
-
         } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException | FileNotFoundException e) {
           if (e in UserInterruptException) exit()
 
