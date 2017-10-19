@@ -8,7 +8,7 @@ script management.
 
 Install
 -------
-
+Build the source using Gradle, unzip the distribution, and add the bin directory to the path.
 
 No Shell
 -----------------
@@ -23,12 +23,14 @@ Use ```:help``` to view all of the commands and ```<command> -h``` to see a comm
 
 ```:clear``` clears the screen of previous lines.
 
-```:exit``` exits the command window, equivalent to `Ctrl-C`.
+```:quit``` exits the command window, equivalent to `Ctrl-C`.
 
 ```:record``` records the current shell session to  a script file to be used for later. If an exception is thrown during
 the recording, that line is not recorded. *this may change in the future. 
 
 ```:execute``` executes the script passed to it.
+
+```:log``` sets the log directory and enables/disables logging 
 
 Example:
 
@@ -86,7 +88,7 @@ bucket.getBulk(['example.txt'], "./downloads/")
 bucket.deleteAllObjects()
 assert 0 == bucket.objects().size()
  
-bucket.putBulk('/path/to/example.txt', 'remoteDir')
+bucket.putBulk('/path/to/example.txt', 'remoteDir/')
 bucket.objects()            // shows object at remoteDir/example.txt
 object = bucket.object('remoteDir/example.txt')
 bucket.deleteObjects(object)
