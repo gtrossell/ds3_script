@@ -101,7 +101,7 @@ class DslCompleter implements Completer {
       def matching = [:]
       matching << findMatchingGlobalMethods(prefix)
       matching << shell.context.variables.findAll {
-        it.key.toString().startsWith(prefix)
+        it.value != null && it.key.toString().startsWith(prefix)
       }.collectEntries {
         [(it.key) : it.value.class]
       }

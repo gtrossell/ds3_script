@@ -89,17 +89,6 @@ class Tool extends Script {
     }
   }
 
-  private static void printResult(ConsoleReader console, String result) {
-    if (result.contains('\n')) {
-      /* ConsoleReader.println does not support '\n' */
-      def lines = result.split('\n')
-      console.println(Globals.RETURN_PROMPT + lines[0])
-      lines[1..-1].each { console.println(it) }
-    } else {
-      console.println(Globals.RETURN_PROMPT + result)
-    }
-  }
-
   /** Logic for parsing and evaluating a line */
   private static String evaluate(shell, line, commandFactory) {
     if (Guard.isStringNullOrEmpty(line)) return ''

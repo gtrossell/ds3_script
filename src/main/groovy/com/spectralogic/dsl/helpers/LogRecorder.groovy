@@ -23,7 +23,7 @@ class LogRecorder {
     loggerContext.reset()
     LOGGER.setLevel(level)
 
-    if (level != Level.OFF) {
+    if (level != Level.OFF && !Globals.logDir.empty) {
       final fileAppender = new RollingFileAppender<>()
       final sizeBasedRollingPolicy = new FixedWindowRollingPolicy()
       final sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy<>()

@@ -34,6 +34,8 @@ class ShellBuilder {
   private buildImportCustomizer() {
     def importCustomizer = new ImportCustomizer()
     importCustomizer.addImport('com.spectralogic.dsl.helpers.Environment')
+    importCustomizer.addStarImports('com.spectralogic.ds3client.commands')
+    importCustomizer.addStarImports('com.spectralogic.ds3client.commands.spectrads3')
     return importCustomizer
   }
 
