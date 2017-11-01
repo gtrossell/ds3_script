@@ -18,8 +18,7 @@ import org.codehaus.groovy.runtime.InvokerHelper
  * It Handles the terminal and handles all user interaction
  */
 class Tool extends Script {
-//  private final static logger = LoggerFactory.getLogger(Tool.class)
-//  private final static recorder = new LogRecorder()
+  private final ConsoleReader console = new ConsoleReader();
 
   static void main(String[] args) {
     InvokerHelper.runScript(Tool, args)
@@ -53,7 +52,6 @@ class Tool extends Script {
       exit()
     }
 
-    def console = new ConsoleReader()
     console.setPrompt(Globals.PROMPT)
     console.setHandleUserInterrupt(true)
     console.addCompleter(new DslCompleter(shell))
@@ -61,31 +59,36 @@ class Tool extends Script {
 
     def commandFactory = new ShellCommandFactory(shell, console)
 
-    try {
-      while (true) {
-        try {
-          def line = console.readLine()
+    while (true) {
+      try {
+        def line = console.readLine()
+        LogRecorder.LOGGER.info("${Globals.PROMPT} $line")
 
-          LogRecorder.LOGGER.info("${Globals.PROMPT} $line")
-
-          def result = evaluate(shell, line, commandFactory)
-
-          LogRecorder.LOGGER.info("${Globals.RETURN_PROMPT} $result")
-          console.println(Globals.RETURN_PROMPT + result)
-        } catch (BpException | RuntimeException | FailedRequestException | ConnectTimeoutException | FileNotFoundException e) {
-          if (e in UserInterruptException) exit()
-
-          console.println(Globals.RETURN_PROMPT + e)
-          console.println(e.getStackTrace().join('\n'))
-
-          LogRecorder.LOGGER.error(e.toString())
-          LogRecorder.LOGGER.error(e.getStackTrace().join('\n'))
-        }
+        def result = evaluate(shell, line, commandFactory)
+        printResult(result)
+      } catch (UserInterruptException e) {
+        exit()
+      } catch (BpException | FailedRequestException | FileNotFoundException | ConnectTimeoutException e) {
+        printError(e)
+      } catch (Exception e) {
+        printError(e, true)
       }
-    } catch (Exception e) {
-      e.printStackTrace()
-    } finally {
-      exit()
+    }
+  }
+
+  def printResult(String text) {
+    LogRecorder.LOGGER.info(Globals.RETURN_PROMPT + text)
+    console.println(Globals.RETURN_PROMPT + text)
+  }
+
+  def printError(Exception e, trace=false) {
+    console.println(Globals.RETURN_PROMPT + e.toString())
+    LogRecorder.LOGGER.error(e.toString())
+
+    if (trace) {
+      def traceMessage = e.getStackTrace().join('\n')
+      console.println(traceMessage)
+      LogRecorder.LOGGER.trace(traceMessage)
     }
   }
 
@@ -98,14 +101,7 @@ class Tool extends Script {
       def args = line.split(' ')
       def command = args[0]
       args = 1 < args.size() ? args[1..-1] : []
-      def response = commandFactory.runCommand(command, args)
-//      response.log()
-      
-      if (response.exit) {
-        exit()
-      }
-
-      return response.getMessage()
+      return commandFactory.runCommand(command, args).getMessage()
     } else {
       /* shell evaluation */
       return shell.evaluate(line)
