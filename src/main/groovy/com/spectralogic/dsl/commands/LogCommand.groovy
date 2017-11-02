@@ -35,7 +35,7 @@ class LogCommand implements ShellCommand {
 
         if (!options) {
             return response
-        } else if (options.h || args.size() < 1) {
+        } else if (options.h || args.size() < 1 || options.arguments()) {
             cli.usage()
             return response.setMessage(stringWriter.toString())
         } else if (options.e) {

@@ -34,7 +34,7 @@ class Tool extends Script {
     console.setPrompt(Globals.PROMPT)
     console.setHandleUserInterrupt(true)
     console.addCompleter(new DslCompleter(shell))
-    println Globals.initMessage(console.getTerminal().getWidth())
+    console.println(Globals.initMessage(console.getTerminal().getWidth()))
 
     def commandFactory = new ShellCommandFactory(shell, console)
 
