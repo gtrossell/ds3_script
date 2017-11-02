@@ -45,10 +45,11 @@ class Globals {
     return PREFS.get(LOG_PREF_KEY, "")
   }
 
-  static initMessage(width) {
+  static initMessage(Integer width) {
     """
 Welcome to the Spectra DSL for BlackPearl!
-Use the ':help' command to get started
+Use the ':help' command to get started.
+${LogRecorder.loggerStatus()}
 ${'=' * (width - 1)}"""
   }
 
