@@ -6,7 +6,7 @@ class QuitCommand implements ShellCommand {
 
   @Override
   CommandResponse run(List args) {
-    throw UserInterruptException('')
+    throw new UserInterruptException('')
   }
 
   @Override
