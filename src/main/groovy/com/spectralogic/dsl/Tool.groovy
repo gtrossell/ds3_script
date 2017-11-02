@@ -57,21 +57,30 @@ class Tool extends Script {
 
   private void argsOptions(GroovyShell shell) {
     /* Cli to run a script, turn on logging, log directory, print version */
-    def cli = new CliBuilder(usage: 'bpsh <scripts> -l <log directory>', stopAtNonOption: false)
-    cli.l('enable logging', longOpt: 'log', args: 1, argName: 'log file directory', optionalArg: true)
+    def cli = new CliBuilder(usage: 'bpsh <script>', stopAtNonOption: false)
+    cli.l('enable logging', longOpt: 'log', args: 1, argName: 'log directory', optionalArg: true)
     cli.v('version', longOpt: 'version')
+    cli.h('display this message', longOpt:'help')
     def options = cli.parse(args)
 
-    if (options.v) {
+    if (!options) {
+      return
+    } else if (options.h) {
+      cli.usage()
+      exit()
+    } else if (options.v) {
       def properties = new Properties()
       this.class.classLoader.getResource("version.properties").withInputStream { properties.load(it) }
       println "bpsh ${properties.'version'}"
       exit()
-    }
-
-    if (options.l) {
+    } else if (options.l) {
       if (options.l instanceof String) {
-        Globals.logDir = options.l as String
+        try {
+          Globals.logDir = options.l as String
+        } catch (FileNotFoundException e) {
+          println e
+          exit()
+        }
       }
       LogRecorder.configureLogging(Level.ALL)
     }
@@ -81,8 +90,15 @@ class Tool extends Script {
     if (arguments.size() > 0) {
       if (!arguments[0].endsWith('.groovy')) arguments[0] += '.groovy'
       def scriptArgs = arguments.size() > 1 ? arguments[1..-1] : []
-      shell.run(new File(arguments[0]), scriptArgs)
-      exit()
+
+      try {
+        def file = new File(arguments[0])
+        shell.run(file, scriptArgs)
+      } catch (FileNotFoundException e) {
+        println e
+      } finally {
+        exit()
+      }
     }
   }
 
