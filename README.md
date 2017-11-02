@@ -10,27 +10,33 @@ Install
 -------
 Build the source using Gradle, unzip the distribution, and add the bin directory to the path.
 
-No Shell
------------------
-Using the following command will run the `script.groovy` script without opening the shell.
-
-```$ bpsh script.groovy```
-
 Shell
 -----
-### Commands
-Use ```:help``` to view all of the commands and ```<command> -h``` to see a command's options.
+### External Commands
+`$ bpsh -h` prints available options.
 
-```:clear``` clears the screen of previous lines.
+`$ bpsh -v` prints the version number.
 
-```:quit``` exits the command window, equivalent to `Ctrl-C`.
+`$ bpsh -d` enables debugging mode, traces will be printed.
 
-```:record``` records the current shell session to  a script file to be used for later. If an exception is thrown during
+`$ bpsh -l <log directory>` enables logging to specified directory. Once set, the log directory is saved for the future.
+
+`$ bpsh script` will run the `script.groovy` script without opening the shell.
+
+### Internal Commands
+Use `:help` to view all of the commands that can be used inside the shell and ```<command> -h``` to see a specific 
+command's help page.
+
+`:clear` clears the screen of previous lines.
+
+`:quit` exits the command window, equivalent to `Ctrl-C`.
+
+`:record` records the current shell session to  a script file to be used for later. If an exception is thrown during
 the recording, that line is not recorded. *this may change in the future. 
 
-```:execute``` executes the script passed to it.
+`:execute` executes, lists, and deletes scripts.
 
-```:log``` sets the log directory and enables/disables logging 
+`:log` sets the log directory and enables/disables logging .
 
 Example:
 
@@ -40,15 +46,15 @@ Example:
 > bucket = client.bucket(args[0])
 > :r
 > bucket = null
-> :e getBucket 'test_bucket'
+> :e getBucket test_bucket
 > assert bucket.name == 'test_bucket'
 ```
 
 ### Shortcuts
 You can use tab completion to view available variables, fields, methods, and method parameters. 
-`Esc-Backspace` will delete the current char set. 
-`Ctrl-C` will safely exit the shell. 
+`Esc-Backspace` will delete the current character set. 
 
+`Ctrl-C` will safely exit the shell. 
 
 DSL
 --------
