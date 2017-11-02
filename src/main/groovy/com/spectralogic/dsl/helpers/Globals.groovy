@@ -9,6 +9,7 @@ import java.util.prefs.Preferences
  * places or are constants
  */
 class Globals {
+  static debug = false
   final static PROMPT = 'spectra> '
   final static RETURN_PROMPT = '===> '
   final static MAX_BULK_LOAD = 200_000 // TODO: might not be the best place for this

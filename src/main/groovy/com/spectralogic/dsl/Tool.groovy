@@ -48,7 +48,7 @@ class Tool extends Script {
       } catch (UserInterruptException e) {
         exit()
       } catch (BpException | FailedRequestException | FileNotFoundException | ConnectTimeoutException e) {
-        printError(e)
+        printError(e, Globals.debug)
       } catch (Exception e) {
         printError(e, true)
       }
@@ -61,6 +61,7 @@ class Tool extends Script {
     cli.l('enable logging', longOpt: 'log', args: 1, argName: 'log directory', optionalArg: true)
     cli.v('version', longOpt: 'version')
     cli.h('display this message', longOpt:'help')
+    cli.d('enable debugging', longOpt: 'debug')
     def options = cli.parse(args)
 
     if (!options) {
@@ -73,7 +74,9 @@ class Tool extends Script {
       this.class.classLoader.getResource("version.properties").withInputStream { properties.load(it) }
       println "bpsh ${properties.'version'}"
       exit()
-    } else if (options.l) {
+    }
+
+    if (options.l) {
       if (options.l instanceof String) {
         try {
           Globals.logDir = options.l as String
@@ -83,6 +86,10 @@ class Tool extends Script {
         }
       }
       LogRecorder.configureLogging(Level.ALL)
+    }
+
+    if (options.d) {
+      Globals.debug = true
     }
 
     /* Run script passed in */
