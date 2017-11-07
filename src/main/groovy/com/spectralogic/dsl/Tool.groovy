@@ -47,7 +47,8 @@ class Tool extends Script {
         printResult(result)
       } catch (UserInterruptException e) {
         exit()
-      } catch (BpException | FailedRequestException | FileNotFoundException | ConnectTimeoutException e) {
+      } catch (BpException | FailedRequestException | FileNotFoundException | ConnectTimeoutException |
+                MissingPropertyException e) {
         printError(e, Globals.debug)
       } catch (Exception e) {
         printError(e, true)
