@@ -48,7 +48,7 @@ class BpBucket extends GetBucketResponse {
    */
   void delete() {
     if (this.objects()) {
-      throw new BpException("Bucket must be deleteAll to delete!")
+      throw new BpException("Bucket must be empty to delete!")
     }
     client.deleteBucket(new DeleteBucketRequest(this.name))
   }
@@ -69,6 +69,10 @@ class BpBucket extends GetBucketResponse {
     }
 
     return reload()
+  }
+
+  BpBucket deleteObjects(List<BpObject> objects) {
+    return deleteObjects(*objects)
   }
 
   /**
@@ -168,6 +172,10 @@ class BpBucket extends GetBucketResponse {
       wantedObjects = listBucketResult.objects.findAll { objectNames.contains(it.getKey()) }
     }
     return contentsToBpObjects(wantedObjects)
+  }
+
+  List<BpObject> objects(List<String> objectNames) {
+    return objects(*objectNames)
   }
 
   /** 
