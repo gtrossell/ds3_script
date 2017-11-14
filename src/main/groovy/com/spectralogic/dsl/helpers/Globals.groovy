@@ -47,11 +47,16 @@ class Globals {
   }
 
   static initMessage(Integer width) {
-    """
+    def message = """
 Welcome to the Spectra DSL for BlackPearl!
 Use the ':help' command to get started.
-${LogRecorder.loggerStatus()}
-${'=' * (width - 1)}"""
+${LogRecorder.loggerStatus()}"""
+
+    if (!new Environment().ready()) {
+      message += "\nSet environment variables to automatically create 'client' variable!"
+    }
+
+    return "$message\n${'=' * (width - 1)}"
   }
 
 }
