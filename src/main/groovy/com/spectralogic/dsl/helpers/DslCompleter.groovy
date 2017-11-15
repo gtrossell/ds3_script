@@ -130,8 +130,15 @@ class DslCompleter implements Completer {
       return findMatchingMethods(prefix.replaceAll("[()]", ""), clazz)
     } else {
       def matching = [:]
-      matching << findMatchingMethods(prefix, clazz)
       matching << findMatchingFields(prefix, clazz)
+      matching << findMatchingMethods(prefix, clazz).findAll { method ->
+        if (method.key.startsWith("get") && method.key.endsWith("()")) {
+          return !matching.keySet().contains(method.key[3..-3].uncapitalize())
+        } else {
+          return true
+        }
+      }
+
       return matching
     }
   }
