@@ -34,6 +34,12 @@ class DslCompleter implements Completer {
 
     def bufferEnd = paramOptions ? cursor - 2 : cursor - 1
     def elementList = splitElements(findElements(buffer[0..bufferEnd]))
+
+    if (elementList.empty) {
+      candidates.addAll(cleanseDuplicatesAndSort(findMatchingGlobals('').keySet().toList()))
+      return cursor
+    }
+
     def matching = findMatchingGlobals(elementList[0])
     Class prevMatchingClass = SpectraDSL.class
     for (def i = 1; i < elementList.size() && matching.size() == 1; i++) {
