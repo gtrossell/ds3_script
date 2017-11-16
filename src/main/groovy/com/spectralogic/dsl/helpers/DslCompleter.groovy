@@ -66,12 +66,12 @@ class DslCompleter implements Completer {
             }
 
             candidates.addAll(
-                    methods.collect { method ->
-                        def params = method.parameters.collect {
-                            it.type.name.split('\\.')[-1].replace(';', '')
-                        }
-                        return "${candidates.first().toString()}${params.join(', ')})"
-                    }.sort { it.size() }
+                methods.collect { method ->
+                    def params = method.parameters.collect {
+                        it.type.name.split('\\.')[-1].replace(';', '')
+                    }
+                    return "${candidates.first().toString()}${params.join(', ')})"
+                }.sort { it.size() }
             )
 
             if (1 < candidates.size() && candidates[1] == candidates[0] + ')') candidates.remove(0)
