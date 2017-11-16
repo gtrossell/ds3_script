@@ -51,9 +51,9 @@ class Tool extends Script {
                 exit()
             } catch (BpException | FailedRequestException | FileNotFoundException | ConnectTimeoutException |
             MissingPropertyException e) {
-                printException(e, Globals.debug)
-            } catch (Exception e) {
-                printException(e, true)
+                printThrowable(e, Globals.debug)
+            } catch (Throwable e) {
+                printThrowable(e, true)
             }
         }
     }
@@ -117,7 +117,7 @@ class Tool extends Script {
         console.println(Globals.RETURN_PROMPT + text)
     }
 
-    private printException(Exception e, trace = false) {
+    private printThrowable(Throwable e, trace = false) {
         console.println(Globals.RETURN_PROMPT + e.toString())
         LogRecorder.LOGGER.error(e.toString())
 
