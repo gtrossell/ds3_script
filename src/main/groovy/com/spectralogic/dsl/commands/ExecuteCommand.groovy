@@ -39,9 +39,9 @@ class ExecuteCommand implements ShellCommand {
             return response.addError("The script '$script' does not exists!")
         }
 
-        // TODO: fix bug where if script is edited, the shell doesn't realize it
         def scriptArgs = args.size() > 1 ? args[1..-1] : []
-        shell.run(script, scriptArgs)
+        shell.run(script.text, script.name, scriptArgs)
+
         return response
     }
 
