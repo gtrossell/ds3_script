@@ -45,13 +45,15 @@ class Tool extends Script {
 
                 def result = evaluate(shell, line, commandFactory)
                 printResult(result)
+            } catch (AssertionError e) {
+                printAssertionError(e)
             } catch (UserInterruptException e) {
                 exit()
             } catch (BpException | FailedRequestException | FileNotFoundException | ConnectTimeoutException |
             MissingPropertyException e) {
-                printError(e, Globals.debug)
+                printException(e, Globals.debug)
             } catch (Exception e) {
-                printError(e, true)
+                printException(e, true)
             }
         }
     }
@@ -115,7 +117,7 @@ class Tool extends Script {
         console.println(Globals.RETURN_PROMPT + text)
     }
 
-    private printError(Exception e, trace = false) {
+    private printException(Exception e, trace = false) {
         console.println(Globals.RETURN_PROMPT + e.toString())
         LogRecorder.LOGGER.error(e.toString())
 
@@ -124,6 +126,12 @@ class Tool extends Script {
             console.println(traceMessage)
             LogRecorder.LOGGER.trace(traceMessage)
         }
+    }
+
+    private printAssertionError(AssertionError e) {
+        def consoleMessage = e.message.replaceAll('\n', "\n${' ' * Globals.RETURN_PROMPT.length()}")
+        console.println(Globals.RETURN_PROMPT + consoleMessage)
+        LogRecorder.LOGGER.error(e.message)
     }
 
     /** Logic for parsing and evaluating a line */
