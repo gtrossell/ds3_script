@@ -8,13 +8,13 @@ class LogCommand implements ShellCommand {
     private final CliBuilder cli
 
     LogCommand() {
-        cli = new CliBuilder(usage:':log, :l [options]')
+        cli = new CliBuilder(usage: ':log, :l [options]')
         cli.header = 'Execute a script'
         cli.h('display this message', longOpt: 'help')
         cli.e('enables logging', longOpt: 'enable')
         cli.d('disables logging', longOpt: 'disable')
         cli.s('prints logger status', longOpt: 'status')
-        cli.l('set/print log directory', longOpt: 'logdir', args:1, argName:'dir', optionalArg: true)
+        cli.l('set/print log directory', longOpt: 'logdir', args: 1, argName: 'dir', optionalArg: true)
     }
 
     @Override

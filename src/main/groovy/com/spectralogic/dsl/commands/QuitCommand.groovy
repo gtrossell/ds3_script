@@ -4,14 +4,14 @@ import jline.console.UserInterruptException
 
 class QuitCommand implements ShellCommand {
 
-  @Override
-  CommandResponse run(List args) {
-    throw new UserInterruptException('')
-  }
+    @Override
+    CommandResponse run(List args) {
+        throw new UserInterruptException('')
+    }
 
-  @Override
-  String[] commandNames() {
-    return [':quit', ':q']
-  }
+    @Override
+    String[] commandNames() {
+        return [':quit', ':q']
+    }
 
 }

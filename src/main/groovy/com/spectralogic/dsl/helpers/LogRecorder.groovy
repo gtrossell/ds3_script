@@ -13,61 +13,61 @@ import org.slf4j.LoggerFactory
 import java.nio.file.FileSystems
 
 class LogRecorder {
-  static final LOGGER = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
-  private final static String LOG_FORMAT_PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5level %msg%n"
-  private final static String LOG_ARCHIVE_FILE_PATTERN =  "spectra%i.log"
-  private final static String LOG_FILE_NAME = "spectra.log"
+    static final LOGGER = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
+    private final static String LOG_FORMAT_PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5level %msg%n"
+    private final static String LOG_ARCHIVE_FILE_PATTERN = "spectra%i.log"
+    private final static String LOG_FILE_NAME = "spectra.log"
 
-  static configureLogging(Level level) {
-    def loggerContext = LOGGER.getLoggerContext()
-    loggerContext.reset()
-    LOGGER.setLevel(level)
+    static configureLogging(Level level) {
+        def loggerContext = LOGGER.getLoggerContext()
+        loggerContext.reset()
+        LOGGER.setLevel(level)
 
-    if (level != Level.OFF && !Globals.logDir.empty) {
-      final fileAppender = new RollingFileAppender<>()
-      final sizeBasedRollingPolicy = new FixedWindowRollingPolicy()
-      final sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy<>()
+        if (level != Level.OFF && !Globals.logDir.empty) {
+            final fileAppender = new RollingFileAppender<>()
+            final sizeBasedRollingPolicy = new FixedWindowRollingPolicy()
+            final sizeBasedTriggeringPolicy = new SizeBasedTriggeringPolicy<>()
 
-      fileAppender.setContext(loggerContext)
-      sizeBasedTriggeringPolicy.setContext(loggerContext)
-      sizeBasedRollingPolicy.setContext(loggerContext)
-      fileAppender.setRollingPolicy(sizeBasedRollingPolicy)
-      sizeBasedRollingPolicy.setParent(fileAppender)
-      sizeBasedRollingPolicy.setMinIndex(0)
-      sizeBasedRollingPolicy.setMaxIndex(5)
+            fileAppender.setContext(loggerContext)
+            sizeBasedTriggeringPolicy.setContext(loggerContext)
+            sizeBasedRollingPolicy.setContext(loggerContext)
+            fileAppender.setRollingPolicy(sizeBasedRollingPolicy)
+            sizeBasedRollingPolicy.setParent(fileAppender)
+            sizeBasedRollingPolicy.setMinIndex(0)
+            sizeBasedRollingPolicy.setMaxIndex(5)
 
-      def logFilePath = FileSystems.getDefault().getPath(Globals.logDir, LOG_FILE_NAME)
-      fileAppender.setFile(logFilePath.toString())
-      sizeBasedRollingPolicy.setFileNamePattern(Globals.logDir + LOG_ARCHIVE_FILE_PATTERN)
-      sizeBasedRollingPolicy.start()
+            def logFilePath = FileSystems.getDefault().getPath(Globals.logDir, LOG_FILE_NAME)
+            fileAppender.setFile(logFilePath.toString())
+            sizeBasedRollingPolicy.setFileNamePattern(Globals.logDir + LOG_ARCHIVE_FILE_PATTERN)
+            sizeBasedRollingPolicy.start()
 
-      sizeBasedTriggeringPolicy.setMaxFileSize(FileSize.valueOf("10MB"))
-      sizeBasedTriggeringPolicy.start()
+            sizeBasedTriggeringPolicy.setMaxFileSize(FileSize.valueOf("10MB"))
+            sizeBasedTriggeringPolicy.start()
 
-      final PatternLayoutEncoder fileEncoder = new PatternLayoutEncoder()
-      fileEncoder.setContext(loggerContext)
-      fileEncoder.setPattern(LOG_FORMAT_PATTERN)
-      fileEncoder.start()
+            final PatternLayoutEncoder fileEncoder = new PatternLayoutEncoder()
+            fileEncoder.setContext(loggerContext)
+            fileEncoder.setPattern(LOG_FORMAT_PATTERN)
+            fileEncoder.start()
 
-      fileAppender.setTriggeringPolicy((TriggeringPolicy)sizeBasedTriggeringPolicy)
-      fileAppender.setRollingPolicy(sizeBasedRollingPolicy)
-      fileAppender.setEncoder(fileEncoder)
-      fileAppender.setName("LOGFILE")
-      sizeBasedRollingPolicy.start()
+            fileAppender.setTriggeringPolicy((TriggeringPolicy) sizeBasedTriggeringPolicy)
+            fileAppender.setRollingPolicy(sizeBasedRollingPolicy)
+            fileAppender.setEncoder(fileEncoder)
+            fileAppender.setName("LOGFILE")
+            sizeBasedRollingPolicy.start()
 
-      LOGGER.addAppender(fileAppender)
-      fileAppender.start()
+            LOGGER.addAppender(fileAppender)
+            fileAppender.start()
 
-      LOGGER.info("Logging enabled.")
+            LOGGER.info("Logging enabled.")
+        }
     }
-  }
 
-  static String loggerStatus() {
-    if (Globals.logDir.empty) {
-      return "Log directory is unset. Set using :log -l <directory>"
-    } else {
-      return "Logging to ${Globals.logDir} is ${LOGGER.level == Level.OFF ? 'disabled.' : 'enabled.'}"
+    static String loggerStatus() {
+        if (Globals.logDir.empty) {
+            return "Log directory is unset. Set using :log -l <directory>"
+        } else {
+            return "Logging to ${Globals.logDir} is ${LOGGER.level == Level.OFF ? 'disabled.' : 'enabled.'}"
+        }
     }
-  }
 
 }
