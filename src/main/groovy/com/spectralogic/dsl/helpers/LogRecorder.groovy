@@ -64,9 +64,10 @@ class LogRecorder {
 
     static String loggerStatus() {
         if (Globals.logDir.empty) {
-            return "Log directory is unset. Set using :log -l <directory>"
+            return Globals.getString('set_log_message')
         } else {
-            return "Logging to ${Globals.logDir} is ${LOGGER.level == Level.OFF ? 'disabled.' : 'enabled.'}"
+            def status = LOGGER.level == Level.OFF ? Globals.getString('disabled') : Globals.getString('enabled')
+            return "Logging to ${Globals.logDir} is ${status}."
         }
     }
 

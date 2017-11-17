@@ -10,14 +10,15 @@ import java.util.prefs.Preferences
  */
 class Globals {
     static debug = false
-    final static PROMPT = 'spectra> '
-    final static RETURN_PROMPT = '===> '
+    final static PROMPT
+    final static RETURN_PROMPT
     final static MAX_BULK_LOAD = 200_000 // TODO: might not be the best place for this
     final static String HOME_DIR
     final static String SCRIPT_DIR
     private final static PREF_NODE = "ds3_script.preferences"
     private final static LOG_PREF_KEY = "LOG_DIR"
     private final static Preferences PREFS
+    private final static STRINGS_BUNDLE = ResourceBundle.getBundle('strings')
 
     static {
         HOME_DIR = new File("").getAbsoluteFile().toString() + '/'
@@ -29,6 +30,14 @@ class Globals {
         if (!PREFS.keys().contains(LOG_PREF_KEY)) {
             PREFS.put(LOG_PREF_KEY, "")
         }
+
+        /* Set Global strings by locale */
+        PROMPT = getString('prompt')
+        RETURN_PROMPT = getString('return_prompt')
+    }
+
+    static String getString(String key) {
+        return STRINGS_BUNDLE.getString(key)
     }
 
     static String setLogDir(String logDir) {
@@ -48,12 +57,11 @@ class Globals {
 
     static initMessage(Integer width) {
         def message = """
-Welcome to the Spectra DSL for BlackPearl!
-Use the ':help' command to get started.
+${getString('welcome_message')}
 ${LogRecorder.loggerStatus()}"""
 
         if (!new Environment().ready()) {
-            message += "\nSet environment variables to automatically create 'client' variable!"
+            message += "\n${getString('set_env_message')}"
         }
 
         return "$message\n${'=' * (width - 1)}"

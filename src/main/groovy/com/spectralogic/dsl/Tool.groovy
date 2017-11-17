@@ -75,7 +75,7 @@ class Tool extends Script {
         } else if (options.v) {
             def properties = new Properties()
             this.class.classLoader.getResource("version.properties").withInputStream { properties.load(it) }
-            println "bpsh ${properties.'version'}"
+            println "bpsh ${properties.version}"
             exit()
         }
 
@@ -151,7 +151,7 @@ class Tool extends Script {
     }
 
     private static exit() {
-        LogRecorder.LOGGER.info("Exited normally.")
+        LogRecorder.LOGGER.info(Globals.getString('exit_message'))
         System.exit(0)
     }
 
