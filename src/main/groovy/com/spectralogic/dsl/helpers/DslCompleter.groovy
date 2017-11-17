@@ -68,7 +68,11 @@ class DslCompleter implements Completer {
             candidates.addAll(
                 methods.collect { method ->
                     def params = method.parameters.collect {
-                        it.type.name.split('\\.')[-1].replace(';', '')
+                        if (it.type.isArray()) {
+                            return arrayToString(it.type)
+                        } else {
+                            return it.type.name.split('\\.')[-1].replace(';', '')
+                        }
                     }
                     return "${candidates.first().toString()}${params.join(', ')})"
                 }.sort { it.size() }
@@ -221,6 +225,19 @@ class DslCompleter implements Completer {
         }
 
         return buffer
+    }
+
+    private String arrayToString(Class clazz) {
+        def options = [:].withDefault { 'array[]' }
+        options.put(char[].class, 'char[]')
+        options.put(int[].class, 'int[]')
+        options.put(boolean[].class, 'boolean[]')
+        options.put(byte[].class, 'byte[]')
+        options.put(short[].class, 'short[]')
+        options.put(long[].class, 'long[]')
+        options.put(float[].class, 'float[]')
+        options.put(double[].class, 'double[]')
+        return options[clazz]
     }
 
 }
