@@ -1,16 +1,13 @@
 package com.spectralogic.dsl
 
 import ch.qos.logback.classic.Level
-import com.spectralogic.ds3client.networking.FailedRequestException
 import com.spectralogic.dsl.commands.ShellCommandFactory
-import com.spectralogic.dsl.exceptions.BpException
+import com.spectralogic.dsl.exceptions.ExceptionHandler
 import com.spectralogic.dsl.helpers.DslCompleter
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import com.spectralogic.ds3client.utils.Guard
 import jline.console.ConsoleReader
-import jline.console.UserInterruptException
-import org.apache.http.conn.ConnectTimeoutException
 import org.codehaus.groovy.runtime.InvokerHelper
 
 /**
@@ -37,6 +34,7 @@ class Tool extends Script {
         console.println(Globals.initMessage(console.getTerminal().getWidth()))
 
         def commandFactory = new ShellCommandFactory(shell, console)
+        def exceptionHandler = new ExceptionHandler(console)
 
         while (true) {
             try {
@@ -45,15 +43,8 @@ class Tool extends Script {
 
                 def result = evaluate(shell, line, commandFactory)
                 printResult(result)
-            } catch (AssertionError e) {
-                printAssertionError(e)
-            } catch (UserInterruptException e) {
-                exit()
-            } catch (BpException | FailedRequestException | FileNotFoundException | ConnectTimeoutException |
-            MissingPropertyException e) {
-                printThrowable(e, Globals.debug)
             } catch (Throwable e) {
-                printThrowable(e, true)
+                exceptionHandler.handleAll(e)
             }
         }
     }
@@ -150,7 +141,7 @@ class Tool extends Script {
         }
     }
 
-    private static exit() {
+    static exit() {
         LogRecorder.LOGGER.info(Globals.getString('exit_message'))
         System.exit(0)
     }
