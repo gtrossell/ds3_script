@@ -135,6 +135,17 @@ class BpBucket extends GetBucketResponse {
             def bulkRequest = new GetBulkJobSpectraS3Request(name, dS3Objects)
             def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
 
+            /* Create any BP remote directories in the given path */
+            names.each { String fileLoc ->
+                def remoteDir = fileLoc.split('/').dropRight(1).join('/')
+                remoteDir = pathStr.endsWith('/') ? "$pathStr$remoteDir" : "$pathStr/$remoteDir"
+
+                def dir = new File(remoteDir)
+                if (!dir.exists()) {
+                    dir.mkdirs()
+                }
+            }
+
             def list = bulkResponse.getMasterObjectList()
             for (objects in list.getObjects()) {
                 for (obj in objects.getObjects()) {
