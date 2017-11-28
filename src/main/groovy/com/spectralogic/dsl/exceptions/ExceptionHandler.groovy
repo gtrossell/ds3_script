@@ -8,17 +8,22 @@ import jline.console.ConsoleReader
 import jline.console.UserInterruptException
 import org.apache.http.conn.ConnectTimeoutException
 
+import java.nio.file.FileAlreadyExistsException
+import java.nio.file.NoSuchFileException
+
 class ExceptionHandler {
     private final ConsoleReader console
     private handlers = [
-            (Throwable.class)               : this.&printThrowable,
-            (UserInterruptException.class)  : this.&userInterrupt,
-            (BpException.class)             : this.&printMessage,
-            (FailedRequestException.class)  : this.&printMessage,
-            (FileNotFoundException.class)   : this.&printMessage,
-            (ConnectTimeoutException.class) : this.&printMessage,
-            (MissingPropertyException.class): this.&printMessage,
-            (AssertionError.class)          : this.&printMessage
+            (Throwable.class)                 : this.&printThrowable,
+            (UserInterruptException.class)    : this.&userInterrupt,
+            (BpException.class)               : this.&printMessage,
+            (FailedRequestException.class)    : this.&printMessage,
+            (FileNotFoundException.class)     : this.&printMessage,
+            (ConnectTimeoutException.class)   : this.&printMessage,
+            (MissingPropertyException.class)  : this.&printMessage,
+            (AssertionError.class)            : this.&printMessage,
+            (NoSuchFileException.class)       : this.&printMessage,
+            (FileAlreadyExistsException.class): this.&printMessage
     ]
 
     ExceptionHandler(ConsoleReader console) {
