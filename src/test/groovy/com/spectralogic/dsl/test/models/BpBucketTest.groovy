@@ -52,10 +52,10 @@ class BpBucketTest extends GroovyTestCase {
     assert file.exists()
 
     /* test get object of remote directory */
-//    bucket.getBulk("remote2/", tmpPath)
-//    [new File("${tmpPath}remote2/txt7.txt"), new File("${tmpPath}remote2/txt8.txt")].each {
-//      assert it.exists()
-//    }
+    bucket.getBulk("remote2/", tmpPath)
+    [new File("${tmpPath}remote2/txt7.txt"), new File("${tmpPath}remote2/txt8.txt")].each {
+      assert it.exists()
+    }
 
     FileUtils.cleanDirectory(new File(tmpPath))
 
