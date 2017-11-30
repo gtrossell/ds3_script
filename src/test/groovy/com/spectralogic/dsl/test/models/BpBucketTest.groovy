@@ -1,3 +1,5 @@
+package com.spectralogic.dsl.test.models
+
 import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.dsl.models.BpClientBuilder
 import org.apache.commons.io.FileUtils
