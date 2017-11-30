@@ -15,6 +15,7 @@ import com.spectralogic.dsl.helpers.Globals
 
 import java.nio.channels.FileChannel
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
 
@@ -82,9 +83,21 @@ class BpBucket extends GetBucketResponse {
      * structure when putting directories.
      */
     BpBucket putBulk(List<String> pathStrs, String remoteDir = '') {
-        def paths = pathStrs.collect { Paths.get(it) }.groupBy { Files.isDirectory(it) }
-        def dirs = paths[true] ?: []
-        def files = paths[false] ?: []
+        def paths = pathStrs.collect { Paths.get(it) }
+
+        /* ensure sure paths are absolute */
+        paths = paths.collect { it.absolute ? it : Paths.get("$Globals.HOME_DIR/$it") }
+
+        /* ensure paths exist */
+        paths.each { path ->
+            if (!Files.exists(path)) {
+                throw new FileNotFoundException(path.toString())
+            }
+        }
+
+        def pathGroups = paths.groupBy { Files.isDirectory(it) }
+        def dirs = pathGroups[true] ?: []
+        def files = pathGroups[false] ?: []
 
         /* grouped files */
         files.groupBy { it.getParent() }.each { dir, fileGroup ->
