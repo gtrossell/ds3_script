@@ -1,0 +1,187 @@
+
+Modular origami
+From Wikipedia, the free encyclopedia
+
+This article includes a list of references, related reading or external links, but its sources remain unclear because it lacks inline citations. Please help to improve this article by introducing more precise citations. (May 2009) (Learn how and when to remove this template message)
+Modular origami
+A stellated icosahedron made from custom papers
+
+Modular origami or unit origami is a paperfolding technique which uses two or more sheets of paper to create a larger and more complex structure than would be possible using single-piece origami techniques. Each individual sheet of paper is folded into a module, or unit, and then modules are assembled into an integrated flat shape or three-dimensional structure by inserting flaps into pockets created by the folding process. These insertions create tension or friction that holds the model together.
+
+Contents
+
+    1 Definition and restrictions
+    2 History
+    3 Types
+    4 Modeling systems
+        4.1 Robert Neale's penultimate module
+        4.2 Mukhopadhyay module
+    5 Notes and references
+    6 Bibliography
+    7 External links
+
+Definition and restrictions
+Examples of modular origami made up of Sonobe units
+
+Modular origami can be classified as a sub-set of multi-piece origami, since the rule of restriction to one sheet of paper is abandoned. However, all the other rules of origami still apply, so the use of glue, thread, or any other fastening that is not a part of the sheet of paper is not generally acceptable in modular origami.
+
+The additional restrictions that distinguish modular origami from other forms of multi-piece origami are using many identical copies of any folded unit, and linking them together in a symmetrical or repeating fashion to complete the model. There is a common misconception that treats all multi-piece origami as modular.
+
+More than one type of module can still be used. Typically this means using separate linking units hidden from sight to hold parts of the construction together. Any other usage is generally discouraged.
+History
+A kusudama, the traditional Japanese precursor to modular origami
+
+The first historical evidence for a modular origami design comes from a Japanese book by Hayato Ohoka published in 1734 called Ranma Zushiki. It contains a print that shows a group of traditional origami models, one of which is a modular cube. The cube is pictured twice (from slightly different angles) and is identified in the accompanying text as a tamatebako (magic treasure chest). Isao Honda's World of Origami (published in 1965) appears to have the same model, where it is called a "cubical box". The six modules required for this design were developed from the traditional Japanese paperfold commonly known as the menko. Each module forms one face of the finished cube.
+
+There are several other traditional Japanese modular designs, including balls of folded paper flowers known as kusudama, or medicine balls. These designs are not integrated and are commonly strung together with thread. The term kusudama is sometimes, rather inaccurately, used to describe any three-dimensional modular origami structure resembling a ball.
+
+There are also a few modular designs in the Chinese paperfolding tradition, notably the pagoda (from Maying Soong) and the lotus made from Joss paper.
+
+Most traditional designs are however single-piece and the possibilities inherent in the modular origami idea were not explored further until the 1960s when the technique was re-invented by Robert Neale in the US and later by Mitsunobu Sonobe in Japan. The 1970s saw a sudden period of interest and development in modular origami as its own distinct field, leading to its present status in origami folding. One notable figure is Steve Krimball, who discovered the potential in Sonobe's cube unit and demonstrated that it could be used to make alternative polyhedral shapes, including a 30-piece ball.[1]
+
+Since then, the modular origami technique has been popularized and developed extensively, and now there have been thousands of designs developed in this repertoire.
+
+Notable modular paperfolders include Robert Neale, Sonobe, Tomoko Fuse, Kunihiko Kasahara, Tom Hull, Heinz Strobl and Ekaterina Lukasheva.
+Types
+Modules of modular origami
+
+Modular origami forms may be flat or three-dimensional. Flat forms are usually polygons (sometimes known as coasters), stars, rotors, and rings. Three-dimensional forms tend to be regular polyhedra or tessellations of simple polyhedra.
+
+Modular origami techniques can be used to create lidded boxes which are not only beautiful but also useful as containers for gifts. Many examples of such boxes are shown in Fabulous Origami Boxes by Tomoko Fuse.
+
+There are some modular origami that are approximations of fractals, such as Menger's sponge. Macro-modular origami is a form of modular origami in which finished assemblies are themselves used as the building blocks to create larger integrated structures. Such structures are described in Tomoko Fuse's book Unit Origami-Multidimensional Transformations (published in 1990).
+Modeling systems
+Robert Neale's penultimate module
+
+Neale developed a system to model equilateral polyhedra based on a module with variable vertex angles. Each module has two pockets and two tabs, on opposite sides. The angle of each tab can be changed independently of the other tab. Each pocket can receive tabs of any angle. The most common angles form polygonal faces:
+
+    60 degrees (triangle)
+    90 degrees (square)
+    108 degrees (pentagon)
+    120 degrees (hexagon)
+
+Each module joins others at the vertices of a polyhedron to form a polygonal face. the tabs form angles on opposite sides of an edge. For example, a subassembly of three triangle corners forms a triangle, the most stable configuration. As the internal angle increases for squares, pentagons and so forth, the stability decreases.
+
+Many polyhedra call for unalike adjacent polygons. for example, a pyramid has one square face and four triangular faces. This requires hybrid modules, or modules having different angles. A pyramid consists of eight modules, four modules as square-triangle, and four as triangle-triangle.
+
+Further polygonal faces are possible by altering the angle at each corner. The Neale modules can form any equilateral polyhedron including those having rhombic faces, like the rhombic dodecahedron.
+Mukhopadhyay module
+
+The Mukhopadhyay module can form any equilateral polyhedron. Each unit has a middle crease that forms an edge, and triangular wings that form adjacent stellated faces. For example, a cuboctahedral assembly has 24 units, since the cuboctahedron has 24 edges. Additionally, bipyramids are possible, by folding the central crease on each module outwards or convexly instead of inwards or concavely as for the icosahedron and other stellated polyhedra. The Mukhopadhyay module works best when glued together, especially for polyhedra having larger numbers of sides.
+Notes and references
+
+    http://www.britishorigami.info/academic/lister/sonobe.php
+
+Bibliography
+
+    Tomoko Fuse (1990). Unit Origami: Multidimensional Transformations. Japan Publications. ISBN 0-87040-852-6.
+    Tomoko Fuse (1998). Fabulous Origami Boxes. Japan Publications Trading. ISBN 0870409786.
+
+External links
+
+    3dOrigamiArt.com Learn how to 3d Origami, tutorials and artist network.
+    [1] 3D origami video tutorials by Arthur Vershigora.
+    Kusudama Pictures
+    Photo Gallery and Folding Instructions For Many Polyhedra and Variations
+    Image of Menger's Sponge in origami
+    Origami tetrahedron page
+    Origami Geosphere Paper model of a Geodesic Sphere.
+    Mukhopadhyay's super simple isosceles triangle module
+    James S. Plank's Penultimate Modular Origami
+    Oxi Module by Michał Kosmulski
+    Kusudama Me! Kusudamas of Lukasheva Ekaterina, also diagrams and tutorials
+    Paper Structures by Krystyna and Wojtek Burczyk
+    Kusudama by Mikhail Puzakov & Ludmila Puzakova: models, folding instruction, history, geometry
+
+    Origami-crane.jpgOrigami portal
+
+Categories:
+
+    ModularityOrigami
+
+Navigation menu
+
+    Not logged in
+    Talk
+    Contributions
+    Create account
+    Log in
+
+    Article
+    Talk
+
+    Read
+    Edit
+    View history
+
+Search
+
+    Main page
+    Contents
+    Featured content
+    Current events
+    Random article
+    Donate to Wikipedia
+    Wikipedia store
+
+Interaction
+
+    Help
+    About Wikipedia
+    Community portal
+    Recent changes
+    Contact page
+
+Tools
+
+    What links here
+    Related changes
+    Upload file
+    Special pages
+    Permanent link
+    Page information
+    Wikidata item
+    Cite this page
+
+Print/export
+
+    Create a book
+    Download as PDF
+    Printable version
+
+In other projects
+
+    Wikimedia Commons
+
+Languages
+
+    Беларуская
+    Français
+    Italiano
+    עברית
+    Bahasa Melayu
+    Nederlands
+    日本語
+    Polski
+    Русский
+    Simple English
+    Українська
+    中文
+
+Edit links
+
+    This page was last edited on 30 November 2017, at 10:43.
+    Text is available under the Creative Commons Attribution-ShareAlike License; additional terms may apply. By using this site, you agree to the Terms of Use and Privacy Policy. Wikipedia® is a registered trademark of the Wikimedia Foundation, Inc., a non-profit organization.
+
+    Privacy policy
+    About Wikipedia
+    Disclaimers
+    Contact Wikipedia
+    Developers
+    Cookie statement
+    Mobile view
+    Enable previews
+
+    Wikimedia Foundation
+    Powered by MediaWiki
+
