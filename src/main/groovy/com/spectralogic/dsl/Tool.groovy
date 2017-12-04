@@ -15,7 +15,7 @@ import org.codehaus.groovy.runtime.InvokerHelper
  * It Handles the terminal and handles all user interaction
  */
 class Tool extends Script {
-    private final ConsoleReader console = new ConsoleReader()
+    private final static ConsoleReader console = new ConsoleReader()
 
     static void main(String[] args) {
         InvokerHelper.runScript(Tool, args)
@@ -32,6 +32,7 @@ class Tool extends Script {
         console.setHandleUserInterrupt(true)
         console.addCompleter(new DslCompleter(shell))
         console.println(Globals.initMessage(console.getTerminal().getWidth()))
+        console.setHistory(Globals.fetchHistory())
 
         def commandFactory = new ShellCommandFactory(shell, console)
         def exceptionHandler = new ExceptionHandler(console)
@@ -142,6 +143,7 @@ class Tool extends Script {
     }
 
     static exit() {
+        Globals.saveHistory(console.history)
         LogRecorder.LOGGER.info(Globals.getString('exit_message'))
         System.exit(0)
     }

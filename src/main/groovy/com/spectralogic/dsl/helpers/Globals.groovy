@@ -1,5 +1,9 @@
 package com.spectralogic.dsl.helpers
 
+import groovy.json.JsonOutput
+import groovy.json.JsonSlurper
+import jline.console.history.History
+import jline.console.history.MemoryHistory
 import sun.util.logging.PlatformLogger
 
 import java.util.prefs.Preferences
@@ -15,9 +19,11 @@ class Globals {
     final static MAX_BULK_LOAD = 200_000 // TODO: might not be the best place for this
     final static String HOME_DIR
     final static String SCRIPT_DIR
+    private final static Preferences PREFS
     private final static PREF_NODE = "ds3_script.preferences"
     private final static LOG_PREF_KEY = "LOG_DIR"
-    private final static Preferences PREFS
+    private final static HISTORY_PREF_KEY = "HISTORY"
+    private final static HISTORY_LIMIT = 100
     private final static STRINGS_BUNDLE = ResourceBundle.getBundle('strings')
 
     static {
@@ -31,6 +37,10 @@ class Globals {
             PREFS.put(LOG_PREF_KEY, "")
         }
 
+        if (!PREFS.keys().contains(HISTORY_PREF_KEY)) {
+            PREFS.put(HISTORY_PREF_KEY, "")
+        }
+
         /* Set Global strings by locale */
         PROMPT = getString('prompt')
         RETURN_PROMPT = getString('return_prompt')
@@ -38,6 +48,18 @@ class Globals {
 
     static String getString(String key) {
         return STRINGS_BUNDLE.getString(key)
+    }
+
+    static History fetchHistory() {
+        def history = new MemoryHistory()
+        new JsonSlurper().parseText(PREFS.get(HISTORY_PREF_KEY, '[]')).each { history.add(it.toString()) }
+        return history
+    }
+
+    static void saveHistory(History history) {
+        def historyLines =  history.collect { it.value() }
+        historyLines = historyLines[0..Math.min(HISTORY_LIMIT, historyLines.size() - 1)]
+        PREFS.put(HISTORY_PREF_KEY, JsonOutput.toJson(historyLines))
     }
 
     static String setLogDir(String logDir) {
