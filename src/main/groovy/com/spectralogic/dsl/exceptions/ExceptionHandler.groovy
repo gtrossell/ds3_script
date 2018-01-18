@@ -1,37 +1,20 @@
 package com.spectralogic.dsl.exceptions
 
-import com.spectralogic.ds3client.networking.FailedRequestException
-import com.spectralogic.dsl.Tool
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import jline.console.ConsoleReader
-import jline.console.UserInterruptException
-import org.apache.http.conn.ConnectTimeoutException
-
-import java.nio.file.FileAlreadyExistsException
-import java.nio.file.NoSuchFileException
 
 class ExceptionHandler {
     private final ConsoleReader console
-    private handlers = [
-            (Throwable.class)                 : this.&printThrowable,
-            (UserInterruptException.class)    : this.&userInterrupt,
-            (BpException.class)               : this.&printMessage,
-            (FailedRequestException.class)    : this.&printMessage,
-            (FileNotFoundException.class)     : this.&printMessage,
-            (ConnectTimeoutException.class)   : this.&printMessage,
-            (MissingPropertyException.class)  : this.&printMessage,
-            (AssertionError.class)            : this.&printMessage,
-            (NoSuchFileException.class)       : this.&printMessage,
-            (FileAlreadyExistsException.class): this.&printMessage
-    ]
+    private handlers = [:]
 
     ExceptionHandler(ConsoleReader console) {
         this.console = console
+        addHandler(Throwable.class, this.&defaultHandler)
     }
 
-    /** Handles any error, finding the nearest extended class that knows how to be handled */
-    def handleAll(Throwable e) {
+    /** Handles any error/exception, finding the nearest extended class that knows how to be handled */
+    def handle(Throwable e) {
         def clazz = e.class
         while (true) {
             if (this.handlers[clazz]) {
@@ -42,18 +25,19 @@ class ExceptionHandler {
                 clazz = clazz.superclass
             }
         }
-
     }
 
-    private userInterrupt(Throwable e) { Tool.exit() }
+    /* Handler must accept specified throwable type as the parameter */
+    def addHandler(Class<Throwable> throwableClass, Closure handler) {
+        handlers[throwableClass] = handler
+    }
 
-    private printMessage(Throwable e) { printThrowable(e, false) }
-
-    private printThrowable(Throwable e, trace=true) {
+    /* Prints exception message and trace if debug option is set */
+    private defaultHandler(Throwable e) {
         console.println(Globals.RETURN_PROMPT + e.toString())
         LogRecorder.LOGGER.error(e.toString())
 
-        if (trace) {
+        if (Globals.debug) {
             def traceMessage = e.getStackTrace().join('\n')
             console.println(traceMessage)
             LogRecorder.LOGGER.trace(traceMessage)
