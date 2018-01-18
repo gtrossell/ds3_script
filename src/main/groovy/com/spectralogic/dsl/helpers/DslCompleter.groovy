@@ -66,16 +66,16 @@ class DslCompleter implements Completer {
             }
 
             candidates.addAll(
-                methods.collect { method ->
-                    def params = method.parameters.collect {
-                        if (it.type.isArray()) {
-                            return arrayToString(it.type)
-                        } else {
-                            return it.type.name.split('\\.')[-1].replace(';', '')
+                    methods.collect { method ->
+                        def params = method.parameters.collect {
+                            if (it.type.isArray()) {
+                                return arrayToString(it.type)
+                            } else {
+                                return it.type.name.split('\\.')[-1].replace(';', '')
+                            }
                         }
-                    }
-                    return "${candidates.first().toString()}${params.join(', ')})"
-                }.sort { it.size() }
+                        return "${candidates.first().toString()}${params.join(', ')})"
+                    }.sort { it.size() }
             )
 
             if (1 < candidates.size() && candidates[1] == candidates[0] + ')') candidates.remove(0)
@@ -107,7 +107,21 @@ class DslCompleter implements Completer {
             def entry = findMatchingGlobalMethods(prefix.replaceAll("[()]", "")).find { it.key.endsWith(')') }
 
             return [(entry.key): entry.value]
-        } else {
+        } else if (prefix.endsWith(']')) {
+            try {
+                def variables = shell.context.variables
+                def varName = prefix.split('\\[')[0]
+                def index = prefix.split('\\[')[-1].split(']')[0]
+
+            if (index.isInteger()) {
+                return ["": variables.get(varName)[index.toInteger()].class]
+            } else {
+                return ["": variables.get(varName)[index[1..-2]].class]
+            }
+            } catch (Throwable e) {
+                return [:]
+            }
+        } else{
             def matching = [:]
             matching << findMatchingGlobalMethods(prefix)
             matching << shell.context.variables.findAll {
@@ -214,14 +228,18 @@ class DslCompleter implements Completer {
 
         /* ignore everything in parenthesis */
         def parenthesisStack = 0
+        def squareBracketsStack = 0
         for (def i = buffer.size() - 1; 0 < i; i--) {
+            // TODO: make sure parenthesis and square brackets are not inside strings
             if (buffer[i] == ')') parenthesisStack++
+            if (buffer[i] == ']') squareBracketsStack++
 
-            if (parenthesisStack == 0 && !isElementCharacter(buffer.charAt(i))) {
+            if (parenthesisStack + squareBracketsStack == 0 && !isElementCharacter(buffer.charAt(i))) {
                 return buffer[++i..-1]
             }
 
             if (buffer[i] == '(') parenthesisStack--
+            if (buffer[i] == '[') squareBracketsStack--
         }
 
         return buffer
