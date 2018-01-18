@@ -8,7 +8,10 @@ import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import com.spectralogic.ds3client.utils.Guard
 import jline.console.ConsoleReader
+import jline.console.UserInterruptException
 import org.codehaus.groovy.runtime.InvokerHelper
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 /**
  * This is the main class for the Spectra DSL tool.
@@ -16,6 +19,7 @@ import org.codehaus.groovy.runtime.InvokerHelper
  */
 class Tool extends Script {
     private final static ConsoleReader console = new ConsoleReader()
+    private final static Logger LOG = LoggerFactory.getLogger(Tool.class)
 
     static void main(String[] args) {
         InvokerHelper.runScript(Tool, args)
@@ -35,17 +39,19 @@ class Tool extends Script {
         console.setHistory(Globals.fetchHistory())
 
         def commandFactory = new ShellCommandFactory(shell, console)
+
         def exceptionHandler = new ExceptionHandler(console)
+        exceptionHandler.addHandler((UserInterruptException.class), { exit() })
 
         while (true) {
             try {
                 def line = console.readLine()
-                LogRecorder.LOGGER.info(Globals.PROMPT + line)
+                LOG.info(Globals.PROMPT + line)
 
                 def result = evaluate(shell, line, commandFactory)
                 printResult(result)
             } catch (Throwable e) {
-                exceptionHandler.handleAll(e)
+                exceptionHandler.handle(e)
             }
         }
     }
@@ -58,6 +64,8 @@ class Tool extends Script {
         cli.h('display this message', longOpt: 'help')
         cli.d('enable debugging', longOpt: 'debug')
         def options = cli.parse(args)
+
+        // TODO: seperate response methods
 
         if (!options) {
             return
@@ -109,23 +117,6 @@ class Tool extends Script {
         console.println(Globals.RETURN_PROMPT + text)
     }
 
-    private printThrowable(Throwable e, trace = false) {
-        console.println(Globals.RETURN_PROMPT + e.toString())
-        LogRecorder.LOGGER.error(e.toString())
-
-        if (trace) {
-            def traceMessage = e.getStackTrace().join('\n')
-            console.println(traceMessage)
-            LogRecorder.LOGGER.trace(traceMessage)
-        }
-    }
-
-    private printAssertionError(AssertionError e) {
-        def consoleMessage = e.message.replaceAll('\n', "\n${' ' * Globals.RETURN_PROMPT.length()}")
-        console.println(Globals.RETURN_PROMPT + consoleMessage)
-        LogRecorder.LOGGER.error(e.message)
-    }
-
     /** Logic for parsing and evaluating a line */
     private static String evaluate(shell, line, commandFactory) {
         if (Guard.isStringNullOrEmpty(line)) return ''
@@ -141,6 +132,8 @@ class Tool extends Script {
             return shell.evaluate(line)
         }
     }
+
+    static userInterrupt(Throwable e) { exit() }
 
     static exit() {
         Globals.saveHistory(console.history)
