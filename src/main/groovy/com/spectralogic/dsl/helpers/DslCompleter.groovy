@@ -113,11 +113,11 @@ class DslCompleter implements Completer {
                 def varName = prefix.split('\\[')[0]
                 def index = prefix.split('\\[')[-1].split(']')[0]
 
-            if (index.isInteger()) {
-                return ["": variables.get(varName)[index.toInteger()].class]
-            } else {
-                return ["": variables.get(varName)[index[1..-2]].class]
-            }
+                if (index.isInteger()) {
+                    return ["": variables.get(varName)[index.toInteger()].class]
+                } else if (index[0]) {
+                    return ["": variables.get(varName)[index[1..-2]].class]
+                }
             } catch (Throwable e) {
                 return [:]
             }
