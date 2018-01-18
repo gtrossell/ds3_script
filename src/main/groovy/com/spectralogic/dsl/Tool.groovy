@@ -43,14 +43,16 @@ class Tool extends Script {
         def exceptionHandler = new ExceptionHandler(console)
         exceptionHandler.addHandler((UserInterruptException.class), { exit() })
 
+        def line = ''
         while (true) {
             try {
-                def line = console.readLine()
+                line = console.readLine()
                 LOG.info(Globals.PROMPT + line)
 
                 def result = evaluate(shell, line, commandFactory)
                 printResult(result)
             } catch (Throwable e) {
+                console.history.add(line)
                 exceptionHandler.handle(e)
             }
         }
