@@ -43,16 +43,19 @@ class Tool extends Script {
         def exceptionHandler = new ExceptionHandler(console)
         exceptionHandler.addHandler((UserInterruptException.class), { exit() })
 
-        def line = ''
+        System.addShutdownHook {
+            Globals.saveHistory(console.history)
+            LOG.info(Globals.getString('exit_message'))
+        }
+
         while (true) {
             try {
-                line = console.readLine()
+                def line = console.readLine()
                 LOG.info(Globals.PROMPT + line)
 
                 def result = evaluate(shell, line, commandFactory)
                 printResult(result)
             } catch (Throwable e) {
-                console.history.add(line)
                 exceptionHandler.handle(e)
             }
         }
@@ -115,7 +118,7 @@ class Tool extends Script {
     }
 
     private printResult(String text) {
-        LogRecorder.LOGGER.info(Globals.RETURN_PROMPT + text)
+        LOG.info(Globals.RETURN_PROMPT + text)
         console.println(Globals.RETURN_PROMPT + text)
     }
 
@@ -135,12 +138,6 @@ class Tool extends Script {
         }
     }
 
-    static userInterrupt(Throwable e) { exit() }
-
-    static exit() {
-        Globals.saveHistory(console.history)
-        LogRecorder.LOGGER.info(Globals.getString('exit_message'))
-        System.exit(0)
-    }
+    static exit(Integer status=0) { System.exit(status) }
 
 }
