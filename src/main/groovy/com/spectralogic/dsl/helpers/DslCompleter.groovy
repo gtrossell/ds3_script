@@ -115,7 +115,7 @@ class DslCompleter implements Completer {
 
                 if (index.isInteger()) {
                     return ["": variables.get(varName)[index.toInteger()].class]
-                } else if (index[0]) {
+                } else {
                     return ["": variables.get(varName)[index[1..-2]].class]
                 }
             } catch (Throwable e) {
