@@ -11,8 +11,6 @@ import java.lang.reflect.Modifier
  * Currently is able to parse methods, variables, parameters, and method parameter classes
  *
  * TODO: parse strings
- * TODO: parse array elements (ie arr[i])
- * TODO: parse map elements
  * TODO: autocomplete groovy collections
  */
 class DslCompleter implements Completer {
@@ -191,17 +189,20 @@ class DslCompleter implements Completer {
         def elementList = []
         def element = ""
         def parenthesisStack = 0
+        def squareBracketsStack = 0
         for (character in elements) {
             if (character == '(') {
                 parenthesisStack++
-                if (!element.isEmpty()) {
+                if (!element.isEmpty() && squareBracketsStack == 0) {
                     elementList << element + "()"
                     element = ""
                 }
             }
 
+            if (character == '[') squareBracketsStack++
+
             if (parenthesisStack == 0) {
-                if (character == '.' && !element.isEmpty()) {
+                if (character == '.' && !element.isEmpty() && squareBracketsStack == 0) {
                     elementList << element
                     element = ""
                 } else if (character != '.') {
@@ -210,6 +211,7 @@ class DslCompleter implements Completer {
             }
 
             if (character == ')') parenthesisStack--
+            if (character == ']') squareBracketsStack--
         }
 
         if (0 < element.size()) elementList << element
