@@ -6,6 +6,8 @@ import jline.console.history.History
 import jline.console.history.MemoryHistory
 import sun.util.logging.PlatformLogger
 
+import java.nio.file.Files
+import java.nio.file.Paths
 import java.util.prefs.Preferences
 
 /**
@@ -14,9 +16,9 @@ import java.util.prefs.Preferences
  */
 class Globals {
     static debug = false
-    final static PROMPT
-    final static RETURN_PROMPT
     final static MAX_BULK_LOAD = 200_000 // TODO: might not be the best place for this
+    final static String PROMPT
+    final static String RETURN_PROMPT
     final static String HOME_DIR
     final static String SCRIPT_DIR
     private final static Preferences PREFS
@@ -57,16 +59,17 @@ class Globals {
     }
 
     static void saveHistory(History history) {
-        def historyLines =  history.collect { it.value() }
-        historyLines = historyLines[0..Math.min(HISTORY_LIMIT, historyLines.size() - 1)]
+        def historyLines =  history.collect { it.value() }.takeRight(HISTORY_LIMIT)
         PREFS.put(HISTORY_PREF_KEY, JsonOutput.toJson(historyLines))
     }
 
     static String setLogDir(String logDir) {
-        logDir = logDir.replaceAll('\\\\', '/')
+        // TODO: test
+        logDir = logDir.replaceAll('\\\\', '/') // TODO: DELETE
         if (logDir[-1] != '/') logDir += '/'
 
-        if (!new File(logDir).exists()) throw new FileNotFoundException(logDir)
+        def path = Paths.get(logDir)
+        if (!Files.exists(path)) throw new FileNotFoundException(logDir)
 
         PREFS.put(LOG_PREF_KEY, logDir)
 
