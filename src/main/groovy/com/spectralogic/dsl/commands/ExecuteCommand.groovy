@@ -5,6 +5,8 @@ import com.spectralogic.dsl.helpers.Globals
 import groovy.io.FileType
 import org.apache.commons.io.FilenameUtils
 
+import java.nio.file.Files
+
 class ExecuteCommand implements ShellCommand {
     private final GroovyShell shell
     private final CliBuilder cli
@@ -35,12 +37,12 @@ class ExecuteCommand implements ShellCommand {
         }
 
         def script = new CommandHelper().getScriptFromString(scriptName)
-        if (!script.exists()) {
+        if (!Files.exists(script)) {
             return response.addError("The script '$script' does not exists!")
         }
 
         def scriptArgs = args.size() > 1 ? args[1..-1] : []
-        shell.run(script.text, script.name, scriptArgs)
+        shell.run(Files.lines(script).collect().join('\n'), script.fileName.toString(), scriptArgs)
 
         return response
     }
@@ -81,8 +83,8 @@ class ExecuteCommand implements ShellCommand {
     private deleteScript(String scriptName) {
         if (FilenameUtils.getExtension(scriptName) == '') scriptName += '.groovy'
         def script = new CommandHelper().getScriptFromString(scriptName)
-        if (script.exists()) {
-            script.delete()
+        if (Files.exists(script)) {
+            Files.delete(script)
             return "Deleted script $scriptName"
         } else {
             return "No script named $scriptName"

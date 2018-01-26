@@ -1,18 +1,22 @@
 package com.spectralogic.dsl.helpers
 
+import java.nio.file.Path
+import java.nio.file.Paths
+
 /** Provides methods to help the command classes */
 class CommandHelper {
 
     /** @return script file from a string by parsing a path, '.', or no given path  */
-    File getScriptFromString(String pathStr) {
+    Path getScriptFromString(String pathStr) {
         def file
         if (!pathStr.contains('/')) {
-            file = new File(Globals.SCRIPT_DIR, pathStr)
+            file = Paths.get(Globals.SCRIPT_DIR, pathStr)
         } else if (pathStr[0] == '.') {
-            file = new File(Globals.HOME_DIR, pathStr.substring(1))
+            file = Paths.get(Globals.HOME_DIR, pathStr.substring(1))
         } else {
-            file = new File(pathStr)
+            file = Paths.get(pathStr)
         }
+
         return file
     }
 

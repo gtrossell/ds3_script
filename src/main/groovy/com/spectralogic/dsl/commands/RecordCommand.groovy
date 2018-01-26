@@ -6,12 +6,16 @@ import com.spectralogic.dsl.helpers.Globals
 import jline.console.ConsoleReader
 import org.apache.commons.io.FilenameUtils
 
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.Files
+
 class RecordCommand implements ShellCommand {
     private CliBuilder cli
     private Environment environment
     private int startLineIndex
     private String scriptName
-    private File scriptFile
+    private Path scriptFile
     private String scriptDesc
     private Boolean isRecording
     private Boolean isRecordEnv
@@ -68,8 +72,8 @@ class RecordCommand implements ShellCommand {
         this.isRecording = false
         this.isRecordEnv = false
 
-        def scriptDir = new File(Globals.SCRIPT_DIR)
-        if (!scriptDir.exists()) scriptDir.mkdirs()
+        def scriptDir = Paths.get(Globals.SCRIPT_DIR)
+        if (!Files.exists(scriptDir)) Files.createDirectory(scriptDir)
     }
 
     /** Builds script lines and saves it to set or given location */
@@ -92,7 +96,7 @@ class RecordCommand implements ShellCommand {
         }
 
         /* create title comment */
-        def scriptName = scriptFile.getName()
+        def scriptName = scriptFile.fileName.toString()
         if (scriptName.contains('.')) scriptName = scriptName.split('\\.')[0]
         scriptDesc = scriptDesc ?: 'Spectra BlackPearl DSL script'
 
@@ -168,10 +172,10 @@ class RecordCommand implements ShellCommand {
     }
 
     /** @return Error message if there is something wrong with the file location  */
-    private CommandResponse errorCheckFile(File file, CommandResponse response) {
-        if (file.exists()) {
+    private CommandResponse errorCheckFile(Path file, CommandResponse response) {
+        if (Files.exists(file)) {
             return response.addError("The file $file already exists!")
-        } else if (!file.getParentFile().exists()) {
+        } else if (!Files.exists(file.parent)) {
             return response.addError("The directory ${file.getParent()} does not exist!")
         } else if (!(FilenameUtils.getExtension(file.toString()) in ['', 'groovy'])) {
             return response.addError("The script extension must be 'groovy' or none.")
@@ -181,9 +185,9 @@ class RecordCommand implements ShellCommand {
     }
 
     /** @return same file but with .groovy extension if none is given  */
-    private File ensureExtension(File file) {
+    private Path ensureExtension(Path file) {
         if (!FilenameUtils.getExtension(file.toString())) {
-            file = new File(file.toString() + '.groovy')
+            file = Paths.get(file.toString() + '.groovy')
         }
         return file
     }
