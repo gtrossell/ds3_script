@@ -39,8 +39,8 @@ class Globals {
             PREFS.put(LOG_PREF_KEY, "")
         }
 
-        if (!PREFS.keys().contains(HISTORY_PREF_KEY)) {
-            PREFS.put(HISTORY_PREF_KEY, "")
+        if (!PREFS.keys().contains(HISTORY_PREF_KEY) || !PREFS.get(HISTORY_PREF_KEY, '')) {
+            PREFS.put(HISTORY_PREF_KEY, "{}")
         }
 
         /* Set Global strings by locale */
@@ -54,7 +54,7 @@ class Globals {
 
     static History fetchHistory() {
         def history = new MemoryHistory()
-        new JsonSlurper().parseText(PREFS.get(HISTORY_PREF_KEY, '[]')).each { history.add(it.toString()) }
+        new JsonSlurper().parseText(PREFS.get(HISTORY_PREF_KEY, '{}')).each { history.add(it.toString()) }
         return history
     }
 
