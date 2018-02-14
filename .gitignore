@@ -12,3 +12,4 @@ build/
 .gradle/
 run.sh
 run.py
+test-data/tmp
