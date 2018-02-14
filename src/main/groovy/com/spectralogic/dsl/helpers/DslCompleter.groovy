@@ -91,6 +91,10 @@ class DslCompleter implements Completer {
     private List<CharSequence> cleanseDuplicatesAndSort(List<String> candidates) {
         if (Guard.isNullOrEmpty(candidates)) return []
 
+        candidates = candidates.findAll {
+            (!(it.startsWith('$') || it.startsWith('_')))
+        }
+
         candidates = candidates.sort()
         List<String> cleaned = [candidates[0]]
         for (candidate in candidates) {
