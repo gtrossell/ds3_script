@@ -76,6 +76,10 @@ class BpBucket extends GetBucketResponse {
         return deleteObjects(*objects)
     }
 
+    BpBucket deleteObject(BpObject object) {
+        return deleteObjects([object])
+    }
+
     /**
      * @param pathStrs Directories and files to upload
      * @param remoteDir Directory on BP to put to
@@ -215,6 +219,10 @@ class BpBucket extends GetBucketResponse {
         } else {
             throw new BpException("${objs.size()} objects named '$objectName' found!")
         }
+    }
+
+    Integer size() {
+        return this.objects().size()
     }
 
     String toString() {
