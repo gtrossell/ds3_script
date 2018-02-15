@@ -28,6 +28,14 @@ class DslCompleter implements Completer {
                 return 0
             }
 
+            /* tabbing a raw string TODO: implement this into the full class so "test".charAt(1). works */
+            if (isTabbingString(buffer, cursor)) {
+                def prefix = parseStringPrefix(buffer, cursor)
+                def matching = findMatchingFieldsAndMethods(prefix, String.class)
+                candidates.addAll(cleanseDuplicatesAndSort(matching.keySet().toList()))
+                return cursor - prefix.length()
+            }
+
             /* tabbing a method for parameter options */
             def paramOptions = buffer[cursor - 1] == '('
 
@@ -87,13 +95,30 @@ class DslCompleter implements Completer {
         }
     }
 
+    /** Returns True if user is tabbing for suggestions on a raw string (ie "string".<cursor>) */
+    private Boolean isTabbingString(String buffer, Integer cursor) {
+        def index = buffer.length() - parseStringPrefix(buffer, cursor).length()
+        def bufferPart = buffer[index - 2..index - 1]
+
+        return (bufferPart == '".' || bufferPart == "'.")
+    }
+
+    /* Finds a string prefix if it exists */
+    private String parseStringPrefix(String buffer, Integer cursor) {
+        def prefix = ""
+        for (def tmpCursor = cursor - 1; tmpCursor > 2; tmpCursor--) {
+            if (!Character.isJavaIdentifierPart(buffer[tmpCursor].toCharacter())) break
+            prefix = buffer[tmpCursor] + prefix
+        }
+
+        return prefix
+    }
+
     /** Prevent duplicates and sort the candidates */
     private List<CharSequence> cleanseDuplicatesAndSort(List<String> candidates) {
         if (Guard.isNullOrEmpty(candidates)) return []
 
-        candidates = candidates.findAll {
-            (!(it.startsWith('$') || it.startsWith('_')))
-        }
+        candidates = candidates.findAll { it != "metaClass" }
 
         candidates = candidates.sort()
         List<String> cleaned = [candidates[0]]
@@ -164,9 +189,13 @@ class DslCompleter implements Completer {
 
     /** Finds public fields by matching them to getter methods */
     private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
-        def classMethodNames = clazz.methods.collect { it.name.toLowerCase() }
+        def classMethodNames = clazz.methods.findAll{
+            !it.synthetic && Modifier.isPublic(it.modifiers)
+        }.collect { it.name.toLowerCase() } // TODO: listBucketResult???
+//        def classMethodNames = clazz.methods.collect { it.name.toLowerCase() }
         return clazz.declaredFields.findAll {
-            it.name.startsWith(prefix)
+            def n = "get${it.name.toLowerCase()}"
+            it.name.startsWith(prefix) && classMethodNames.any { n == it }
         }.collectEntries {
             [(it.name): it.type]
         }
