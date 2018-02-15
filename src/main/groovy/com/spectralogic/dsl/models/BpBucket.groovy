@@ -20,16 +20,13 @@ import java.nio.file.Paths
 import java.nio.file.StandardOpenOption
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
-class BpBucket extends GetBucketResponse {
+class BpBucket {
     private final BpClient client
     private final helper
     private ListBucketResult listBucketResult
     final String name
 
     BpBucket(GetBucketResponse response, BpClient client) {
-        super(response.getListBucketResult(),
-                response.getChecksum(),
-                response.getChecksumType())
         this.client = client
         this.helper = Ds3ClientHelpers.wrap(client)
         this.listBucketResult = response.getListBucketResult()
@@ -38,7 +35,7 @@ class BpBucket extends GetBucketResponse {
 
     /** @return the current version of this bucket. Doesn't change this object  */
     BpBucket reload() {
-        this.listBucketResult = client.bucket(this.name).getListBucketResult()
+        this.listBucketResult = client.bucket(this.name).listBucketResult
         return this
     }
 

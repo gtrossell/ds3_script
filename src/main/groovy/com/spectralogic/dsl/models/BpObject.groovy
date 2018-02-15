@@ -6,11 +6,13 @@ import com.spectralogic.ds3client.models.Contents
 import com.spectralogic.ds3client.models.User
 
 /** Represents a BlackPearl Object */
-class BpObject extends Ds3Object {
+class BpObject {
     private final BpBucket bucket
     private final Ds3ClientImpl client
     private final User owner
     final Map metadata
+    final String name
+    final Integer size
 
     BpObject(Contents contents, BpBucket bucket, Ds3ClientImpl client) {
         this.name = contents.getKey()
