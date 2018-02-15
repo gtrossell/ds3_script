@@ -119,7 +119,7 @@ class DslCompleterTest extends GroovyTestCase {
             /* Indexed List candidates */
             candidates = []
             completer.complete("testList[1].", 12, candidates)
-            r = ["bitCount(", "byteValue()", "compare(", "compareTo(", "compareUnsigned(", "decode(", "divideUnsigned(",
+            r = ["BYTES", "MAX_VALUE", "MIN_VALUE", "SIZE", "TYPE", "bitCount(", "byteValue()", "compare(", "compareTo(", "compareUnsigned(", "decode(", "divideUnsigned(",
                  "doubleValue()", "equals(", "floatValue()", "getInteger(", "hashCode(", "highestOneBit(", "intValue()",
                  "longValue()", "lowestOneBit(", "max(", "min(", "numberOfLeadingZeros(", "numberOfTrailingZeros(",
                  "parseInt(", "parseUnsignedInt(", "remainderUnsigned(", "reverse(", "reverseBytes(", "rotateLeft(",

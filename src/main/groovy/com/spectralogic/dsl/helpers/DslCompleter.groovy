@@ -10,7 +10,6 @@ import java.lang.reflect.Modifier
  * JLine Auto completer for the DSL shell
  * Currently is able to parse methods, variables, parameters, and method parameter classes
  *
- * TODO: parse strings
  * TODO: autocomplete groovy collections
  */
 class DslCompleter implements Completer {
@@ -189,13 +188,15 @@ class DslCompleter implements Completer {
 
     /** Finds public fields by matching them to getter methods */
     private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
+        /* Groovy properties are given as methods, find all getters */
         def classMethodNames = clazz.methods.findAll{
-            !it.synthetic && Modifier.isPublic(it.modifiers)
-        }.collect { it.name.toLowerCase() } // TODO: listBucketResult???
-//        def classMethodNames = clazz.methods.collect { it.name.toLowerCase() }
-        return clazz.declaredFields.findAll {
-            def n = "get${it.name.toLowerCase()}"
-            it.name.startsWith(prefix) && classMethodNames.any { n == it }
+            !it.synthetic && Modifier.isPublic(it.modifiers) && it.name.startsWith('get') &&
+                    it.parameterTypes.length == 0 && it.name.length() > 3
+        }.collect { it.name.toLowerCase()[3..-1] }
+
+        /* collect public fields and properties with getters */
+        return clazz.declaredFields.findAll { field ->
+            field.name.startsWith(prefix) && (classMethodNames.any { it == field.name } || Modifier.isPublic(field.modifiers))
         }.collectEntries {
             [(it.name): it.type]
         }
