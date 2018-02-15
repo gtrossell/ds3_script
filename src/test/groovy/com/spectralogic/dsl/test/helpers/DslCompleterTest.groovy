@@ -2,6 +2,7 @@ package com.spectralogic.dsl.test.helpers
 
 import com.spectralogic.dsl.helpers.DslCompleter
 import com.spectralogic.dsl.models.BpBucket
+import com.spectralogic.dsl.models.BpClientBuilder
 import org.junit.Test
 
 class DslCompleterTest extends GroovyTestCase {
@@ -86,9 +87,56 @@ class DslCompleterTest extends GroovyTestCase {
         def shell = [context: [:]] as GroovyShell
         def completer = new DslCompleter(shell)
 
-        def candidates = ["cab", "bca", "abc"]
+        def candidates = ["cab", "bca", "abc", "metaClass"]
         def sorted = ["abc", "bca", "cab"]
         assertEquals sorted, completer.cleanseDuplicatesAndSort(candidates)
+    }
+
+    @Test
+    void testCompleter() {
+        /* Use a bucket as a test object */
+        def client = new BpClientBuilder().create()
+        def bucketName = 'test_bucket_' + (new Random().nextInt(10**4))
+        def bucket = client.createBucket(bucketName)
+
+        def shell = [context: ["testVar": "test", "bucket": bucket, "testList": [1,2,3]]] as GroovyShell
+        def completer = new DslCompleter(shell)
+        def candidates = []
+        def r
+
+        try {
+            completer.complete("testV", 5, candidates)
+            r = ["testVar"]
+            assertEquals r, candidates
+
+            /* BpBucket candidates */
+            candidates = []
+            completer.complete("bucket.", 7, candidates)
+            r = ["delete()", "deleteAllObjects()", "deleteObject(", "deleteObjects(", "getBulk(", "getName()", "name",
+                 "object(", "objects(", "putBulk(", "reload()","size()", "toString()"]
+//            assertEquals r, candidates
+
+            /* Indexed List candidates */
+            candidates = []
+            completer.complete("testList[1].", 12, candidates)
+            r = ["bitCount(", "byteValue()", "compare(", "compareTo(", "compareUnsigned(", "decode(", "divideUnsigned(",
+                 "doubleValue()", "equals(", "floatValue()", "getInteger(", "hashCode(", "highestOneBit(", "intValue()",
+                 "longValue()", "lowestOneBit(", "max(", "min(", "numberOfLeadingZeros(", "numberOfTrailingZeros(",
+                 "parseInt(", "parseUnsignedInt(", "remainderUnsigned(", "reverse(", "reverseBytes(", "rotateLeft(",
+                 "rotateRight(", "shortValue()", "signum(", "sum(", "toBinaryString(", "toHexString(", "toOctalString(",
+                 "toString(", "toUnsignedLong(", "toUnsignedString(", "valueOf("]
+            assertEquals r, candidates
+
+            /* String candidates */
+            candidates = []
+            completer.complete("'string'.ch", 11, candidates)
+            r = ["charAt("]
+            assertEquals r, candidates
+
+            /* Array candidates TODO */
+        } finally {
+            bucket.delete()
+        }
     }
 
 }
