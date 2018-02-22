@@ -1,7 +1,5 @@
 package com.spectralogic.dsl.models
 
-import com.spectralogic.ds3client.commands.GetObjectRequest
-import com.spectralogic.ds3client.commands.spectrads3.GetBulkJobSpectraS3Request
 import com.spectralogic.ds3client.helpers.FileObjectGetter
 import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChannelBuilder
@@ -14,11 +12,8 @@ import com.spectralogic.ds3client.commands.DeleteObjectsRequest
 import com.spectralogic.ds3client.commands.GetBucketResponse
 import com.spectralogic.dsl.helpers.Globals
 
-import java.nio.channels.FileChannel
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.StandardOpenOption
 
 /** Represents a BlackPearl bucket, extended from GetBucketResponse */
 class BpBucket {
@@ -34,16 +29,16 @@ class BpBucket {
         this.name = response.getListBucketResult().getName()
     }
 
-    /** @return the current version of this bucket. Doesn't change this object  */
+    // TODO: don't return
+    /** @return the current version of this bucket */
     BpBucket reload() {
         this.listBucketResult = client.bucket(this.name).listBucketResult
         return this
     }
 
     /**
-     * Deletes bucket, but only if the bucket is already empty so that data is not
-     * accidentally deleted
-     * @return true if bucket was deleted
+     * Deletes bucket
+     * Throws BpException if bucket is not empty so that data is not accidentally deleted
      */
     void delete() {
         if (this.objects()) {
@@ -169,7 +164,7 @@ class BpBucket {
         if (objectNames.length != 0) {
             wantedObjects = listBucketResult.objects.findAll { objectNames.contains(it.getKey()) }
         }
-        
+
         return contentsToBpObjects(wantedObjects)
     }
 
