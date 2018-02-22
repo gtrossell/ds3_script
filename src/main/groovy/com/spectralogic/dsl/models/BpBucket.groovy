@@ -15,7 +15,7 @@ import com.spectralogic.dsl.helpers.Globals
 import java.nio.file.Files
 import java.nio.file.Paths
 
-/** Represents a BlackPearl bucket, extended from GetBucketResponse */
+/** Represents a BlackPearl bucket */
 class BpBucket {
     private final BpClient client
     private final helper
@@ -29,8 +29,7 @@ class BpBucket {
         this.name = response.getListBucketResult().getName()
     }
 
-    // TODO: don't return
-    /** @return the current version of this bucket */
+    /** reload listBucketResult */
     void reload() {
         this.listBucketResult = client.bucket(this.name).listBucketResult
     }
@@ -46,7 +45,7 @@ class BpBucket {
         client.deleteBucket(new DeleteBucketRequest(this.name))
     }
 
-    /** Deletes all objects inside it */
+    /** Deletes all objects */
     BpBucket deleteAllObjects() {
         return deleteObjects(*contentsToBpObjects(helper.listObjects(name)))
     }
@@ -95,31 +94,33 @@ class BpBucket {
         def dirs = pathGroups[true] ?: []
         def files = pathGroups[false] ?: []
 
-        /* grouped files */
-        files.groupBy { it.getParent() }.each { parentDir, fileGroup ->
-            def groupIterator = fileGroup.iterator()
-            while (groupIterator) {
-                def objs = groupIterator.take(Globals.MAX_BULK_LOAD).collect {
-                    new Ds3Object(it.getFileName().toString(), Files.size(it))
+        try {
+            /* grouped files */
+            files.groupBy { it.getParent() }.each { parentDir, fileGroup ->
+                def groupIterator = fileGroup.iterator()
+                while (groupIterator) {
+                    def objs = groupIterator.take(Globals.MAX_BULK_LOAD).collect {
+                        new Ds3Object(it.getFileName().toString(), Files.size(it))
+                    }
+
+                    def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
+                    job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(parentDir), remoteDir))
                 }
-
-                def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
-                job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(parentDir), remoteDir))
             }
-        }
 
-        /* directories */
-        dirs.each { dir ->
-            def objIterator = helper.listObjectsForDirectory(dir).iterator()
-            while (objIterator) {
-                def objs = objIterator.take(Globals.MAX_BULK_LOAD).collect()
+            /* directories */
+            dirs.each { dir ->
+                def objIterator = helper.listObjectsForDirectory(dir).iterator()
+                while (objIterator) {
+                    def objs = objIterator.take(Globals.MAX_BULK_LOAD).collect()
 
-                def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
-                job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
+                    def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
+                    job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
+                }
             }
+        } finally {
+            reload()
         }
-
-        reload()
     }
 
     void putBulk(String pathStr, String remoteDir = '') {
