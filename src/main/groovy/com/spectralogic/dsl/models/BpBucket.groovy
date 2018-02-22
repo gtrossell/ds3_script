@@ -80,16 +80,16 @@ class BpBucket {
      * structure when putting directories.
      */
     BpBucket putBulk(List<String> pathStrs, String remoteDir = '') {
-        def paths = pathStrs.collect { Paths.get(it) }
+        /* Create paths, ensure paths are absolute & exist */
+        def paths = pathStrs.collect { pathStr ->
+            def path = Paths.get(pathStr)
+            path = path.absolute ? path : Paths.get("$Globals.HOME_DIR/$path")
 
-        /* ensure sure paths are absolute */
-        paths = paths.collect { it.absolute ? it : Paths.get("$Globals.HOME_DIR/$it") }
-
-        /* ensure paths exist */
-        paths.each { path ->
             if (!Files.exists(path)) {
                 throw new FileNotFoundException(path.toString())
             }
+
+            return path
         }
 
         def pathGroups = paths.groupBy { Files.isDirectory(it) }
@@ -97,14 +97,15 @@ class BpBucket {
         def files = pathGroups[false] ?: []
 
         /* grouped files */
-        files.groupBy { it.getParent() }.each { dir, fileGroup ->
+        files.groupBy { it.getParent() }.each { parentDir, fileGroup ->
             def groupIterator = fileGroup.iterator()
             while (groupIterator) {
                 def objs = groupIterator.take(Globals.MAX_BULK_LOAD).collect {
                     new Ds3Object(it.getFileName().toString(), Files.size(it))
                 }
+
                 def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
-                job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
+                job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(parentDir), remoteDir))
             }
         }
 
@@ -113,6 +114,7 @@ class BpBucket {
             def objIterator = helper.listObjectsForDirectory(dir).iterator()
             while (objIterator) {
                 def objs = objIterator.take(Globals.MAX_BULK_LOAD).collect()
+
                 def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
                 job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
             }
