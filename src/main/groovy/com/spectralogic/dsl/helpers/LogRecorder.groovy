@@ -8,12 +8,13 @@ import ch.qos.logback.core.rolling.RollingFileAppender
 import ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy
 import ch.qos.logback.core.rolling.TriggeringPolicy
 import ch.qos.logback.core.util.FileSize
+import com.spectralogic.dsl.Tool
 import org.slf4j.LoggerFactory
 
 import java.nio.file.FileSystems
 
 class LogRecorder {
-    static final LOGGER = (Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)
+    private static final Logger LOGGER = (Logger) LoggerFactory.getLogger(Tool.class)
     private final static String LOG_FORMAT_PATTERN = "%d{yyyy-MM-dd HH:mm:ss} %-5level %msg%n"
     private final static String LOG_ARCHIVE_FILE_PATTERN = "spectra%i.log"
     private final static String LOG_FILE_NAME = "spectra.log"

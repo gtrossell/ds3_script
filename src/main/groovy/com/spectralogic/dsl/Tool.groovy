@@ -70,14 +70,16 @@ class Tool extends Script {
         cli.d('enable debugging', longOpt: 'debug')
         def options = cli.parse(args)
 
-        // TODO: seperate response methods
-
         if (!options) {
             return
-        } else if (options.h) {
+        }
+
+        if (options.h) {
             cli.usage()
             exit()
-        } else if (options.v) {
+        }
+
+        if (options.v) {
             def properties = new Properties()
             this.class.classLoader.getResource("version.properties").withInputStream { properties.load(it) }
             println "bpsh ${properties.version}"
@@ -85,15 +87,7 @@ class Tool extends Script {
         }
 
         if (options.l) {
-            if (options.l instanceof String) {
-                try {
-                    Globals.logDir = options.l as String
-                } catch (FileNotFoundException e) {
-                    println e
-                    exit()
-                }
-            }
-            LogRecorder.configureLogging(Level.ALL)
+            setupLogger(options.l)
         }
 
         if (options.d) {
@@ -120,6 +114,18 @@ class Tool extends Script {
     private printResult(String text) {
         LOG.info(Globals.RETURN_PROMPT + text)
         console.println(Globals.RETURN_PROMPT + text)
+    }
+
+    private setupLogger(logDir) {
+        if (logDir instanceof String) {
+            try {
+                Globals.logDir = logDir as String
+            } catch (FileNotFoundException e) {
+                println e
+                exit()
+            }
+        }
+        LogRecorder.configureLogging(Level.ALL)
     }
 
     /** Logic for parsing and evaluating a line */
