@@ -2,6 +2,7 @@ package com.spectralogic.dsl.models
 
 import com.spectralogic.ds3client.commands.GetObjectRequest
 import com.spectralogic.ds3client.commands.spectrads3.GetBulkJobSpectraS3Request
+import com.spectralogic.ds3client.helpers.FileObjectGetter
 import com.spectralogic.dsl.exceptions.BpException
 import com.spectralogic.ds3client.helpers.channelbuilders.PrefixAdderObjectChannelBuilder
 import com.spectralogic.ds3client.helpers.Ds3ClientHelpers
@@ -132,54 +133,26 @@ class BpBucket {
     /**
      * Writes objects to specified directory
      * @param objectNames names of the objects to get
-     * @param pathStr directory to write to
+     * @param destinationPathStr directory to write to
      */
-    void getBulk(List<String> objectNames, String pathStr = '') {
-        def path = Paths.get(pathStr)
-        if (Files.isRegularFile(path)) {
-            throw new BpException("$pathStr is not a directory!")
-        } else if (!Files.exists(path)) {
-            Files.createDirectory(path)
+    void getBulk(List<String> objectNames, String destinationPathStr = '') {
+
+        /* Make sure download directory isn't a file, create directory if it doesn't exist */
+        def destinationPath = Paths.get(destinationPathStr)
+        if (Files.isRegularFile(destinationPath)) {
+            throw new BpException("$destinationPathStr is not a directory!")
+        } else if (!Files.exists(destinationPath)) {
+            Files.createDirectory(destinationPath)
         }
 
+        /* Read objects, Globals.MAX_BULK_LOAD at a time */
         def nameIterator = objectNames.iterator()
         while (nameIterator) {
             def names = nameIterator.take(Globals.MAX_BULK_LOAD).collect()
             def dS3Objects = objects(*names).collect { new Ds3Object(it.getName()) }
-            def bulkRequest = new GetBulkJobSpectraS3Request(name, dS3Objects)
-            def bulkResponse = this.client.getBulkJobSpectraS3(bulkRequest)
 
-            /* Create any BP remote directories in the given path */
-            names.each { String fileLoc ->
-                def remoteDir = fileLoc.split('/').dropRight(1).join('/')
-                remoteDir = pathStr.endsWith('/') ? "$pathStr$remoteDir" : "$pathStr/$remoteDir"
-
-                def dir = new File(remoteDir)
-                if (!dir.exists()) {
-                    dir.mkdirs()
-                }
-            }
-
-            def list = bulkResponse.getMasterObjectList()
-            for (objects in list.getObjects()) {
-                for (obj in objects.getObjects()) {
-                    def channel = FileChannel.open(
-                            path.resolve(obj.getName()),
-                            StandardOpenOption.WRITE,
-                            StandardOpenOption.CREATE
-                    )
-
-                    channel.position(obj.getOffset())
-
-                    client.getObject(new GetObjectRequest(
-                            name,
-                            obj.getName(),
-                            channel,
-                            list.getJobId().toString(),
-                            obj.getOffset()
-                    ))
-                }
-            }
+            def readJob = this.helper.startReadJob(this.name, dS3Objects)
+            readJob.transfer(new FileObjectGetter(destinationPath))
         }
     }
 
