@@ -31,9 +31,8 @@ class BpBucket {
 
     // TODO: don't return
     /** @return the current version of this bucket */
-    BpBucket reload() {
+    void reload() {
         this.listBucketResult = client.bucket(this.name).listBucketResult
-        return this
     }
 
     /**
@@ -79,7 +78,7 @@ class BpBucket {
      * Puts each file and each directory's files given into the bucket. Maintains the subdirectory
      * structure when putting directories.
      */
-    BpBucket putBulk(List<String> pathStrs, String remoteDir = '') {
+    void putBulk(List<String> pathStrs, String remoteDir = '') {
         /* Create paths, ensure paths are absolute & exist */
         def paths = pathStrs.collect { pathStr ->
             def path = Paths.get(pathStr)
@@ -120,11 +119,11 @@ class BpBucket {
             }
         }
 
-        return reload()
+        reload()
     }
 
-    BpBucket putBulk(String pathStr, String remoteDir = '') {
-        return putBulk([pathStr], remoteDir)
+    void putBulk(String pathStr, String remoteDir = '') {
+        putBulk([pathStr], remoteDir)
     }
 
     /**
@@ -153,8 +152,8 @@ class BpBucket {
         }
     }
 
-    BpBucket getBulk(String objectName, String pathStr = '') {
-        return getBulk([objectName], pathStr)
+    void getBulk(String objectName, String pathStr = '') {
+        getBulk([objectName], pathStr)
     }
 
     /**
