@@ -22,6 +22,7 @@ class DslCompleterTest extends GroovyTestCase {
         assertEquals "createBpClient(method()).toString().", completer.findElements("test = createBpClient(method()).toString().")
         assertEquals "test[1].", completer.findElements("t = test[1].")
         assertEquals "", completer.findElements("t = test[1]")
+        assertEquals '"test".ch', completer.findElements('test = "test".ch')
 
         /* this returns empty because before findElements is called, the trailing '(' is removed */
         assertEquals "", completer.findElements("test = createBpClient(")
@@ -45,6 +46,10 @@ class DslCompleterTest extends GroovyTestCase {
         assertEquals l, completer.splitElements("test(method()).")
         l = ["test[1]", ""]
         assertEquals l, completer.splitElements("test[1].")
+        l = ['"test"', "ch"]
+        assertEquals l, completer.splitElements('"test".ch')
+        l = ["'test'", "ch"]
+        assertEquals l, completer.splitElements("'test'.ch")
     }
 
     @Test
@@ -80,6 +85,10 @@ class DslCompleterTest extends GroovyTestCase {
         match = ["testVar": String.class, "test2Var": String.class]
         assertEquals match, completer.findMatchingGlobals("t")
         assertEquals [:], completer.findMatchingGlobals("abc")
+        match = ['"test"': String.class]
+        assertEquals match, completer.findMatchingGlobals('"test"')
+        match = ["'test'": String.class]
+        assertEquals match, completer.findMatchingGlobals("'test'")
     }
 
     @Test
@@ -130,7 +139,7 @@ class DslCompleterTest extends GroovyTestCase {
             /* String candidates */
             candidates = []
             completer.complete("'string'.ch", 11, candidates)
-            r = ["charAt("]
+            r = ["charAt(", "charAt(int)"]
             assertEquals r, candidates
 
             /* Array candidates TODO */

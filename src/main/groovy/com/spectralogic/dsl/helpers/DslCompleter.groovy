@@ -27,14 +27,6 @@ class DslCompleter implements Completer {
                 return 0
             }
 
-            /* tabbing a raw string TODO: implement this into the full class so "test".charAt(1). works */
-            if (isTabbingString(buffer, cursor)) {
-                def prefix = parseStringPrefix(buffer, cursor)
-                def matching = findMatchingFieldsAndMethods(prefix, String.class)
-                candidates.addAll(cleanseDuplicatesAndSort(matching.keySet().toList()))
-                return cursor - prefix.length()
-            }
-
             /* tabbing a method for parameter options */
             def paramOptions = buffer[cursor - 1] == '('
 
@@ -152,7 +144,9 @@ class DslCompleter implements Completer {
             } catch (ignored) {
                 return [:]
             }
-        } else{
+        } else if (prefix.endsWith('"') || prefix.endsWith("'")) {
+            return [(prefix): String.class]
+        } else {
             def matching = [:]
             matching << findMatchingGlobalMethods(prefix)
             matching << shell.context.variables.findAll {
@@ -257,7 +251,8 @@ class DslCompleter implements Completer {
      * @return chain of methods/objects that the cursor is on
      */
     protected String findElements(String buffer) {
-        def isElementCharacter = { Character c -> c == '.'.toCharacter() || Character.isJavaIdentifierPart(c) }
+        def validChars = ['.'.toCharacter(), '"'.toCharacter(), "'".toCharacter()]
+        def isElementCharacter = { Character c -> validChars.contains(c) || Character.isJavaIdentifierPart(c) }
 
         if (!isElementCharacter(buffer[-1].toCharacter())) return ''
 
@@ -265,7 +260,6 @@ class DslCompleter implements Completer {
         def parenthesisStack = 0
         def squareBracketsStack = 0
         for (def i = buffer.size() - 1; 0 < i; i--) {
-            // TODO: make sure parenthesis and square brackets are not inside strings
             if (buffer[i] == ')') parenthesisStack++
             if (buffer[i] == ']') squareBracketsStack++
 
