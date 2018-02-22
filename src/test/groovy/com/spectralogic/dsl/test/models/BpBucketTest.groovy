@@ -71,6 +71,18 @@ class BpBucketTest extends GroovyTestCase {
     }
 
     @Test
+    void testPutFileFail() {
+        def (bucket, bucketName, client) = createContext()
+
+        try {
+            shouldFail { bucket.putBulk("$homePath/test-data/dir2/txt10.txt") }
+        } finally {
+            bucket.deleteAllObjects()
+            bucket.delete()
+        }
+    }
+
+    @Test
     void testPutDirectory() {
         def (bucket, bucketName, client) = createContext()
 
