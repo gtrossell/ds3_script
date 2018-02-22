@@ -43,4 +43,8 @@ class BpObject {
         bucket.getBulk([name], pathStr)
     }
 
+    String toString() {
+        return "name: $name"
+    }
+
 }
