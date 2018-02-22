@@ -165,12 +165,11 @@ class BpBucket {
      * @return list all objects in bucket or objects with given names
      */
     List<BpObject> objects(String... objectNames) {
-        def wantedObjects
-        if (objectNames.length == 0) {
-            wantedObjects = listBucketResult.objects
-        } else {
+        def wantedObjects = listBucketResult.objects
+        if (objectNames.length != 0) {
             wantedObjects = listBucketResult.objects.findAll { objectNames.contains(it.getKey()) }
         }
+        
         return contentsToBpObjects(wantedObjects)
     }
 
