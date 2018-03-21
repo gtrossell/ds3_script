@@ -86,30 +86,12 @@ class DslCompleter implements Completer {
         }
     }
 
-    /** Returns True if user is tabbing for suggestions on a raw string (ie "string".<cursor>) */
-    private Boolean isTabbingString(String buffer, Integer cursor) {
-        def index = buffer.length() - parseStringPrefix(buffer, cursor).length()
-        def bufferPart = buffer[index - 2..index - 1]
-
-        return (bufferPart == '".' || bufferPart == "'.")
-    }
-
-    /* Finds a string prefix if it exists */
-    private String parseStringPrefix(String buffer, Integer cursor) {
-        def prefix = ""
-        for (def tmpCursor = cursor - 1; tmpCursor > 2; tmpCursor--) {
-            if (!Character.isJavaIdentifierPart(buffer[tmpCursor].toCharacter())) break
-            prefix = buffer[tmpCursor] + prefix
-        }
-
-        return prefix
-    }
-
     /** Prevent duplicates and sort the candidates */
     private List<CharSequence> cleanseDuplicatesAndSort(List<String> candidates) {
         if (Guard.isNullOrEmpty(candidates)) return []
 
-        candidates = candidates.findAll { it != "metaClass" }
+        def ignoredPrefixes = ["__", '$', "metaClass"]
+        candidates = candidates.findAll { c -> !ignoredPrefixes.any { c.startsWith(it) } }
 
         candidates = candidates.sort()
         List<String> cleaned = [candidates[0]]
@@ -183,10 +165,18 @@ class DslCompleter implements Completer {
     /** Finds public fields by matching them to getter methods */
     private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
         /* Groovy properties are given as methods, find all getters */
-        def classMethodNames = clazz.methods.findAll{
-            !it.synthetic && Modifier.isPublic(it.modifiers) && it.name.startsWith('get') &&
-                    it.parameterTypes.length == 0 && it.name.length() > 3
-        }.collect { it.name.toLowerCase()[3..-1] }
+        def classMethodNames = clazz.methods.findAll {
+            !it.synthetic && Modifier.isPublic(it.modifiers) && it.parameterTypes.length == 0 &&
+                    ((it.name.startsWith('get') && it.name.length() > 3) ||
+                            (it.name.startsWith('is') && it.name.length() > 2))
+        }.collect {
+            def name = it.name.toLowerCase()
+            if (name.startsWith('is')) {
+                name[2..-1]
+            } else {
+                name[3..-1]
+            }
+        }
 
         /* collect public fields and properties with getters */
         return clazz.declaredFields.findAll { field ->
