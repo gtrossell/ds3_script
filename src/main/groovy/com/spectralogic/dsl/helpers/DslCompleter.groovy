@@ -162,33 +162,40 @@ class DslCompleter implements Completer {
         }
     }
 
-    /** Finds public fields by matching them to getter methods */
-    private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
-        /* Groovy properties are given as methods, find all getters */
-        def classMethodNames = clazz.methods.findAll {
+    /** Finds public getters and returns their names  */
+    private List<String> getGetterMethodNames(Class clazz) {
+        return clazz.methods.findAll {
             !it.synthetic && Modifier.isPublic(it.modifiers) && it.parameterTypes.length == 0 &&
                     ((it.name.startsWith('get') && it.name.length() > 3) ||
                             (it.name.startsWith('is') && it.name.length() > 2))
-        }.collect {
-            def name = it.name.toLowerCase()
+        }.collect { it.name }
+    }
+
+    /** Finds public fields by matching them to getter methods */
+    private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
+        /* Groovy properties are given as methods, find all getters */
+        def classGetterNames = getGetterMethodNames(clazz).collect { name ->
             if (name.startsWith('is')) {
-                name[2..-1]
+                name[2..-1].toLowerCase()
             } else {
-                name[3..-1]
+                name[3..-1].toLowerCase()
             }
         }
 
         /* collect public fields and properties with getters */
         return clazz.declaredFields.findAll { field ->
-            field.name.startsWith(prefix) && (classMethodNames.any { it == field.name } || Modifier.isPublic(field.modifiers))
+            field.name.startsWith(prefix) && (classGetterNames.any { it == field.name } ||
+                    Modifier.isPublic(field.modifiers))
         }.collectEntries {
             [(it.name): it.type]
         }
     }
 
     private Map<String, Class> findMatchingMethods(String prefix, Class clazz) {
+        def getterMethodNames = getGetterMethodNames(clazz)
         return clazz.declaredMethods.findAll {
-            !it.synthetic && Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix)
+            !it.synthetic && Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix) &&
+                    !getterMethodNames.contains(it.name)
         }.collectEntries {
             [(it.name + (it.parameterTypes.length == 0 ? "()" : "(")): it.returnType]
         }
