@@ -16,7 +16,8 @@ import java.util.prefs.Preferences
  */
 class Globals {
     static debug = false
-    final static MAX_BULK_LOAD = 200_000 // TODO: might not be the best place for this
+    final static MAX_BULK_LOAD = 100_000
+    final static OBJECT_PAGE_SIZE = 1_000
     final static String PROMPT
     final static String RETURN_PROMPT
     final static String HOME_DIR
@@ -73,7 +74,7 @@ class Globals {
 
         PREFS.put(LOG_PREF_KEY, logDir)
 
-        LogRecorder.configureLogging(LogRecorder.LOGGER.level)
+        LogRecorder.configureLogging()
     }
 
     static String getLogDir() {
