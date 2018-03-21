@@ -13,14 +13,16 @@ class BpClient extends Ds3ClientImpl {
         super(netClient)
     }
 
-    /** @return BpBucket of bucket with given name  */
-    BpBucket bucket(String bucketName) {
-        def response = this.getBucket(new GetBucketRequest(bucketName))
-        return new BpBucket(response, this)
+    /** @return BpBucket of getBucket with given name  */
+    BpBucket getBucket(String bucketName) {
+        /* Test of getBucket exists TODO? */
+        this.getBucket(new GetBucketRequest(bucketName))
+        return new BpBucket(bucketName, this)
     }
 
     /** @return the names of the buckets  */
     List<String> buckets() {
+        // TODO: do object iterator like thing after asking ryan
         def response = this.getService(new GetServiceRequest())
         return response.getListAllMyBucketsResult().getBuckets().collect { it.getName() }
     }
@@ -28,7 +30,7 @@ class BpClient extends Ds3ClientImpl {
     /** @return newly created BpBucket  */
     BpBucket createBucket(String name, String dataPolicyId = "") {
         putBucketSpectraS3(new PutBucketSpectraS3Request(name).withDataPolicyId(dataPolicyId))
-        return bucket(name)
+        return getBucket(name)
     }
 
     String toString() {
