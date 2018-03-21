@@ -103,12 +103,12 @@ class DslCompleterTest extends GroovyTestCase {
 
     @Test
     void testCompleter() {
-        /* Use a bucket as a test object */
+        /* Use a getBucket as a test object */
         def client = new BpClientBuilder().create()
         def bucketName = 'test_bucket_' + (new Random().nextInt(10**4))
         def bucket = client.createBucket(bucketName)
 
-        def shell = [context: ["testVar": "test", "bucket": bucket, "testList": [1,2,3]]] as GroovyShell
+        def shell = [context: ["testVar": "test", "getBucket": bucket, "testList": [1,2,3]]] as GroovyShell
         def completer = new DslCompleter(shell)
         def candidates = []
         def r
@@ -120,7 +120,7 @@ class DslCompleterTest extends GroovyTestCase {
 
             /* BpBucket candidates */
             candidates = []
-            completer.complete("bucket.", 7, candidates)
+            completer.complete("getBucket.", 7, candidates)
             r = ["delete()", "deleteAllObjects()", "deleteObject(", "deleteObjects(", "getBulk(", "getName()", "name",
                  "object(", "objects(", "putBulk(", "reload()","size()", "toString()"]
 //            assertEquals r, candidates

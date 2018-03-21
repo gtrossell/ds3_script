@@ -19,12 +19,12 @@ class SpectraDSLTest extends GroovyTestCase {
         assert !(env.getSecretKey() in invalidVars)
         def client = new BpClientBuilder().create()
 
-        /* create a bucket to test if connection is good */
+        /* create a getBucket to test if connection is good */
         def bucketName = 'test_bucket_' + (new Random().nextInt(10**4))
         def bucket = client.createBucket(bucketName)
         assertEquals bucketName, bucket.name
         bucket.delete()
-        shouldFail { client.bucket(bucketName) }
+        shouldFail { client.getBucket(bucketName) }
     }
 
 }

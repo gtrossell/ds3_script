@@ -21,7 +21,7 @@ class BpBucketTest extends GroovyTestCase {
     void testDeleteBucket() {
         def (bucket, bucketName, client) = createContext()
         bucket.delete()
-        shouldFail { client.bucket(bucketName) }
+        shouldFail { client.getBucket(bucketName) }
     }
 
     @Test
@@ -29,22 +29,23 @@ class BpBucketTest extends GroovyTestCase {
         def (bucket, bucketName, client) = createContext()
 
         try {
-            assertEquals 0, bucket.size()
+            assertEquals 0, bucket.getSize()
             bucket.putBulk(["${homePath}/test-data/dir1/txt1.txt",
                             "${homePath}/test-data/dir1/txt2.txt",
                             "${homePath}/test-data/dir1/txt3.txt",
                             "${homePath}/test-data/dir1/txt4.txt"])
-            assertEquals 4, bucket.size()
+            assertEquals 4, bucket.getSize()
 
-            bucket.deleteObject(bucket.object('txt1.txt'))
-            assertEquals 3, bucket.size()
+            println bucket.getObject('txt1.txt')
+            bucket.deleteObject(bucket.getObject('txt1.txt'))
+            assertEquals 3, bucket.getSize()
 
-            bucket.deleteObjects([bucket.object('txt2.txt'),
-                                  bucket.object('txt3.txt')])
-            assertEquals 1, bucket.size()
+            bucket.deleteObjects([bucket.getObject('txt2.txt'),
+                                  bucket.getObject('txt3.txt')])
+            assertEquals 1, bucket.getSize()
 
             bucket.deleteAllObjects()
-            assertEquals 0, bucket.size()
+            assertEquals 0, bucket.getSize()
         } finally {
             bucket.deleteAllObjects()
             bucket.delete()
@@ -56,14 +57,14 @@ class BpBucketTest extends GroovyTestCase {
         def (bucket, bucketName, client) = createContext()
 
         try {
-            assertEquals 0, bucket.size()
+            assertEquals 0, bucket.getSize()
             bucket.putBulk("$homePath/test-data/dir2/txt5.txt")
-            assertEquals 1, bucket.size()
+            assertEquals 1, bucket.getSize()
 
             bucket.putBulk(["${homePath}/test-data/dir1/txt1.txt",
                             "${homePath}/test-data/dir1/txt2.txt",
                             "${homePath}/test-data/dir1/txt3.txt"])
-            assertEquals 4, bucket.size()
+            assertEquals 4, bucket.getSize()
         } finally {
             bucket.deleteAllObjects()
             bucket.delete()
@@ -87,9 +88,9 @@ class BpBucketTest extends GroovyTestCase {
         def (bucket, bucketName, client) = createContext()
 
         try {
-            assertEquals 0, bucket.size()
+            assertEquals 0, bucket.getSize()
             bucket.putBulk("$homePath/test-data/dir3/")
-            assertEquals 2, bucket.size()
+            assertEquals 2, bucket.getSize()
         } finally {
             bucket.deleteAllObjects()
             bucket.delete()
