@@ -19,7 +19,7 @@ class LogRecorder {
     private final static String LOG_ARCHIVE_FILE_PATTERN = "spectra%i.log"
     private final static String LOG_FILE_NAME = "spectra.log"
 
-    static configureLogging(Level level) {
+    static configureLogging(Level level=LOGGER.level) {
         def loggerContext = LOGGER.getLoggerContext()
         loggerContext.reset()
         LOGGER.setLevel(level)
