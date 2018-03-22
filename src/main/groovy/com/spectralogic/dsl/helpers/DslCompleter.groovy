@@ -162,14 +162,15 @@ class DslCompleter implements Completer {
         }
     }
 
-    /* Converts mutator function name to it's lowercased field name (eg. isEmpty -> empty) */
+    /* Converts mutator function name to its field name (eg. isEmptyField -> emptyField) */
     private String mutatorToField(String mutatorName) {
-        return (mutatorName.startsWith('is') ? mutatorName[2..-1] : mutatorName[3..-1]).toLowerCase()
+        def fieldName = mutatorName.startsWith('is') ? mutatorName[2..-1] : mutatorName[3..-1]
+        return fieldName[0].toLowerCase() + fieldName.substring(1)
     }
 
     /** Finds public getters and setters and returns their names  */
     private List<String> getMutatorMethodNames(Class clazz) {
-        def fields = clazz.declaredFields.collect { it.name.toLowerCase() }
+        def fields = clazz.declaredFields.collect { it.name }
 
         return clazz.methods.findAll {
             !it.synthetic && Modifier.isPublic(it.modifiers) && (
@@ -191,7 +192,7 @@ class DslCompleter implements Completer {
 
         /* collect public fields and properties with getters */
         return clazz.declaredFields.findAll { field ->
-            field.name.startsWith(prefix) && (mutatorNames.contains(field.name.toLowerCase()) ||
+            field.name.startsWith(prefix) && (mutatorNames.contains(field.name) ||
                     Modifier.isPublic(field.modifiers))
         }.collectEntries {
             [(it.name): it.type]
