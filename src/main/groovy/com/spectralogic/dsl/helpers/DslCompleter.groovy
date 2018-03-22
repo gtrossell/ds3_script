@@ -162,8 +162,15 @@ class DslCompleter implements Completer {
         }
     }
 
+    /* Converts mutator function name to it's lowercased field name (eg. isEmpty -> empty) */
+    private String mutatorToField(String mutatorName) {
+        return (mutatorName.startsWith('is') ? mutatorName[2..-1] : mutatorName[3..-1]).toLowerCase()
+    }
+
     /** Finds public getters and setters and returns their names  */
     private List<String> getMutatorMethodNames(Class clazz) {
+        def fields = clazz.declaredFields.collect { it.name.toLowerCase() }
+
         return clazz.methods.findAll {
             !it.synthetic && Modifier.isPublic(it.modifiers) && (
                 /* getters */
@@ -173,21 +180,18 @@ class DslCompleter implements Completer {
             ) || (
                 /* setters */
                 it.parameters.length == 1 && it.name.startsWith('set') && it.name.length() > 3
-            )
-
+            ) && fields.contains(mutatorToField(it.name))
         }.collect { it.name }
     }
 
     /** Finds public fields by matching them to getter methods */
     private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
         /* Groovy properties are given as methods, find all getters */
-        def mutatorNames = getMutatorMethodNames(clazz).collect { name ->
-            (name.startsWith('is') ? name[2..-1] : name[3..-1]).toLowerCase()
-        }
+        def mutatorNames = getMutatorMethodNames(clazz).collect { mutatorToField(it) }
 
         /* collect public fields and properties with getters */
         return clazz.declaredFields.findAll { field ->
-            field.name.startsWith(prefix) && (mutatorNames.contains(field.name) ||
+            field.name.startsWith(prefix) && (mutatorNames.contains(field.name.toLowerCase()) ||
                     Modifier.isPublic(field.modifiers))
         }.collectEntries {
             [(it.name): it.type]
