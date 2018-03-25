@@ -25,28 +25,24 @@ class BpBucket {
     private final BpClient client
     private final Ds3ClientHelpers helper
     final String name
-    Long size
-    Boolean empty
+    final Long size
+    final boolean empty
 
     BpBucket(String name, BpClient client) {
-        // TODO: Test if bucket exists?
         this.client = client
         this.helper = Ds3ClientHelpers.wrap(client)
         this.name = name
+
+        this.size = -1
+        this.empty = true
     }
 
-    /**
-     * Deletes getBucket
-     * Throws BpException if getBucket is not empty so that data is not accidentally deleted
-     */
+    /** Deletes this bucket */
     void delete() {
-        if (!this.isEmpty()) {
-            throw new BpException("Bucket must be empty to delete!")
-        }
         client.deleteBucket(new DeleteBucketRequest(this.name))
     }
 
-    /** Deletes all objects */
+    /** Deletes all objects in this bucket */
     void deleteAllObjects() {
         deleteObjects(new BpObjectIterable(this.client, this))
     }
@@ -55,7 +51,6 @@ class BpBucket {
     void deleteObjects(Iterable<BpObject> objects) {
         def objIterator = objects.iterator()
         while (objIterator) {
-            // TODO: what amount to take?
             def currentBatch = objIterator.take(Globals.OBJECT_PAGE_SIZE).collect { it.name }
             client.deleteObjects(new DeleteObjectsRequest(name, currentBatch))
         }
@@ -180,14 +175,14 @@ class BpBucket {
     }
 
     Long getSize() {
-        // TODO: please let there be a better way
+        // TODO: count pagnations? add remainder
         def size = 0
         new BpObjectIterable(this.client, this).each { size++ }
         return size
     }
 
     Boolean exists() {
-        switch (client.headBucket(new HeadBucketRequest(name))) {
+        switch (client.headBucket(new HeadBucketRequest(name)).status) {
             case HeadBucketResponse.Status.NOTAUTHORIZED:
             case HeadBucketResponse.Status.EXISTS:
                 return true

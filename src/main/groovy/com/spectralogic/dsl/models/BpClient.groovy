@@ -2,7 +2,6 @@ package com.spectralogic.dsl.models
 
 import com.spectralogic.ds3client.commands.spectrads3.PutBucketSpectraS3Request
 import com.spectralogic.ds3client.networking.NetworkClient
-import com.spectralogic.ds3client.commands.GetBucketRequest
 import com.spectralogic.ds3client.commands.GetServiceRequest
 import com.spectralogic.ds3client.Ds3ClientImpl
 
@@ -15,14 +14,14 @@ class BpClient extends Ds3ClientImpl {
 
     /** @return BpBucket of getBucket with given name  */
     BpBucket getBucket(String bucketName) {
-        /* Test of getBucket exists TODO? */
-        this.getBucket(new GetBucketRequest(bucketName))
         return new BpBucket(bucketName, this)
     }
 
     /** @return the names of the buckets  */
     List<String> buckets() {
         // TODO: do object iterator like thing after asking ryan
+        // TODO: transform to string
+        // TODO: getBuckets
         def response = this.getService(new GetServiceRequest())
         return response.getListAllMyBucketsResult().getBuckets().collect { it.getName() }
     }
