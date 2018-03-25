@@ -24,7 +24,7 @@ class SpectraDSLTest extends GroovyTestCase {
         def bucket = client.createBucket(bucketName)
         assertEquals bucketName, bucket.name
         bucket.delete()
-        shouldFail { client.getBucket(bucketName) }
+        assertFalse client.getBucket(bucketName).exists()
     }
 
 }
