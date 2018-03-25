@@ -63,7 +63,7 @@ uses the DSL and then run it using the `bpsh` command.
 
 ### Default variables
 Two variables, 'client' and 'environment', are already created and initialized 
-if your environment variables are set. 
+if your environment variables are set. [Variables to set.](https://github.com/SpectraLogic/ds3_java_cli#user-content-usage)
 
 * client -> BpClient object that represents the client created from environment
 variables
@@ -83,29 +83,29 @@ client = createBpClient(endpoint, accessKey, secretKey)
 ```groovy
 bucket = client.createBucket('test_bucket')
  
-assert bucket == client.bucket('test_bucket')
+assert bucket == client.getBucket('test_bucket')
 assert client == bucket.client
 assert 'test_bucket' == bucket.name
 assert client.buckets() == ['test_bucket']
  
 bucket.putBulk('/path/to/example.txt')
-bucket.objects()            // shows example.txt object
+bucket.getAllObjects().collect()
 bucket.getBulk(['example.txt'], "./downloads/")
 bucket.deleteAllObjects()
-assert 0 == bucket.objects().size()
- 
+assert 0 == bucket.size
+
 bucket.putBulk('/path/to/example.txt', 'remoteDir/')
-bucket.objects()            // shows object at remoteDir/example.txt
-object = bucket.object('remoteDir/example.txt')
-bucket.deleteObjects(object)
+object = bucket.getObject('remoteDir/example.txt')
+bucket.deleteObject(object)
 assert 0 == bucket.objects().size()
- 
+
 bucket.delete()             // bucket must be empty to delete
 ```
 
 #### Objects
 ```groovy
 object = bucket.object('test_object')
+object.exists()
 object.metadata
 object.writeTo('/path/to/destination')
 object.delete()  // deletes object from bucket
