@@ -68,10 +68,11 @@ class BpBucket {
      *  all subdirectory files will also be uploaded with maintained directory structure.
      */
     void putBulk(Iterable<String> pathStrs, String remoteDir='') {
-        // TODO: make sure '/' is appended to remoteDir
-        // TODO: do something for keeping directory structure on passed files
-        // TODO: make sure when putting a directory, that directory is the parent and not included in the BP path
-        /* Create paths, ensure paths are absolute & exist */
+        if (remoteDir.length() > 0) {
+            remoteDir = remoteDir.endsWith('/') ? remoteDir : remoteDir + '/'
+        }
+
+        /* Ensure paths are absolute & exist */
         def paths = pathStrs.collect { pathStr ->
             def path = Paths.get(pathStr)
             path = path.absolute ? path : Paths.get("$Globals.HOME_DIR/$path")
