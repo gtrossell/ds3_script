@@ -18,7 +18,7 @@ class BpClient extends Ds3ClientImpl {
     }
 
     /** @return the names of the buckets  */
-    List<String> buckets() {
+    List<String> bucketNames() {
         // TODO: do object iterator like thing after asking ryan
         // TODO: transform to string
         // TODO: getBuckets

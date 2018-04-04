@@ -10,12 +10,12 @@ class BpClientTest extends GroovyTestCase {
     void testClient() throws IOException {
         def client = new BpClientBuilder().create()
 
-        def bucketCount = client.buckets().size()
+        def bucketCount = client.bucketNames().size()
 
         def bucketName = 'test_bucket_' + (new Random().nextInt(10**4))
         def bucket = client.createBucket(bucketName)
 
-        assertEquals bucketCount + 1, client.buckets().size()
+        assertEquals bucketCount + 1, client.bucketNames().size()
         assertEquals bucketName, bucket.name
         assertEquals bucket.name, client.getBucket(bucketName).name
         bucket.delete()
