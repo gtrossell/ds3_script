@@ -23,10 +23,6 @@ class BpObjectIterable<T> implements Iterable<T> {
         this.bucket = bucket
     }
 
-//    BpObjectIterable(Iterable<String> objectNames, BpClient client, BpBucket bucket) {
-//
-//    }
-
     @Override
     Iterator<BpObject> iterator() {
         if (this.valueRetrieved) {
@@ -40,6 +36,17 @@ class BpObjectIterable<T> implements Iterable<T> {
                     page = objectLoader.nextValues ?: []
                     pageIndex = 0
                 }
+            }
+
+            /* Sums page sizes. This is more efficient than counting objects is BpBucket to get size */
+            Long size() {
+                Long size = 0
+                while (page.size() == Globals.OBJECT_PAGE_SIZE) {
+                    size += Globals.OBJECT_PAGE_SIZE
+                    page = objectLoader.nextValues
+                }
+                size += page.size()
+                return size
             }
 
             @Override

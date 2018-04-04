@@ -178,10 +178,7 @@ class BpBucket {
 
     /* object count */
     Long getSize() {
-        // TODO: count pagnations? add remainder
-        def size = 0
-        new BpObjectIterable(this.client, this).each { size++ }
-        return size
+        new BpObjectIterable(this.client, this).size()
     }
 
     Boolean exists() {
