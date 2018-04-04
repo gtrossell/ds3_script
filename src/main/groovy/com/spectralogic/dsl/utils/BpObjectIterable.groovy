@@ -38,6 +38,13 @@ class BpObjectIterable<T> implements Iterable<T> {
                 }
             }
 
+            /* Alternative to next(), returns a list of objects on current page */
+            ArrayList<DetailedS3Object> nextPage() {
+                def currPage = page
+                page = objectLoader.nextValues
+                return currPage
+            }
+
             /* Sums page sizes. This is more efficient than counting objects is BpBucket to get size */
             Long size() {
                 Long size = 0
