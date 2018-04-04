@@ -62,9 +62,10 @@ class BpBucket {
 
     /**
      * @param pathStrs Directories and files to upload
-     * @param remoteDir Directory on BP to put to
-     * Puts each file and each directory's files given into the getBucket. Maintains the subdirectory
-     * structure when putting directories.
+     * @param remoteDir Remote directory on BP to put to
+     * A specific file will be uploaded to the remote directory (or root directory if not specified)
+     * A directory will have its file(s) uploaded to the remote directory (or root directory if not specified)
+     *  all subdirectory files will also be uploaded with maintained directory structure.
      */
     void putBulk(Iterable<String> pathStrs, String remoteDir='') {
         // TODO: make sure '/' is appended to remoteDir
@@ -174,6 +175,7 @@ class BpBucket {
         return new BpObject(objectName, this, this.client)
     }
 
+    /* object count */
     Long getSize() {
         // TODO: count pagnations? add remainder
         def size = 0

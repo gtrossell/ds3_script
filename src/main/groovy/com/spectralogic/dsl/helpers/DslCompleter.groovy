@@ -28,7 +28,7 @@ class DslCompleter implements Completer {
             }
 
             /* tabbing a method for parameter options */
-            def paramOptions = buffer[cursor - 1] == '('
+            Boolean paramOptions = buffer[cursor - 1] == '('
 
             def bufferEnd = paramOptions ? cursor - 2 : cursor - 1
             def elementList = splitElements(findElements(buffer[0..bufferEnd]))
@@ -38,6 +38,7 @@ class DslCompleter implements Completer {
                 return cursor
             }
 
+            /* iterate over elements and their classes */
             def matching = findMatchingGlobals(elementList[0])
             Class prevMatchingClass = SpectraDSL.class
             for (def i = 1; i < elementList.size() && matching.size() == 1; i++) {
