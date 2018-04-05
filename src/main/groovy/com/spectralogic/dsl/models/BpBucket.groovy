@@ -69,6 +69,10 @@ class BpBucket {
         deleteObjects([object])
     }
 
+    void deleteObject(String objectName) {
+        deleteObjects([new BpObject(objectName, this, this.client)])
+    }
+
     /**
      * @param pathStrs Directories and files to upload
      * @param remoteDir Remote directory on BP to put to
