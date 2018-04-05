@@ -13,6 +13,7 @@ class BpObject {
     final String name
     final Long size
     final Map metadata
+    final Boolean exists
 
     BpObject(DetailedS3Object object, BpBucket bucket, BpClient client) {
         this.bucket = bucket
@@ -21,6 +22,7 @@ class BpObject {
 
         this.size = -1
         this.metadata = [:]
+        this.exists = false
     }
 
     BpObject(String name, BpBucket bucket, BpClient client) {
@@ -30,17 +32,20 @@ class BpObject {
 
         this.size = -1
         this.metadata = [:]
+        this.exists = false
     }
 
     Long getSize() {
         return this.client.headObject(new HeadObjectRequest(this.bucket.name, this.name)).objectSize
     }
 
-    Metadata getMetadata() {
-        return this.client.headObject(new HeadObjectRequest(this.bucket.name, this.name)).metadata
+    Map<String,List<String>> getMetadata() {
+        def metadata = this.client.headObject(new HeadObjectRequest(this.bucket.name, this.name)).metadata
+
+        return metadata.keys().collectEntries { [(it) : metadata.get(it)] }
     }
 
-    Boolean exists() {
+    Boolean isExists() {
         switch (this.client.headObject(new HeadObjectRequest(this.bucket.name, this.name)).status) {
             case HeadObjectResponse.Status.EXISTS:
                 return true
