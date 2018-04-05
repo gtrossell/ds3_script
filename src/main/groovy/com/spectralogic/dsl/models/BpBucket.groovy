@@ -44,15 +44,22 @@ class BpBucket {
 
     /** Deletes all objects in this bucket */
     void deleteAllObjects() {
-        deleteObjects(new BpObjectIterable(this.client, this))
+        def objIterator = new BpObjectIterable(this.client, this).iterator()
+        while (objIterator.hasNext()) {
+            def currBatch = objIterator.nextPage().collect { it.name }
+            client.deleteObjects(new DeleteObjectsRequest(this.name, currBatch))
+
+            /* reset iterator because deleting objects ruins paging */
+            objIterator = new BpObjectIterable(this.client, this).iterator()
+        }
     }
 
     /** Recursively delete objects in max 1000 object bulks */
     void deleteObjects(Iterable<BpObject> objects) {
         def objIterator = objects.iterator()
-        while (objIterator) {
+        while (objIterator.hasNext()) {
             def currentBatch = objIterator.take(Globals.OBJECT_PAGE_SIZE).collect { it.name }
-            client.deleteObjects(new DeleteObjectsRequest(name, currentBatch))
+            client.deleteObjects(new DeleteObjectsRequest(this.name, currentBatch))
         }
     }
 
@@ -66,6 +73,7 @@ class BpBucket {
      * A specific file will be uploaded to the remote directory (or root directory if not specified)
      * A directory will have its file(s) uploaded to the remote directory (or root directory if not specified)
      *  all subdirectory files will also be uploaded with maintained directory structure.
+     *  TODO: what happens when given absolute path or '..'
      */
     void putBulk(Iterable<String> pathStrs, String remoteDir='') {
         if (remoteDir.length() > 0) {
@@ -178,7 +186,7 @@ class BpBucket {
 
     /* object count */
     Long getSize() {
-        new BpObjectIterable(this.client, this).size()
+        return new BpObjectIterable(this.client, this).iterator().size()
     }
 
     Boolean exists() {
