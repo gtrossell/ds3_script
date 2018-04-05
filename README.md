@@ -43,7 +43,7 @@ Example:
 ```
 > args = ['test_bucket']
 > :r getBucket
-> bucket = client.bucket(args[0])
+> bucket = client.getBucket(args[0])
 > :r
 > bucket = null
 > :e getBucket test_bucket
@@ -105,7 +105,7 @@ bucket.delete()             // bucket must be empty to delete
 #### Objects
 ```groovy
 object = bucket.object('test_object')
-object.exists()
+object.exists
 object.metadata
 object.writeTo('/path/to/destination')
 object.delete()  // deletes object from bucket
