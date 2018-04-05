@@ -19,7 +19,7 @@ class BpObjectTest extends GroovyTestCase {
         def fileName = 'txt1.txt'
         bucket.putBulk("${homePath}/test-data/dir1/" + fileName)
         def object = bucket.getObject(fileName)
-        assert object.exists()
+        assert object.exists
         def meta = object.getMetadata()
         // TODO test metadata
 
@@ -33,7 +33,7 @@ class BpObjectTest extends GroovyTestCase {
         /* delete */
         object.delete()
         assert bucket.isEmpty()
-        assert !object.exists()
+        assert !object.exists
         bucket.delete()
     }
 

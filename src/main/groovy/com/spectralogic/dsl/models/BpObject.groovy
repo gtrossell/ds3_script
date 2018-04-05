@@ -13,7 +13,7 @@ class BpObject {
     final String name
     final Long size
     final Map metadata
-    final Boolean exists
+    final boolean exists
 
     BpObject(DetailedS3Object object, BpBucket bucket, BpClient client) {
         this.bucket = bucket
@@ -45,7 +45,7 @@ class BpObject {
         return metadata.keys().collectEntries { [(it) : metadata.get(it)] }
     }
 
-    Boolean isExists() {
+    boolean isExists() {
         switch (this.client.headObject(new HeadObjectRequest(this.bucket.name, this.name)).status) {
             case HeadObjectResponse.Status.EXISTS:
                 return true
