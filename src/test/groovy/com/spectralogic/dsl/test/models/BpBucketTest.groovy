@@ -36,7 +36,6 @@ class BpBucketTest extends GroovyTestCase {
                             "${homePath}/test-data/dir1/txt4.txt"])
             assertEquals 4, bucket.getSize()
 
-            println bucket.getObject('txt1.txt')
             bucket.deleteObject(bucket.getObject('txt1.txt'))
             assertEquals 3, bucket.getSize()
 
