@@ -27,6 +27,7 @@ class BpBucket {
     final String name
     final Long size
     final boolean empty
+    final boolean exists
 
     BpBucket(String name, BpClient client) {
         this.client = client
@@ -35,6 +36,7 @@ class BpBucket {
 
         this.size = -1
         this.empty = true
+        this.exists = false
     }
 
     /** Deletes this bucket */
@@ -189,7 +191,7 @@ class BpBucket {
         return new BpObjectIterable(this.client, this).iterator().size()
     }
 
-    Boolean exists() {
+    Boolean isExists() {
         switch (client.headBucket(new HeadBucketRequest(name)).status) {
             case HeadBucketResponse.Status.NOTAUTHORIZED:
             case HeadBucketResponse.Status.EXISTS:

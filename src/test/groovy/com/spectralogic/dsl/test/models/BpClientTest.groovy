@@ -19,7 +19,7 @@ class BpClientTest extends GroovyTestCase {
         assertEquals bucketName, bucket.name
         assertEquals bucket.name, client.getBucket(bucketName).name
         bucket.delete()
-        assertFalse client.getBucket(bucketName).exists()
+        assertFalse client.getBucket(bucketName).exists
     }
 
 }

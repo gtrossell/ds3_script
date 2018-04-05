@@ -21,7 +21,7 @@ class BpBucketTest extends GroovyTestCase {
     void testDeleteBucket() {
         def (bucket, bucketName, client) = createContext()
         bucket.delete()
-        assertFalse client.getBucket(bucketName).exists()
+        assertFalse client.getBucket(bucketName).exists
     }
 
     @Test
