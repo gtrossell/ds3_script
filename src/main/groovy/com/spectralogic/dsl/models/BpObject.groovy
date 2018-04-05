@@ -4,7 +4,6 @@ import com.spectralogic.ds3client.Ds3ClientImpl
 import com.spectralogic.ds3client.commands.HeadObjectRequest
 import com.spectralogic.ds3client.commands.HeadObjectResponse
 import com.spectralogic.ds3client.models.DetailedS3Object
-import com.spectralogic.ds3client.networking.Metadata
 
 /** Represents a BlackPearl Object */
 class BpObject {
