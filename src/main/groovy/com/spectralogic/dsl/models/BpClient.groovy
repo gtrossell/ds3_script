@@ -7,9 +7,14 @@ import com.spectralogic.ds3client.Ds3ClientImpl
 
 /** Represents a BlackPearl Client */
 class BpClient extends Ds3ClientImpl {
+    final Long size
+    final boolean https
 
     BpClient(NetworkClient netClient) {
         super(netClient)
+
+        this.size = -1
+        this.https = false
     }
 
     /** @return BpBucket of getBucket with given name  */
@@ -19,9 +24,6 @@ class BpClient extends Ds3ClientImpl {
 
     /** @return the names of the buckets  */
     List<String> bucketNames() {
-        // TODO: do object iterator like thing after asking ryan
-        // TODO: transform to string
-        // TODO: getBuckets
         def response = this.getService(new GetServiceRequest())
         return response.getListAllMyBucketsResult().getBuckets().collect { it.getName() }
     }
@@ -30,6 +32,14 @@ class BpClient extends Ds3ClientImpl {
     BpBucket createBucket(String name, String dataPolicyId = "") {
         putBucketSpectraS3(new PutBucketSpectraS3Request(name).withDataPolicyId(dataPolicyId))
         return getBucket(name)
+    }
+
+    boolean isHttps() {
+        return this.connectionDetails.https
+    }
+
+    Long getSize() {
+        return this.bucketNames().size()
     }
 
     String toString() {
