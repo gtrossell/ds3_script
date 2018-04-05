@@ -191,7 +191,7 @@ class BpBucket {
         return new BpObjectIterable(this.client, this).iterator().size()
     }
 
-    Boolean isExists() {
+    boolean isExists() {
         switch (client.headBucket(new HeadBucketRequest(name)).status) {
             case HeadBucketResponse.Status.NOTAUTHORIZED:
             case HeadBucketResponse.Status.EXISTS:
