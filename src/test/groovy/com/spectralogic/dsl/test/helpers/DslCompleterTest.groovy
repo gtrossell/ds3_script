@@ -120,10 +120,10 @@ class DslCompleterTest extends GroovyTestCase {
 
             /* BpBucket candidates */
             candidates = []
-            completer.complete("getBucket.", 7, candidates)
-            r = ["delete()", "deleteAllObjects()", "deleteObject(", "deleteObjects(", "getBulk(", "getName()", "name",
-                 "object(", "objects(", "putBulk(", "reload()","size()", "toString()"]
-//            assertEquals r, candidates
+            completer.complete("getBucket.", 10, candidates)
+            r = ["delete()", "deleteAllObjects()", "deleteObject(", "deleteObjects(", "empty", "exists",
+                 "getAllObjects()", "getBulk(", "getObject(", "getObjects(", "name", "putBulk(", "size", "toString()"]
+            assertEquals r, candidates
 
             /* Indexed List candidates */
             candidates = []
