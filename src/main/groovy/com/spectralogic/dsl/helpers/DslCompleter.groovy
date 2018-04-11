@@ -174,7 +174,7 @@ class DslCompleter implements Completer {
         def fields = clazz.declaredFields.collect { it.name }
 
         return clazz.methods.findAll {
-            !it.synthetic && Modifier.isPublic(it.modifiers) && (
+            (!it.synthetic && Modifier.isPublic(it.modifiers) && (
                 /* getters */
                 it.parameters.length == 0 &&
                 ((it.name.startsWith('get') && it.name.length() > 3) ||
@@ -182,7 +182,7 @@ class DslCompleter implements Completer {
             ) || (
                 /* setters */
                 it.parameters.length == 1 && it.name.startsWith('set') && it.name.length() > 3
-            ) && fields.contains(mutatorToField(it.name))
+            )) && fields.contains(mutatorToField(it.name))
         }.collect { it.name }
     }
 
