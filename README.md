@@ -8,7 +8,21 @@ script management.
 
 Install
 -------
+Make sure JDK 1.7+ is installed. 
+
+[Install Gradle](https://docs.gradle.org/current/userguide/installation.html#sec:prerequisites)
+
+Clone this repository, build with `gradle build -x test`.
+
+Unzip `build/distributions/bpsh-0.5.zip`.
+
+Add `bpsh-0.5/bin` to path.
+
 Build the source using Gradle, unzip the distribution, and add the bin directory to the path.
+
+Optionally update the environment variables `DS3_ENDPOINT`, `DS3_ACCESS_KEY`, and `DS3_SECRET_KEY`
+
+Use the command `bpsh` to run.
 
 Shell
 -----
