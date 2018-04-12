@@ -104,7 +104,7 @@ class DslCompleter implements Completer {
     }
 
     /** Find matching global variables and methods and their respective class or return type */
-    private Map<String, Class> findMatchingGlobals(String prefix) {
+    private Map<String,Class> findMatchingGlobals(String prefix) {
         if (prefix == null) return [:]
 
         if (prefix.endsWith('(')) {
@@ -142,7 +142,7 @@ class DslCompleter implements Completer {
         }
     }
 
-    private Map<String, Class> findMatchingGlobalMethods(String prefix) {
+    private Map<String,Class> findMatchingGlobalMethods(String prefix) {
         return SpectraDSL.class.declaredMethods.findAll {
             Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix)
         }.collectEntries {
@@ -151,13 +151,14 @@ class DslCompleter implements Completer {
     }
 
     /** Finds matching fields and methods of a class and their respective class or return type */
-    protected Map<String, Class> findMatchingFieldsAndMethods(String prefix, Class clazz) {
+    protected Map<String,Class> findMatchingFieldsAndMethods(String prefix, Class clazz) {
         if (prefix.endsWith('(') || prefix.endsWith(')')) {
             return findMatchingMethods(prefix.replaceAll("[()]", ""), clazz)
         } else {
             def matching = [:]
             matching << findMatchingFields(prefix, clazz)
             matching << findMatchingMethods(prefix, clazz)
+            matching << findMatchingCollections(prefix, clazz)
 
             return matching
         }
@@ -187,7 +188,7 @@ class DslCompleter implements Completer {
     }
 
     /** Finds public fields by matching them to getter methods */
-    private Map<String, Class> findMatchingFields(String prefix, Class clazz) {
+    private Map<String,Class> findMatchingFields(String prefix, Class clazz) {
         /* Groovy properties are given as methods, find all getters */
         def mutatorNames = getMutatorMethodNames(clazz).collect { mutatorToField(it) }
 
@@ -200,7 +201,7 @@ class DslCompleter implements Completer {
         }
     }
 
-    private Map<String, Class> findMatchingMethods(String prefix, Class clazz) {
+    private Map<String,Class> findMatchingMethods(String prefix, Class clazz) {
         def mutatorNames = getMutatorMethodNames(clazz)
         return clazz.declaredMethods.findAll {
             !it.synthetic && Modifier.isPublic(it.modifiers) && it.name.startsWith(prefix) &&
@@ -210,8 +211,31 @@ class DslCompleter implements Completer {
         }
     }
 
+    private Map<String,Class> findMatchingCollections(String prefix, Class clazz) {
+        Map<String,Class> matches
+        switch(clazz) {
+            case Map:
+            case Iterable:
+                matches = [
+                    "collect()": Collection,
+                    "find {": Object,
+                    "findAll {": Collection,
+                    "each {": Iterable
+                ]
+                break
+            case Iterator:
+                matches = ["each{": Iterable]
+                break
+            default:
+                matches = [:]
+                break
+        }
+
+        return matches.findAll { it.key.startsWith(prefix) }
+    }
+
     /** Takes a map created by the above methods and returns methods/fields/vars that match exactly */
-    protected Map<String, Class> getExactMatches(String name, Map<String, Class> matching) {
+    protected Map<String,Class> getExactMatches(String name, Map<String, Class> matching) {
         return matching.findAll { it.key.toString().replaceAll("[()]", "") == name }
     }
 
