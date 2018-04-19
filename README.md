@@ -6,7 +6,7 @@ the [Groovy Language](http://groovy-lang.org/), but implements many custom funct
 scripts for the BlackPearl easy. The tool also provides a shell that features autocompletion and
 script management.
 
-Install
+Building
 -------
 Make sure JDK 1.7+ is installed. 
 
@@ -14,9 +14,9 @@ Make sure JDK 1.7+ is installed.
 
 Clone this repository, build with `gradle build -x test`.
 
-Unzip `build/distributions/bpsh-0.5.zip`.
+Unzip `build/distributions/bpsh-X.X.zip`.
 
-Add `bpsh-0.5/bin` to path.
+Add `bpsh-X.X/bin` to path.
 
 Build the source using Gradle, unzip the distribution, and add the bin directory to the path.
 
