@@ -6,23 +6,10 @@ the [Groovy Language](http://groovy-lang.org/), but implements many custom funct
 scripts for the BlackPearl easy. The tool also provides a shell that features autocompletion and
 script management.
 
-Building
+Releases
 -------
-Make sure JDK 1.7+ is installed. 
-
-[Install Gradle](https://docs.gradle.org/current/userguide/installation.html#sec:prerequisites)
-
-Clone this repository, build with `gradle build -x test`.
-
-Unzip `build/distributions/bpsh-X.X.zip`.
-
-Add `bpsh-X.X/bin` to path.
-
-Build the source using Gradle, unzip the distribution, and add the bin directory to the path.
-
-Optionally update the environment variables `DS3_ENDPOINT`, `DS3_ACCESS_KEY`, and `DS3_SECRET_KEY`
-
-Use the command `bpsh` to run.
+There are no current releases with installers, but 
+[here](https://github.com/SpectraLogic/ds3_script/blob/master/BUILD.md) is the guide to building it manually.
 
 Shell
 -----
@@ -73,7 +60,8 @@ You can use tab completion to view available variables, fields, methods, and met
 DSL
 --------
 These examples will be shown by using the shell. However, you can also write a Groovy script that
-uses the DSL and then run it using the `bpsh` command.
+uses the DSL and then run it using the `bpsh` command (ex: `$ bpsh CreateBucket.groovy`). See the 
+[samples directory](https://github.com/SpectraLogic/ds3_script/tree/master/samples) for script examples.
 
 ### Default variables
 Two variables, 'client' and 'environment', are already created and initialized 
