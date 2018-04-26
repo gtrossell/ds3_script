@@ -40,8 +40,8 @@ class Globals {
             PREFS.put(LOG_PREF_KEY, "")
         }
 
-        if (!PREFS.keys().contains(HISTORY_PREF_KEY) || !PREFS.get(HISTORY_PREF_KEY, '')) {
-            PREFS.put(HISTORY_PREF_KEY, "{}")
+        if (!PREFS.keys().contains(HISTORY_PREF_KEY) || ['', '{}'].contains(PREFS.get(HISTORY_PREF_KEY, ''))) {
+            PREFS.put(HISTORY_PREF_KEY, "[]")
         }
 
         /* Set Global strings by locale */
@@ -55,13 +55,14 @@ class Globals {
 
     static History fetchHistory() {
         def history = new MemoryHistory()
-        new JsonSlurper().parseText(PREFS.get(HISTORY_PREF_KEY, '{}')).each { history.add(it.toString()) }
+        new JsonSlurper().parseText(PREFS.get(HISTORY_PREF_KEY, '[]')).each { history.add(it.toString()) }
         return history
     }
 
     static void saveHistory(History history) {
         def historyLines =  history.collect { it.value() }.takeRight(HISTORY_LIMIT)
         PREFS.put(HISTORY_PREF_KEY, JsonOutput.toJson(historyLines))
+        PREFS.flush()
     }
 
     static String setLogDir(String logDir) {
@@ -73,6 +74,7 @@ class Globals {
         if (!Files.exists(path)) throw new FileNotFoundException(logDir)
 
         PREFS.put(LOG_PREF_KEY, logDir)
+        PREFS.flush()
 
         LogRecorder.configureLogging()
     }
