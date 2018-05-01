@@ -1,7 +1,12 @@
+//plugins {
+//    id "nebula.ospackage" version "4.8.0"
+//}
+
 apply plugin: 'groovy'
 apply plugin: 'application'
+//apply plugin: 'nebula.ospackage'
 
-version = 0.5
+version = '0.5.1'
 
 repositories {
     mavenCentral()
@@ -13,7 +18,7 @@ repositories {
 
 dependencies {
     compile 'org.codehaus.groovy:groovy-all:2.4.12'
-    compile 'com.spectralogic.ds3:ds3-sdk:3.4.0'
+    compile 'com.spectralogic.ds3:ds3-sdk:3.5.4'
     compile 'ch.qos.logback:logback-core:1.2.3'
     compile 'ch.qos.logback:logback-classic:1.2.3'
     compile 'jline:jline:2.14.5'
@@ -31,7 +36,7 @@ task createProperties(dependsOn: processResources) {
     doLast {
         new File("$buildDir/resources/main/version.properties").withWriter { w ->
             Properties p = new Properties()
-            p['version'] = project.version.toString()
+            p['version'] = project.version
             p.store w, null
         }
     }
@@ -42,3 +47,30 @@ classes {
 }
 
 mainClassName = 'com.spectralogic.dsl.Tool'
+
+//ospackage {
+//    packageName = "bpsh"
+//    version = "${project.version}"
+//    release = "1"
+//
+//    os = LINUX
+//    type = BINARY
+////    arch = NOARCH
+//
+//    into "/opt/local/bpsh"
+////    user "bpsh"
+////    permissionGroup "bpsh"
+//
+//    /* copy files and remove project version */
+//    from(jar.outputs.files) {
+//        rename { String fileName ->
+//            fileName.replace("-${project.version}", "")
+//        }
+//        fileMode 0500
+//        into "bin"
+//    }
+//}
+
+//buildDeb {
+//    requires('openjdk-8-jre')
+//}

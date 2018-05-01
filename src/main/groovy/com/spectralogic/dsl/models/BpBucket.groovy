@@ -119,7 +119,9 @@ class BpBucket {
         dirs.each { dir ->
             def objIterator = helper.listObjectsForDirectory(dir).iterator()
             while (objIterator) {
-                def objs = objIterator.take(Globals.MAX_BULK_LOAD).collect()
+                def objs = objIterator.take(Globals.MAX_BULK_LOAD).findAll { obj ->
+                    !Files.isDirectory(Paths.get(dir.toString(), obj.name))
+                }
 
                 def job = helper.startWriteJob(name, helper.addPrefixToDs3ObjectsList(objs, remoteDir))
                 job.transfer(new PrefixAdderObjectChannelBuilder(new FileObjectPutter(dir), remoteDir))
@@ -150,12 +152,13 @@ class BpBucket {
         while (nameIterator) {
             def objectNamesIter = new IteratorWrapper<String>(nameIterator.take(Globals.MAX_BULK_LOAD))
             FluentIterable<String> ds3Objects = FluentIterable.from(objectNamesIter)
+            // TODO: try to find a way to make this iterable
             def readJob = this.helper.startReadJob(this.name, ds3Objects.transform(new Function<String, Ds3Object>() {
                 @Override
                 Ds3Object apply(@Nullable String name) {
                     return new Ds3Object(name)
                 }
-            }))
+            }).toList())
 
             readJob.transfer(new FileObjectGetter(destinationPath))
         }
