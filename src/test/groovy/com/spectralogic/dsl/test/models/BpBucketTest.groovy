@@ -119,7 +119,7 @@ class BpBucketTest extends GroovyTestCase {
 
         try {
             bucket.putBulk("$homePath/test-data/dir3/", "remote/")
-            bucket.getBulk(["remote/txt6.txt", "remote/subdir/txt7.txt"], tmpPath)
+            bucket.getBulk(["remote/"], tmpPath)
             def file = new File("${tmpPath}remote/txt6.txt")
             assert file.exists()
             file = new File("${tmpPath}remote/subdir/txt7.txt")

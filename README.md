@@ -90,9 +90,11 @@ assert client == bucket.client
 assert 'test_bucket' == bucket.name
 assert client.buckets() == ['test_bucket']
  
-bucket.putBulk('/path/to/example.txt')
-bucket.getAllObjects().collect()
-bucket.getBulk(['example.txt'], "./downloads/")
+bucket.putBulk('/path/to/example.txt', 'remoteDir/')
+bucket.getAllObjects().collect() // list all objects in bucket
+bucket.getBulk(['remoteDir/example.txt'], "./downloads/")
+// or get by directory
+bucket.getBulk(['remoteDir/'], "./downloads/")
 bucket.deleteAllObjects()
 assert 0 == bucket.size
 

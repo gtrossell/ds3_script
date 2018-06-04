@@ -18,6 +18,7 @@ import com.spectralogic.dsl.utils.IteratorWrapper
 
 import javax.annotation.Nullable
 import java.nio.file.Files
+import java.nio.file.Path
 import java.nio.file.Paths
 
 /** Represents a BlackPearl getBucket */
@@ -133,8 +134,24 @@ class BpBucket {
         putBulk([pathStr], remoteDir)
     }
 
+    /* raw get bulk method logic */
+    private getJob(Iterator<String> iterator, Path destinationPath) {
+        def objectNamesIter = new IteratorWrapper<String>(iterator)
+        FluentIterable<String> ds3Objects = FluentIterable.from(objectNamesIter)
+
+        def readJob = this.helper.startReadJob(this.name, ds3Objects.transform(new Function<String, Ds3Object>() {
+            @Override
+            Ds3Object apply(@Nullable String name) {
+                return new Ds3Object(name)
+            }
+        }).toList())
+
+        readJob.transfer(new FileObjectGetter(destinationPath))
+    }
+
     /**
-     * Writes objects to specified directory
+     * Writes objects to specified directory. Remote directories are specified by a trailing '/' on the object name.
+     * Each object within that directory will be retrieved.
      * @param objectNames names of the objects to get
      * @param destinationPathStr directory to write to
      */
@@ -147,20 +164,36 @@ class BpBucket {
             Files.createDirectory(destinationPath)
         }
 
-        /* Read objects, Globals.MAX_BULK_LOAD at a time */
+        /* Read objects, Globals.MAX_BULK_LOAD at a time. If directory is encountered, save directories for later */
         def nameIterator = objectNames.iterator()
+        def directoryList = []
         while (nameIterator) {
-            def objectNamesIter = new IteratorWrapper<String>(nameIterator.take(Globals.MAX_BULK_LOAD))
-            FluentIterable<String> ds3Objects = FluentIterable.from(objectNamesIter)
-            // TODO: try to find a way to make this iterable
-            def readJob = this.helper.startReadJob(this.name, ds3Objects.transform(new Function<String, Ds3Object>() {
-                @Override
-                Ds3Object apply(@Nullable String name) {
-                    return new Ds3Object(name)
-                }
-            }).toList())
+            Map<Boolean,List<String>> batch = nameIterator.take(Globals.MAX_BULK_LOAD).collect().groupBy { String obj ->
+                obj.endsWith('/')
+            }
 
-            readJob.transfer(new FileObjectGetter(destinationPath))
+            if (batch[true]) directoryList.addAll(batch[true])
+            if (batch[false]) this.getJob(batch[false].iterator(), destinationPath)
+        }
+
+        /* Search directory contents recursively */
+        def searchDir
+        searchDir = { String dir ->
+            if (!dir) return []
+
+            def dirList = this.helper.remoteListDirectory(this.name, dir)
+            def dirs = dirList.findAll { it.isPrefix() }.collect { it.name }
+            def files = dirList.findAll { it.isContents() }.collect { it.name }
+            while (dirs) {
+                files.addAll(searchDir(dirs.pop()))
+            }
+
+            return files
+        }
+
+        Iterator<String> dirObjects = directoryList.collect { searchDir(it) }.flatten().iterator()
+        while (dirObjects) {
+            this.getJob(dirObjects.take(Globals.MAX_BULK_LOAD), destinationPath)
         }
     }
 
