@@ -1,12 +1,7 @@
-//plugins {
-//    id "nebula.ospackage" version "4.8.0"
-//}
-
 apply plugin: 'groovy'
 apply plugin: 'application'
-//apply plugin: 'nebula.ospackage'
 
-version = '0.5.1'
+version = '0.5.2'
 
 repositories {
     mavenCentral()
@@ -47,30 +42,3 @@ classes {
 }
 
 mainClassName = 'com.spectralogic.dsl.Tool'
-
-//ospackage {
-//    packageName = "bpsh"
-//    version = "${project.version}"
-//    release = "1"
-//
-//    os = LINUX
-//    type = BINARY
-////    arch = NOARCH
-//
-//    into "/opt/local/bpsh"
-////    user "bpsh"
-////    permissionGroup "bpsh"
-//
-//    /* copy files and remove project version */
-//    from(jar.outputs.files) {
-//        rename { String fileName ->
-//            fileName.replace("-${project.version}", "")
-//        }
-//        fileMode 0500
-//        into "bin"
-//    }
-//}
-
-//buildDeb {
-//    requires('openjdk-8-jre')
-//}
