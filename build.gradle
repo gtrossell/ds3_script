@@ -1,9 +1,15 @@
+plugins {
+    id "nebula.ospackage" version "4.8.0"
+}
+
 apply plugin: 'groovy'
 apply plugin: 'application'
+apply plugin: 'nebula.deb'
 
 version = '0.5.3'
 
 repositories {
+    jcenter()
     mavenCentral()
     mavenLocal()
     maven {
@@ -44,3 +50,22 @@ classes {
 }
 
 mainClassName = 'com.spectralogic.dsl.Tool'
+
+ospackage {
+    packageName = 'bpsh'
+    version = "${project.version}"
+    release = '1'
+    os = LINUX
+
+    from("build/distributions/bpsh-${project.version}.tar") {
+        into '/opt/bpsh'
+    }
+    postInstall("tar xf /opt/bpsh/bpsh-${project.version}.tar -C /opt/bpsh/")
+    postInstall("ln -s  /opt/bpsh/bpsh-${project.version}/bin/bpsh /sbin/bpsh")
+    preUninstall('unlink /sbin/bpsh')
+    preUninstall('rm -rf /opt/bpsh/*')
+}
+
+buildDeb {
+    requires('openjdk-8-jre')
+}
