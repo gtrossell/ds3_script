@@ -69,3 +69,7 @@ ospackage {
 buildDeb {
     requires('openjdk-8-jre')
 }
+
+buildRpm {
+    requires('java-1.8.0-openjdk')
+}
