@@ -9,8 +9,6 @@ import java.lang.reflect.Modifier
 /**
  * JLine Auto completer for the DSL shell
  * Currently is able to parse methods, variables, parameters, and method parameter classes
- *
- * TODO: autocomplete groovy collections
  */
 class DslCompleter implements Completer {
     private final GroovyShell shell

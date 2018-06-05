@@ -77,7 +77,9 @@ class DslCompleterTest extends GroovyTestCase {
 
     @Test
     void testFindMatchingGlobals() {
-        def shell = [context: ["testVar": "test", "test2Var": "test"]] as GroovyShell
+        def shell = [context: new Binding()] as GroovyShell
+        shell.context = new Binding(["testVar": "test", "test2Var": "test"])
+
         def completer = new DslCompleter(shell)
 
         def match = ["testVar": String.class]
@@ -108,7 +110,9 @@ class DslCompleterTest extends GroovyTestCase {
         def bucketName = 'test_bucket_' + (new Random().nextInt(10**4))
         def bucket = client.createBucket(bucketName)
 
-        def shell = [context: ["testVar": "test", "getBucket": bucket, "testList": [1,2,3]]] as GroovyShell
+        def shell = [context: new Binding()] as GroovyShell
+        shell.context = new Binding(["testVar": "test", "getBucket": bucket, "testList": [1,2,3]])
+
         def completer = new DslCompleter(shell)
         def candidates = []
         def r
