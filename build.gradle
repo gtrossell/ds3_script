@@ -58,12 +58,12 @@ ospackage {
     os = LINUX
 
     from("build/distributions/bpsh-${project.version}.tar") {
-        into '/opt/bpsh'
+        into "/opt/bpsh-${project.version}"
     }
-    postInstall("tar xf /opt/bpsh/bpsh-${project.version}.tar -C /opt/bpsh/")
-    postInstall("ln -s  /opt/bpsh/bpsh-${project.version}/bin/bpsh /sbin/bpsh")
+    postInstall("tar xf /opt/bpsh-${project.version}/bpsh-${project.version}.tar -C /opt/bpsh-${project.version}/")
+    postInstall("ln -s  /opt/bpsh-${project.version}/bpsh-${project.version}/bin/bpsh /sbin/bpsh")
     preUninstall('unlink /sbin/bpsh')
-    preUninstall('rm -rf /opt/bpsh/*')
+    preUninstall("rm -rf /opt/bpsh-${project.version}/*")
 }
 
 buildDeb {
