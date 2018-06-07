@@ -19,6 +19,7 @@ class RecordCommand implements ShellCommand {
     private String scriptDesc
     private Boolean isRecording
     private Boolean isRecordEnv
+    private Boolean overwrite
     private ConsoleReader console
 
     RecordCommand(Environment environment, console) {
@@ -31,6 +32,7 @@ class RecordCommand implements ShellCommand {
         cli.e('save environment in script', longOpt: 'environment')
         cli.d('script description', longOpt: 'desc', args: 1, argName: 'description')
         cli.h('display this message', longOpt: 'help')
+        cli.o('overwrite script with the same name', longOpt: 'overwrite')
     }
 
     @Override
@@ -71,6 +73,7 @@ class RecordCommand implements ShellCommand {
         this.scriptFile = null
         this.isRecording = false
         this.isRecordEnv = false
+        this.overwrite = false
 
         def scriptDir = Paths.get(Globals.SCRIPT_DIR)
         if (!Files.exists(scriptDir)) Files.createDirectory(scriptDir)
@@ -147,6 +150,10 @@ class RecordCommand implements ShellCommand {
             return response.addInfo(stringWriter.toString())
         }
 
+        if (options.o) {
+            this.overwrite = true
+        }
+
         if (options.arguments()) {
             def file = new CommandHelper().getScriptFromString(options.arguments()[0])
             file = ensureExtension(file)
@@ -168,12 +175,13 @@ class RecordCommand implements ShellCommand {
         if (options.e) {
             this.isRecordEnv = true
         }
+
         return response
     }
 
     /** @return Error message if there is something wrong with the file location  */
     private CommandResponse errorCheckFile(Path file, CommandResponse response) {
-        if (Files.exists(file)) {
+        if (!overwrite && Files.exists(file)) {
             return response.addError("The file $file already exists!")
         } else if (!Files.exists(file.parent)) {
             return response.addError("The directory ${file.getParent()} does not exist!")
