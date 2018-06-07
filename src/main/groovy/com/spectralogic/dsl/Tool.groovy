@@ -7,6 +7,7 @@ import com.spectralogic.dsl.helpers.DslCompleter
 import com.spectralogic.dsl.helpers.Globals
 import com.spectralogic.dsl.helpers.LogRecorder
 import com.spectralogic.ds3client.utils.Guard
+import com.spectralogic.dsl.helpers.MultilineShellHelper
 import jline.console.ConsoleReader
 import jline.console.UserInterruptException
 import org.codehaus.groovy.runtime.InvokerHelper
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory
 class Tool extends Script {
     private final static ConsoleReader console = new ConsoleReader()
     private final static Logger LOG = LoggerFactory.getLogger(Tool.class)
+    private static MultilineShellHelper multiline = new MultilineShellHelper()
 
     static void main(String[] args) {
         InvokerHelper.runScript(Tool, args)
@@ -112,8 +114,10 @@ class Tool extends Script {
     }
 
     private printResult(String text) {
-        LOG.info(Globals.RETURN_PROMPT + text)
-        console.println(Globals.RETURN_PROMPT + text)
+        if (!multiline.isMultiline()) {
+            LOG.info(Globals.RETURN_PROMPT + text)
+            console.println(Globals.RETURN_PROMPT + text)
+        }
     }
 
     private setupLogger(logDir) {
@@ -130,7 +134,11 @@ class Tool extends Script {
 
     /** Logic for parsing and evaluating a line */
     private static String evaluate(shell, line, commandFactory) {
-        if (Guard.isStringNullOrEmpty(line)) return ''
+        if (Guard.isStringNullOrEmpty(line)) {
+            multiline.reset()
+            LOG.info("Aborting multiline expression")
+            return ''
+        }
 
         if (line.startsWith(':')) {
             /* command */
@@ -138,6 +146,15 @@ class Tool extends Script {
             def command = args[0]
             args = 1 < args.size() ? args[1..-1] : []
             return commandFactory.runCommand(command, args).getMessage()
+        } else if (multiline.isMultiline()) {
+            multiline.addLine(line)
+            if (multiline.isComplete()) {
+                return shell.evaluate(multiline.getExpression())
+            }
+            return ''
+        } else if (multiline.startMultiline(line)) {
+            multiline.addLine(line)
+            return ''
         } else {
             /* shell evaluation */
             return shell.evaluate(line)
