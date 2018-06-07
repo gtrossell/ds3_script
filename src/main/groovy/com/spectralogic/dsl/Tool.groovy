@@ -28,7 +28,7 @@ class Tool extends Script {
             Globals.saveHistory(console.history)
             LOG.info(Globals.getString('exit_message'))
         }
-        
+
         InvokerHelper.runScript(Tool, args)
     }
 
@@ -99,14 +99,37 @@ class Tool extends Script {
         /* Run script passed in */
         def arguments = options.arguments()
         if (arguments.size() > 0) {
-            if (!arguments[0].endsWith('.groovy')) arguments[0] += '.groovy'
+            def scriptName = arguments[0]
+            if (!scriptName.endsWith('.groovy')) scriptName += '.groovy'
+
+            LOG.info("Running script $scriptName")
+
             def scriptArgs = arguments.size() > 1 ? arguments[1..-1] : []
 
+            def stringWriter = new StringWriter()
+            shell.context.setProperty('out', new PrintWriter(stringWriter))
+
+            def logOutput = { output -> LOG.info("Script output:\n$output") }
+
             try {
-                def file = new File(arguments[0])
-                shell.run(file, scriptArgs)
-            } catch (FileNotFoundException e) {
+                def file = new File(scriptName)
+                shell.setVariable('args', scriptArgs)
+                shell.evaluate(file)
+
+                println stringWriter.toString()
+                logOutput(stringWriter.toString())
+            } catch (Throwable e) {
+                println stringWriter.toString()
                 println e
+
+                logOutput(stringWriter.toString())
+                LOG.error(e.message)
+
+                if (Globals.debug) {
+                    def stackTrace = e.stackTrace.join('\n')
+                    println stackTrace
+                    LOG.error(stackTrace)
+                }
             } finally {
                 exit()
             }
