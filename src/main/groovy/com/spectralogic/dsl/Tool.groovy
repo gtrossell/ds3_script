@@ -136,7 +136,6 @@ class Tool extends Script {
     private static String evaluate(shell, line, commandFactory) {
         if (Guard.isStringNullOrEmpty(line)) {
             multiline.reset()
-            LOG.info("Aborting multiline expression")
             return ''
         }
 
