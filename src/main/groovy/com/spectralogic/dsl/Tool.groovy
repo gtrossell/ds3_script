@@ -146,14 +146,11 @@ class Tool extends Script {
             def command = args[0]
             args = 1 < args.size() ? args[1..-1] : []
             return commandFactory.runCommand(command, args).getMessage()
-        } else if (multiline.isMultiline()) {
+        } else if (multiline.isMultiline() || multiline.startMultiline(line)) {
             multiline.addLine(line)
             if (multiline.isComplete()) {
                 return shell.evaluate(multiline.getExpression())
             }
-            return ''
-        } else if (multiline.startMultiline(line)) {
-            multiline.addLine(line)
             return ''
         } else {
             /* shell evaluation */
