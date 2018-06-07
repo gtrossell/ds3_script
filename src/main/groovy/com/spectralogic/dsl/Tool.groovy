@@ -24,6 +24,11 @@ class Tool extends Script {
     private static MultilineShellHelper multiline = new MultilineShellHelper()
 
     static void main(String[] args) {
+        System.addShutdownHook {
+            Globals.saveHistory(console.history)
+            LOG.info(Globals.getString('exit_message'))
+        }
+        
         InvokerHelper.runScript(Tool, args)
     }
 
@@ -44,11 +49,6 @@ class Tool extends Script {
 
         def exceptionHandler = new ExceptionHandler(console)
         exceptionHandler.addHandler((UserInterruptException.class), { exit() })
-
-        System.addShutdownHook {
-            Globals.saveHistory(console.history)
-            LOG.info(Globals.getString('exit_message'))
-        }
 
         while (true) {
             try {
