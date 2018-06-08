@@ -6,7 +6,7 @@ apply plugin: 'groovy'
 apply plugin: 'application'
 apply plugin: 'nebula.deb'
 
-version = '0.5.3'
+version = '3.5.0'
 
 repositories {
     jcenter()
