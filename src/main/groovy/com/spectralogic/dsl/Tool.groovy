@@ -158,7 +158,9 @@ class Tool extends Script {
     /** Logic for parsing and evaluating a line */
     private static String evaluate(shell, line, commandFactory) {
         if (Guard.isStringNullOrEmpty(line)) {
-            multiline.reset()
+            if (multiline.isMultiline()) {
+                return shell.evaluate(multiline.getExpression())
+            }
             return ''
         }
 
