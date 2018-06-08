@@ -18,6 +18,10 @@ repositories {
 }
 
 dependencies {
+    /* For Java 9 & 10 support */
+    compile 'javax.xml.bind:jaxb-api:2.2.8'
+    testCompile 'javax.xml.bind:jaxb-api:2.2.8'
+
     compile 'org.codehaus.groovy:groovy-all:2.5.0'
     compile 'org.codehaus.groovy:groovy-cli-commons:2.5.0'
     compile 'com.spectralogic.ds3:ds3-sdk:3.5.4'
