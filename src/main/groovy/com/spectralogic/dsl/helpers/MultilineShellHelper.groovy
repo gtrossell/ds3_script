@@ -66,6 +66,12 @@ class MultilineShellHelper {
                 case '}':
                     update['brackets'] -= 1
                     break
+                case '[':
+                    update['square'] += 1
+                    break
+                case ']':
+                    update['square'] -= 1
+                    break
             }
         }
 
@@ -73,7 +79,7 @@ class MultilineShellHelper {
     }
 
     private emptyStack() {
-        return ['parenthesis': 0, 'brackets': 0]
+        return ['parenthesis': 0, 'brackets': 0, 'square': 0]
     }
 
     def reset() {
