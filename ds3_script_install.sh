@@ -1,3 +1,5 @@
+echo "Installing ds3_script for you"
+
 cd ~
 
 sudo apt-get update 
@@ -11,3 +13,4 @@ git clone https://github.com/SpectraLogic/ds3_script.git
 cd ds3_script
 ./gradlew build -x test
 unzip build/distributions/*.zip -d ~/
+echo "ds3_script now installed!"
