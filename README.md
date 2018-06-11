@@ -1,15 +1,24 @@
 ds3_script
 ==========
 
-ds3_script is a tool for creating and running scripts using its custom DSL. The DSL is based off of
-the [Groovy Language](http://groovy-lang.org/), but implements many custom functions to make writing 
-scripts for the BlackPearl easy. The tool also provides a shell that features autocompletion and
-script management.
+DS3 Script is a JVM scripting language for interfacing with the BlackPearl and is run using the bpsh executable. The DSL 
+is based on the [Groovy Language](http://groovy-lang.org/), but implements many custom objects and functions to make 
+writing scripts for the BlackPearl easy. It's recommended to get comfortable with Groovy's 
+[syntax & features](http://groovy-lang.org/syntax.html) first, but note that bpsh does not ask the user to use 
+`def` to define new variables. bpsh also provides a shell that features autocompletion, debugging, logging,
+and script management.
 
 Releases
--------
-There are no current releases with installers, but 
-[here](https://github.com/SpectraLogic/ds3_script/blob/master/BUILD.md) is the guide to building it manually.
+--------
+Official release binaries are hosted on Github. Please add an issue to the issue tracker to report bugs.
+
+[Releases](https://github.com/SpectraLogic/ds3_script/releases)
+
+[Install instructions](https://github.com/SpectraLogic/ds3_script/blob/master/INSTALL.md)
+
+[Build instructions](https://github.com/SpectraLogic/ds3_script/blob/master/BUILD.md)
+
+[Issue tracker](https://github.com/SpectraLogic/ds3_script/issues)
 
 Shell
 -----
@@ -25,19 +34,19 @@ Shell
 `$ bpsh script` will run the `script.groovy` script without opening the shell.
 
 ### Internal Commands
-Use `:help` to view all of the commands that can be used inside the shell and ```<command> -h``` to see a specific 
+Use `:help` (`:h`) to view all of the commands that can be used inside the shell and ```<command> -h``` to see a specific 
 command's help page.
 
-`:clear` clears the screen of previous lines.
+`:clear` (`:c`) clears the screen of previous lines.
 
-`:quit` exits the command window, equivalent to `Ctrl-C`.
+`:quit` (`:q`) exits the command window, equivalent to `Ctrl-C`.
 
-`:record` records the current shell session to  a script file to be used for later. If an exception is thrown during
+`:record` (`:r`) records the current shell session to  a script file to be used for later. If an exception is thrown during
 the recording, that line is not recorded. *this may change in the future. 
 
-`:execute` executes, lists, and deletes scripts.
+`:execute` (`:e`) executes, lists, and deletes scripts.
 
-`:log` sets the log directory and enables/disables logging .
+`:log` (`:l`) sets the log directory and enables/disables logging .
 
 Example:
 
@@ -53,6 +62,7 @@ Example:
 
 ### Shortcuts
 You can use tab completion to view available variables, fields, methods, and method parameters. 
+
 `Esc-Backspace` will delete the current character set. 
 
 `Ctrl-C` will safely exit the shell. 
@@ -64,12 +74,12 @@ uses the DSL and then run it using the `bpsh` command (ex: `$ bpsh CreateBucket.
 [samples directory](https://github.com/SpectraLogic/ds3_script/tree/master/samples) for script examples.
 
 ### Default variables
-Two variables, 'client' and 'environment', are already created and initialized 
+Two variables, `client` and `environment`, are already created and initialized 
 if your environment variables are set. [Variables to set.](https://github.com/SpectraLogic/ds3_java_cli#user-content-usage)
 
-* client -> BpClient object that represents the client created from environment
+* `client` -> BpClient object that represents the client created from environment
 variables
-* environment -> Environment object that represents set environment variables
+* `environment` -> Environment object that represents set environment variables for endpoint, access key, and secret key
 
 #### Clients
 ```groovy
