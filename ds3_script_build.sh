@@ -13,4 +13,4 @@ git clone https://github.com/SpectraLogic/ds3_script.git
 cd ds3_script
 ./gradlew build -x test
 unzip build/distributions/*.zip -d ~/
-echo "ds3_script now installed!"
+echo "ds3_script now built and ready for you to use!"
