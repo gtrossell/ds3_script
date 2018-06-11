@@ -1,8 +1,9 @@
 # Building bpsh
 
 To build bpsh (the ds3_script shell), you will need to have 
-[Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) installed. Once Java 8 is installed, you 
-can use [git](https://git-scm.com/) to download the source or download the source zip from Github.
+[Java 8](http://www.oracle.com/technetwork/java/javase/downloads/index.html) or higher installed 
+(Java 8 is recommended). Once Java 8+ is installed, you can use [git](https://git-scm.com/) to download the source or 
+download the source zip from Github.
 
 Once the source code is copied to your local system, cd into the root directory. To build bpsh run the command 
 `./gradlew build -x test` from the command line for Unix systems. On Windows the command is `gradlew.bat build -x test`.
