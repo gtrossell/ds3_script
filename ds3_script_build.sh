@@ -1,4 +1,4 @@
-echo "Installing ds3_script for you"
+echo "Building ds3_script for you"
 
 cd ~
 
