@@ -1,5 +1,5 @@
 /**********************************/
-/* test                           */
+/* Sync                           */
 /*--------------------------------*/
 /* Spectra BlackPearl DSL script  */
 /*                                */
@@ -45,7 +45,6 @@ public void readFromFile ()
 /* ------  MAIN ------ */
 def bucketContent = []
 def listFiles
-
 
         bucketContent = bucket('test_bucket')
         //println bucketContent //debug
